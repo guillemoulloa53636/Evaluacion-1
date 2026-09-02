@@ -3,16 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Menu</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    
-</body>
-<nav class="navbar navbar-expand-lg navbar-dark border-bottom py-3" style="background-color: #0a2540;">
+    <nav class="navbar navbar-expand-lg navbar-dark border-bottom py-3" style="background-color: #0a2540;">
         <div class="container-fluid px-4">
             
             <a class="navbar-brand d-flex align-items-center fw-bold" href="#">
@@ -28,16 +26,25 @@
             <div class="collapse navbar-collapse" id="menuNavegacion">
                 <ul class="navbar-nav ms-auto d-flex align-items-center gap-3">
 
-                    <li class="nav-item">
-                        <a class="btn btn-turquesa rounded-1 px-3 fw-semibold" href="#">
-                            <i class="bi bi-headset me-1"></i> Servicio al cliente
-                        </a>
-                    </li>
 
                     <li class="nav-item d-flex align-items-center gap-2">
                         <i class="bi bi-person-circle fs-2 text-secondary"></i>
-                        <a class="btn btn-turquesa rounded-1 px-3 fw-semibold" href="#">
+                        <img src="Img/cropped_circle_image.png" alt="Icono usuario" width="70" height="70" >
+                        <a class="btn btn-turquesa rounded-1 px-3 fw-semibold text-white" href="cuenta.html">
                             Mi cuenta
+                        </a>
+                    </li>
+
+                     <li class="nav-item d-flex align-items-center gap-2">
+                        <i class="bi bi-person-circle fs-2 text-secondary"></i>
+                        <a class="btn btn-turquesa rounded-1 px-3 fw-semibold text-white" href="registro.html">
+                            Registrarse
+                        </a>
+                    </li>
+
+                     <li class="nav-item">
+                        <a class="btn btn-turquesa rounded-1 px-3 fw-semibold text-white " href="servicio.html">
+                            <i class="bi bi-headset me-1"></i> Servicio al cliente
                         </a>
                     </li>
 
@@ -57,9 +64,267 @@
             </div>
         </div>
     </nav>
+
+    
     <div class = "container mt-5 text-center">
 
 <h2>¡Asegura el mejor asiento para tu próximo viaje! Tu compra de pasajes online, rápida y sin complicaciones.</h2>
 
     </div>
+<section class="hero-search py-5" style="background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('Img/bus-banner.jpg') center/cover no-repeat; min-height: 380px;">
+        <div class="container py-4">
+            <form action="#" method="GET">
+                <div class="row g-2 align-items-end bg-dark bg-opacity-50 p-3 rounded-3 shadow">
+                    
+                    <!-- Origen -->
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label fw-semibold text-white mb-1 small">¿De dónde partes?</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">🇨🇱</span>
+                            <input type="text" class="form-control border-start-0" placeholder="Origen" required>
+                        </div>
+                    </div>
+
+                    <!-- Destino -->
+                    <div class="col-lg-3 col-md-6">
+                        <label class="form-label fw-semibold text-white mb-1 small">¿A dónde quieres ir?</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">🇨🇱</span>
+                            <input type="text" class="form-control border-start-0" placeholder="Destino" required>
+                        </div>
+                    </div>
+
+                    <!-- Fecha Ida -->
+                    <div class="col-lg-2 col-md-6">
+                        <label class="form-label fw-semibold text-white mb-1 small">Ida</label>
+                        <input type="date" class="form-control" required>
+                    </div>
+
+                    <!-- Fecha Vuelta -->
+                    <div class="col-lg-2 col-md-6">
+                        <label class="form-label fw-semibold text-white mb-1 small">Vuelta (opcional)</label>
+                        <input type="date" class="form-control">
+                    </div>
+
+                    <!-- Botón Buscar -->
+                    <div class="col-lg-2 col-md-12">
+                        <button type="submit" class="btn btn-turquesa w-100 fw-bold text-uppercase py-2v text-white">
+                            Buscar
+                        </button>
+                    </div>
+
+                    <!-- Opción Booking -->
+                    <div class="col-12 mt-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="bookingCheck" checked>
+                            <label class="form-check-label text-white fw-bold small" for="bookingCheck">
+                                Busca alojamiento con Booking.com
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <div class = "container mt-5 text-center" >
+<h2>Nuestros principales tours</h2>
+    </div>
+<div class="container my-5">
+    
+
+    <div id="carruselRutas" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            
+            <div class="carousel-item active">
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-5 g-3">
+                    
+                    <div class="col">
+                        <div class="card h-100 border text-center">
+                            <img src="Img/Aero.jpg" class="card-img-top" alt="Aeropuerto" style="height: 140px; object-fit: cover;">
+                            <div class="card-body p-2 d-flex flex-column justify-content-between">
+                                <p class="card-text small text-muted mb-2">Desde el aeropuerto internacional a todos los terminales de Buses en Santiago, Centro y Providencia</p>
+                                <p class="text-turquesa fw-bold small mb-0">desde $ 2.200</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="card h-100 border text-center">
+                            <img src="Img/Mont.jpg" class="card-img-top" alt="Puerto Montt" style="height: 140px; object-fit: cover;">
+                            <div class="card-body p-2">
+                                <p class="text-muted small mb-1">Santiago a Puerto Montt</p>
+                                <p class="text-turquesa fw-bold small">desde $ 15.000</p>
+                                <hr class="my-1">
+                                <p class="text-muted small mb-1">Puerto Montt a Santiago</p>
+                                <p class="text-turquesa fw-bold small mb-0">desde $ 21.200</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="card h-100 border text-center">
+                            <img src="Img/Gran_Concepcion.jpg" class="card-img-top" alt="Concepción" style="height: 140px; object-fit: cover;">
+                            <div class="card-body p-2">
+                                <p class="text-muted small mb-1">Santiago a Concepción</p>
+                                <p class="text-turquesa fw-bold small">desde $ 14.700</p>
+                                <hr class="my-1">
+                                <p class="text-muted small mb-1">Concepción a Santiago</p>
+                                <p class="text-turquesa fw-bold small mb-0">desde $ 14.700</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="card h-100 border text-center">
+                            <img src="Img/Temuco.jpg" class="card-img-top" alt="Temuco" style="height: 140px; object-fit: cover;">
+                            <div class="card-body p-2">
+                                <p class="text-muted small mb-1">Santiago a Temuco</p>
+                                <p class="text-turquesa fw-bold small">desde $ 9.700</p>
+                                <hr class="my-1">
+                                <p class="text-muted small mb-1">Temuco a Santiago</p>
+                                <p class="text-turquesa fw-bold small mb-0">desde $ 9.900</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="card h-100 border text-center">
+                            <img src="Img/Valdi.JPG" class="card-img-top" alt="Valdivia" style="height: 140px; object-fit: cover;">
+                            <div class="card-body p-2">
+                                <p class="text-muted small mb-1">Santiago a Chiloe</p>
+                                <p class="text-turquesa fw-bold small">desde $ 12.500</p>
+                                <hr class="my-1">
+                                <p class="text-muted small mb-1">Chiloe a Santiago</p>
+                                <p class="text-turquesa fw-bold small mb-0">desde $ 12.500</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="carousel-item">
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-5 g-3">
+                    <div class="col">
+                        <div class="card h-100 border text-center">
+                            <img src="Img/Valpo.webp" class="card-img-top" alt="Valdivia" style="height: 140px; object-fit: cover;">
+                            <div class="card-body p-2">
+                                <p class="text-muted small mb-1">Santiago a valparaiso</p>
+                                <p class="text-turquesa fw-bold small">desde $ 12.500</p>
+                                <hr class="my-1">
+                                <p class="text-muted small mb-1">valparaiso a Santiago</p>
+                                <p class="text-turquesa fw-bold small mb-0">desde $ 12.500</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card h-100 border text-center">
+                            <img src="Img/quintero.jpg" class="card-img-top" alt="Valdivia" style="height: 140px; object-fit: cover;">
+                            <div class="card-body p-2">
+                                <p class="text-muted small mb-1">Santiago a Quintero</p>
+                                <p class="text-turquesa fw-bold small">desde $ 12.500</p>
+                                <hr class="my-1">
+                                <p class="text-muted small mb-1">Quintero a Santiago</p>
+                                <p class="text-turquesa fw-bold small mb-0">desde $ 12.500</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card h-100 border text-center">
+                            <img src="Img/Talca.jpg" class="card-img-top" alt="Valdivia" style="height: 140px; object-fit: cover;">
+                            <div class="card-body p-2">
+                                <p class="text-muted small mb-1">Santiago a Talca</p>
+                                <p class="text-turquesa fw-bold small">desde $ 12.500</p>
+                                <hr class="my-1">
+                                <p class="text-muted small mb-1">Talca a Santiago</p>
+                                <p class="text-turquesa fw-bold small mb-0">desde $ 12.500</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card h-100 border text-center">
+                            <img src="Img/Vinia.jpg" class="card-img-top" alt="Valdivia" style="height: 140px; object-fit: cover;">
+                            <div class="card-body p-2">
+                                <p class="text-muted small mb-1">Santiago a Viña</p>
+                                <p class="text-turquesa fw-bold small">desde $ 12.500</p>
+                                <hr class="my-1">
+                                <p class="text-muted small mb-1">Viña a Santiago</p>
+                                <p class="text-turquesa fw-bold small mb-0">desde $ 12.500</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card h-100 border text-center">
+                            <img src="Img/Pichilemu.jpg" class="card-img-top" alt="Valdivia" style="height: 140px; object-fit: cover;">
+                            <div class="card-body p-2">
+                                <p class="text-muted small mb-1">Santiago a Pichilemu</p>
+                                <p class="text-turquesa fw-bold small">desde $ 12.500</p>
+                                <hr class="my-1">
+                                <p class="text-muted small mb-1">Pichilemu a Santiago</p>
+                                <p class="text-turquesa fw-bold small mb-0">desde $ 12.500</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    </div>
+            </div>
+            <div class="carousel-item">
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-5 g-3 justify-content-center">
+                    <div class="col">
+                        <div class="card h-100 border text-center">
+                            <img src="Img/Serena.webp" class="card-img-top" alt="Valdivia" style="height: 140px; object-fit: cover;">
+                            <div class="card-body p-2">
+                                <p class="text-muted small mb-1">Santiago a La serena</p>
+                                <p class="text-turquesa fw-bold small">desde $ 12.500</p>
+                                <hr class="my-1">
+                                <p class="text-muted small mb-1">La serena a Santiago</p>
+                                <p class="text-turquesa fw-bold small mb-0">desde $ 12.500</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card h-100 border text-center">
+                            <img src="Img/Antofa.jpg" class="card-img-top" alt="Valdivia" style="height: 140px; object-fit: cover;">
+                            <div class="card-body p-2">
+                                <p class="text-muted small mb-1">Santiago a Antofagasta</p>
+                                <p class="text-turquesa fw-bold small">desde $ 12.500</p>
+                                <hr class="my-1">
+                                <p class="text-muted small mb-1">Antofagasta a Santiago</p>
+                                <p class="text-turquesa fw-bold small mb-0">desde $ 12.500</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card h-100 border text-center">
+                            <img src="Img/Arica.jpg" class="card-img-top" alt="Valdivia" style="height: 140px; object-fit: cover;">
+                            <div class="card-body p-2">
+                                <p class="text-muted small mb-1">Santiago a Arica</p>
+                                <p class="text-turquesa fw-bold small">desde $ 12.500</p>
+                                <hr class="my-1">
+                                <p class="text-muted small mb-1">Arica a Santiago</p>
+                                <p class="text-turquesa fw-bold small mb-0">desde $ 12.500</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    </div>
+            </div>
+           
+
+        </div>
+
+        <div class="carousel-indicators position-relative mt-4">
+            <button type="button" data-bs-target="#carruselRutas" data-bs-slide-to="0" class="active punto-indicador" aria-current="true" aria-label="Página 1"></button>
+            <button type="button" data-bs-target="#carruselRutas" data-bs-slide-to="1" class="punto-indicador" aria-label="Página 2"></button>
+            <button type="button" data-bs-target="#carruselRutas" data-bs-slide-to="2" class="punto-indicador" aria-label="Página 3"></button>
+            
+        </div>
+    </div>
+</div>
+</body>
+
 </html>

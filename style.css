@@ -5,3 +5,22 @@ body{
 h2{
     color: rgb(7, 38, 138);
 }
+
+a{
+    color: white;
+}
+
+.carousel-indicators .punto-indicador {
+    width: 10px !important;
+    height: 10px !important;
+    border-radius: 50% !important;
+    background-color: #adb5bd;
+    border: none;
+    margin: 0 4px;
+    opacity: 0.6;
+}
+
+.carousel-indicators .punto-indicador.active {
+    background-color: #6c757d;
+    opacity: 1;
+}
