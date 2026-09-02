@@ -68,5 +68,89 @@
         </div>
     </nav>
     
+<div class="container d-flex justify-content-center align-items-center py-5" style="min-height: 85vh;">
+    
+    <!-- Tarjeta de Registro -->
+    <div class="card shadow-lg p-4 rounded-4 border-0" style="width: 100%; max-width: 500px;">
+        
+        <!-- Cabecera del formulario -->
+        <div class="text-center mb-4">
+            <h3 class="fw-bold" style="color: #0a2540;">Registro de Usuario</h3>
+            <p class="text-muted small mb-0">Completa tus datos para crear una cuenta nueva</p>
+        </div>
+
+        <!-- Formulario -->
+        <form action="index.html">
+            <!-- Nombre Completo -->
+            <div class="mb-3">
+                <label for="nombre" class="form-label fw-semibold text-secondary">Nombre Completo</label>
+                <input type="text" class="form-control py-2" id="nombre" placeholder="Ej: Juan Pérez" required>
+            </div>
+
+            <!-- Correo -->
+            <div class="mb-3">
+                <label for="correo" class="form-label fw-semibold text-secondary">Correo Electrónico</label>
+                <input type="email" class="form-control py-2" id="correo" placeholder="ejemplo@correo.com" required>
+            </div>
+
+            <!-- Confirmar Correo -->
+            <div class="mb-3">
+                <label for="confirmarCorreo" class="form-label fw-semibold text-secondary">Confirmar Correo Electrónico</label>
+                <input type="email" class="form-control py-2" id="confirmarCorreo" placeholder="Repite tu correo electrónico" required>
+            </div>
+
+            <!-- Contraseña -->
+            <div class="mb-3">
+                <label for="password" class="form-label fw-semibold text-secondary">Contraseña</label>
+                <input type="password" class="form-control py-2" id="password" placeholder="Crea una contraseña segura" required>
+            </div>
+
+            <!-- Confirmar Contraseña -->
+            <div class="mb-3">
+                <label for="confirmarPassword" class="form-label fw-semibold text-secondary">Confirmar Contraseña</label>
+                <input type="password" class="form-control py-2" id="confirmarPassword" placeholder="Repite tu contraseña" required>
+            </div>
+
+            <!-- Teléfono -->
+            <div class="mb-3">
+                <label for="telefono" class="form-label fw-semibold text-secondary">Teléfono <span class="fw-normal text-muted">(opcional)</span></label>
+                <input type="tel" class="form-control py-2" id="telefono" placeholder="+56 9 1234 5678">
+            </div>
+
+            <!-- Región y Comuna en dos columnas -->
+            <div class="row g-2 mb-4">
+                <div class="col-12 col-md-6">
+                    <label for="region" class="form-label fw-semibold text-secondary">Región</label>
+                    <select class="form-select py-2" id="region" required>
+                        <option value="" selected disabled>-- Seleccione --</option>
+                        <option value="1">Región Metropolitana</option>
+                        <option value="2">Región de la Araucanía</option>
+                        <option value="3">Región de Ñuble</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="comuna" class="form-label fw-semibold text-secondary">Comuna</label>
+                    <select class="form-select py-2" id="comuna" required>
+                        <option value="" selected disabled>-- Seleccione --</option>
+                        <option value="1">Linares</option>
+                        <option value="2">Longaví</option>
+                        <option value="3">Concepción</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Botón Registrar -->
+            <button type="submit" class="btn w-100 fw-bold text-white py-2 mb-3 shadow-sm" style="background-color: #0a2540; border-radius: 8px;">
+                Crear Cuenta
+            </button>
+
+            <!-- Enlace a Iniciar Sesión -->
+            <div class="text-center mt-3">
+                <span class="text-muted small">¿Ya tienes una cuenta?</span>
+                <a href="login.html" class="text-decoration-none fw-bold" style="color: #cc1313;">Inicia sesión aquí</a>
+            </div>
+        </form>
+    </div>
+</div>
 </body>
 </html>
