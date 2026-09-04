@@ -124,7 +124,7 @@
                 <h4 class="fw-bold mb-4" style="color: #0a2540;">Productos / Viajes Relacionados</h4>
                 
                 <div id="carruselRelacionados" class="carousel slide" data-bs-ride="false">
-                    <div class="carousel-inner">
+                    <div class="carousel-inner" id="relacionadosLista">
 
                         <!-- Grupo 1 -->
                         <div class="carousel-item active">
@@ -285,23 +285,11 @@
         </div>
     </div>
 
+
     <!-- Scripts al final del body -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="main.js"></script>
-    <script src="js/productos.js"></script>
-    <script src="js/detalle.js"></script>
 
-    <script>
-    // Obtener los productos que guardó el Administrador
-    function cargarProductosCliente() {
-        const productos = JSON.parse(localStorage.getItem('productos_viajes')) || [];
-        
-        console.log("Productos cargados para el cliente:", productos);
-        
-        // Aquí puedes recorrer el arreglo 'productos' y pintarlos en tus Cards/Tarjetas
-    }
-
-    document.addEventListener('DOMContentLoaded', cargarProductosCliente);
-</script>
+    
 </body>
 </html>

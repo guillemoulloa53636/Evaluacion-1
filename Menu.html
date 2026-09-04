@@ -139,7 +139,7 @@
 
                     <div class="col">
                         <div class="card h-100 border text-center">
-                            <a href="Detalle.html">
+                            <a href="Detalle.html?prod=puertomontt">
                                 <img src="Img/Mont.jpg" class="card-img-top" alt="Puerto Montt" style="height: 140px; object-fit: cover;">
                             </a>
                             <div class="card-body p-2">
@@ -154,7 +154,7 @@
 
                     <div class="col">
                         <div class="card h-100 border text-center">
-                            <a href="Detalle.html">
+                            <a href="Detalle.html?prod=concepcion">
                                 <img src="Img/Gran_Concepcion.jpg" class="card-img-top" alt="Concepción" style="height: 140px; object-fit: cover;">
                             </a>
                             <div class="card-body p-2">
@@ -169,7 +169,7 @@
 
                     <div class="col">
                         <div class="card h-100 border text-center">
-                            <a href="Detalle.html">
+                            <a href="Detalle.html?prod=pucon">
                                 <img src="Img/Temuco.jpg" class="card-img-top" alt="Temuco" style="height: 140px; object-fit: cover;">
                             </a>
                             <div class="card-body p-2">
@@ -184,7 +184,7 @@
 
                     <div class="col">
                         <div class="card h-100 border text-center">
-                            <a href="Detalle.html">
+                            <a href="Detalle.html?prod=chiloe">
                                 <img src="Img/Valdi.JPG" class="card-img-top" alt="Valdivia" style="height: 140px; object-fit: cover;">
                             </a>
                             <div class="card-body p-2">
@@ -204,8 +204,8 @@
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-5 g-3">
                     <div class="col">
                         <div class="card h-100 border text-center">
-                            <a href="Detalle.html">
-                                <img src="Img/Valpo.webp" class="card-img-top" alt="Valdivia" style="height: 140px; object-fit: cover;">
+                            <a href="Detalle.html?prod=valparaiso">
+                                <img src="Img/Valpo.webp" class="card-img-top" alt="Valparaíso" style="height: 140px; object-fit: cover;">
                             </a>
                             <div class="card-body p-2">
                                 <p class="text-muted small mb-1">Santiago a valparaiso</p>
@@ -218,7 +218,7 @@
                     </div>
                     <div class="col">
                         <div class="card h-100 border text-center">
-                            <a href="Detalle.html">
+                            <a href="Detalle.html?prod=quintero">
                                 <img src="Img/quintero.jpg" class="card-img-top" alt="Valdivia" style="height: 140px; object-fit: cover;">
                             </a>
                             <div class="card-body p-2">
@@ -232,7 +232,7 @@
                     </div>
                     <div class="col">
                         <div class="card h-100 border text-center">
-                            <a href="Detalle.html">
+                            <a href="Detalle.html?prod=talca">
                                 <img src="Img/Talca.jpg" class="card-img-top" alt="Valdivia" style="height: 140px; object-fit: cover;">
                             </a>
                             <div class="card-body p-2">
@@ -246,7 +246,7 @@
                     </div>
                     <div class="col">
                         <div class="card h-100 border text-center">
-                           <a href="Detalle.html">
+                           <a href="Detalle.html?prod=vina">
                              <img src="Img/Vinia.jpg" class="card-img-top" alt="Valdivia" style="height: 140px; object-fit: cover;">
                            </a>
                             <div class="card-body p-2">
@@ -260,7 +260,7 @@
                     </div>
                     <div class="col">
                         <div class="card h-100 border text-center">
-                            <a href="Detalle.html">
+                            <a href="Detalle.html?prod=pichilemu">
                                 <img src="Img/Pichilemu.jpg" class="card-img-top" alt="Valdivia" style="height: 140px; object-fit: cover;">
                             </a>
                             <div class="card-body p-2">
@@ -279,7 +279,7 @@
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-5 g-3 justify-content-center">
                     <div class="col">
                         <div class="card h-100 border text-center">
-                            <a href="Detalle.html">
+                            <a href="Detalle.html?prod=laserena">
                                 <img src="Img/Serena.webp" class="card-img-top" alt="Valdivia" style="height: 140px; object-fit: cover;">
                             </a>
                             <div class="card-body p-2">
@@ -293,7 +293,7 @@
                     </div>
                     <div class="col">
                         <div class="card h-100 border text-center">
-                            <a href="Detalle.html">
+                            <a href="Detalle.html?prod=antofagasta">
                                 <img src="Img/Antofa.jpg" class="card-img-top" alt="Valdivia" style="height: 140px; object-fit: cover;">
                             </a>
                             <div class="card-body p-2">
@@ -307,7 +307,7 @@
                     </div>
                     <div class="col">
                         <div class="card h-100 border text-center">
-                            <a href="Detalle.html">
+                            <a href="Detalle.html?prod=arica">
                                 <img src="Img/Arica.jpg" class="card-img-top" alt="Valdivia" style="height: 140px; object-fit: cover;">
                             </a>
                             <div class="card-body p-2">
@@ -371,6 +371,19 @@
     </div>
 </div>
 
+<script>
+    document.querySelectorAll('.carousel-item .card').forEach(card => {
+        const enlaceDetalle = card.querySelector('a[href^="Detalle.html?prod="]');
+        if (!enlaceDetalle) return;
+
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', event => {
+            if (!event.target.closest('a')) {
+                window.location.href = enlaceDetalle.href;
+            }
+        });
+    });
+</script>
 </body>
 
 </html>
