@@ -336,6 +336,41 @@
         </div>
     </div>
 </div>
+
+<button class="btn btn-outline-light me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#panelAdmin" aria-controls="panelAdmin">
+    <i class="bi bi-sliders"></i> Panel
+</button>
+
+<div class="offcanvas offcanvas-start bg-dark text-white" tabindex="-1" id="panelAdmin" aria-labelledby="panelAdminLabel">
+    <div class="offcanvas-header border-bottom border-secondary">
+        <h5 class="offcanvas-title" id="panelAdminLabel">
+            <i class="bi bi-gear-fill me-2"></i> Opciones de Usuario
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body d-flex flex-column justify-content-between p-4">
+        <div>
+            <p class="text-muted small">Selecciona el modo de vista del sistema:</p>
+            
+            <a href="admin.html" class="btn btn-warning w-100 fw-bold py-2 mb-3 shadow">
+                <i class="bi bi-shield-lock-fill me-1"></i> Cambiar a modo administrador
+            </a>
+            
+            <hr class="border-secondary">
+
+            <ul class="list-unstyled">
+                <li class="mb-2"><a href="#" class="text-white text-decoration-none"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
+                <li class="mb-2"><a href="#" class="text-white text-decoration-none"><i class="bi bi-bus-front me-2"></i> Gestionar Buses</a></li>
+                <li class="mb-2"><a href="#" class="text-white text-decoration-none"><i class="bi bi-ticket-perforated me-2"></i> Pasajes Vendidos</a></li>
+            </ul>
+        </div>
+
+        <div class="text-center text-muted small">
+            <small>Viajes por Chile v1.0</small>
+        </div>
+    </div>
+</div>
+
 </body>
 
 </html>

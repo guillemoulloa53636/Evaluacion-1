@@ -24,3 +24,24 @@ a{
     background-color: #6c757d;
     opacity: 1;
 }
+
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.carousel-indicators .punto-indicador {
+    width: 10px !important;
+    height: 10px !important;
+    border-radius: 50% !important;
+    background-color: #adb5bd;
+    border: none;
+    margin: 0 4px;
+    opacity: 0.6;
+}

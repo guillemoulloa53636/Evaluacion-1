@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Viajes por Chile</title>
+    <!-- Bootstrap 5 CSS (Versión Estable 5.3.3) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <div class="d-flex min-vh-100">
+
+        <!-- BARRA LATERAL (SIDEBAR) -->
+        <aside class="bg-dark text-white p-3 d-flex flex-column justify-content-between col-md-3 col-lg-2 min-vh-100">
+            <div>
+                <!-- Logo Empresa -->
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none fw-bold pb-3 mb-3 border-bottom border-secondary">
+                    <img src="Img/Buses.png" alt="logo viajes por chile" width="40" height="40" class="me-2">
+                    <span class="fs-6">Viajes por chile<small class="text-secondary fs-6">.cl</small></span>
+                </a>
+
+                <!-- Navegación Superior -->
+                <ul class="nav nav-pills flex-column gap-1 mb-4" id="adminMenu">
+                    <li class="nav-item">
+                        <a href="#dashboard" class="nav-link text-white-50 d-flex align-items-center gap-2" data-bs-toggle="pill">
+                            <i class="bi bi-grid-fill"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                       <a href="javascript:void(0)" class="nav-link text-white-50 d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalEditarProducto" onclick="limpiarFormulario()"></a>
+                            <i class="bi bi-bus-front"></i> Lista de productos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="javascript:void(0)" class="nav-link text-white-50 d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalEditarProducto" onclick="limpiarFormulario()">
+        <i class="bi bi-pencil-square"></i> Crear / Editar Producto
+    </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link text-white-50 d-flex align-items-center gap-2">
+                            <i class="bi bi-people"></i> Clientes
+                        </a>
+                    </li>
+                </ul>
+
+                <hr class="border-secondary">
+
+                <!-- Navegación Inferior -->
+                <ul class="nav nav-pills flex-column gap-1">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link text-white-50 d-flex align-items-center gap-2">
+                            <i class="bi bi-person-gear"></i> Mi Perfil
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Usuario / Volver -->
+            <div class="pt-3 border-top border-secondary">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <img src="Img/cropped_circle_image.png" alt="Admin" width="35" height="35" class="rounded-circle border border-secondary">
+                    <div class="text-white">
+                        <span class="fw-semibold d-block small">Administrador</span>
+                    </div>
+                </div>
+                <a href="index.html" class="btn btn-outline-light btn-sm w-100">
+                    <i class="bi bi-box-arrow-left me-1"></i> Modo Cliente
+                </a>
+            </div>
+        </aside>
+
+        <!-- ÁREA DE CONTENIDO PRINCIPAL -->
+        <main class="flex-grow-1 bg-body-tertiary d-flex flex-column min-vh-100">
+            
+            <!-- ENCABEZADO SUPERIOR -->
+            <header class="bg-white border-bottom px-4 py-3 d-flex justify-content-between align-items-center shadow-sm">
+                <h1 class="h4 fw-bold mb-0 text-dark">Gestión de Productos y Pasajes</h1>
+                
+                <div class="d-flex align-items-center gap-3">
+                    <div class="position-relative">
+                        <button class="btn btn-light rounded-circle p-2 d-flex align-items-center justify-content-center">
+                            <i class="bi bi-bell-fill fs-5 text-dark"></i>
+                        </button>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            3
+                        </span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- CONTENIDO DE LAS SECCIONES -->
+            <div class="p-4 flex-grow-1">
+
+                <!-- SECCIÓN: LISTA DE PRODUCTOS -->
+                <div class="card border-0 shadow-sm p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h5 class="fw-bold mb-1">Catálogo de Productos / Pasajes</h5>
+                            <p class="text-muted small mb-0">Administra los destinos, precios y detalles de la flota.</p>
+                        </div>
+                        <button class="btn btn-primary text-white btn-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#modalEditarProducto" onclick="limpiarFormulario()">
+                            <i class="bi bi-plus-lg me-1"></i> Añadir Nuevo Producto
+                        </button>
+                    </div>
+
+                    <!-- Buscador y Filtros -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                                <input type="text" class="form-control" placeholder="Buscar por destino o código...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select form-select-sm">
+                                <option selected>Todas las categorías</option>
+                                <option value="1">Semi Cama</option>
+                                <option value="2">Salón Cama</option>
+                                <option value="3">Premium</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de Productos -->
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Imagen</th>
+                                    <th>Origen - Destino</th>
+                                    <th>Precio</th>
+                                    <th>Tipo Servicio</th>
+                                    <th>Estado</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Producto 1: Puerto Montt -->
+                                <tr>
+                                    <td><strong>#PROD-01</strong></td>
+                                    <td>
+                                        <img src="Img/Buses.png" alt="Puerto Montt" width="50" height="35" class="rounded object-fit-cover border bg-light">
+                                    </td>
+                                    <td class="fw-semibold">Santiago ➔ Puerto Montt</td>
+                                    <td class="text-success fw-bold">$35.000</td>
+                                    <td><span class="badge bg-warning text-dark">Salón Cama</span></td>
+                                    <td><span class="badge bg-success">Activo</span></td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-primary me-1" title="Editar" data-bs-toggle="modal" data-bs-target="#modalEditarProducto" onclick="cargarProducto('puertomontt')">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Producto 2: Valparaíso -->
+                                <tr>
+                                    <td><strong>#PROD-02</strong></td>
+                                    <td>
+                                        <img src="Img/Buses.png" alt="Valparaíso" width="50" height="35" class="rounded object-fit-cover border bg-light">
+                                    </td>
+                                    <td class="fw-semibold">Santiago ➔ Valparaíso</td>
+                                    <td class="text-success fw-bold">$10.000</td>
+                                    <td><span class="badge bg-secondary">Clásico</span></td>
+                                    <td><span class="badge bg-success">Activo</span></td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-primary me-1" title="Editar" data-bs-toggle="modal" data-bs-target="#modalEditarProducto" onclick="cargarProducto('valparaiso')">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Producto 3: La Serena -->
+                                <tr>
+                                    <td><strong>#PROD-03</strong></td>
+                                    <td>
+                                        <img src="Img/Buses.png" alt="La Serena" width="50" height="35" class="rounded object-fit-cover border bg-light">
+                                    </td>
+                                    <td class="fw-semibold">Santiago ➔ La Serena</td>
+                                    <td class="text-success fw-bold">$18.500</td>
+                                    <td><span class="badge bg-info text-dark">Semi Cama</span></td>
+                                    <td><span class="badge bg-success">Activo</span></td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-primary me-1" title="Editar" data-bs-toggle="modal" data-bs-target="#modalEditarProducto" onclick="cargarProducto('laserena')">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Producto 4: Concepción -->
+                                <tr>
+                                    <td><strong>#PROD-04</strong></td>
+                                    <td>
+                                        <img src="Img/Buses.png" alt="Concepción" width="50" height="35" class="rounded object-fit-cover border bg-light">
+                                    </td>
+                                    <td class="fw-semibold">Santiago ➔ Concepción</td>
+                                    <td class="text-success fw-bold">$22.000</td>
+                                    <td><span class="badge bg-warning text-dark">Salón Cama</span></td>
+                                    <td><span class="badge bg-success">Activo</span></td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-primary me-1" title="Editar" data-bs-toggle="modal" data-bs-target="#modalEditarProducto" onclick="cargarProducto('concepcion')">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Producto 5: Pucón -->
+                                <tr>
+                                    <td><strong>#PROD-05</strong></td>
+                                    <td>
+                                        <img src="Img/Buses.png" alt="Pucón" width="50" height="35" class="rounded object-fit-cover border bg-light">
+                                    </td>
+                                    <td class="fw-semibold">Santiago ➔ Pucón</td>
+                                    <td class="text-success fw-bold">$28.000</td>
+                                    <td><span class="badge bg-warning text-dark">Salón Cama</span></td>
+                                    <td><span class="badge bg-danger">Agotado</span></td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-primary me-1" title="Editar" data-bs-toggle="modal" data-bs-target="#modalEditarProducto" onclick="cargarProducto('pucon')">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Producto 6: Chiloé -->
+                                <tr>
+                                    <td><strong>#PROD-06</strong></td>
+                                    <td>
+                                        <img src="Img/Buses.png" alt="Chiloé" width="50" height="35" class="rounded object-fit-cover border bg-light">
+                                    </td>
+                                    <td class="fw-semibold">Santiago ➔ Chiloé</td>
+                                    <td class="text-success fw-bold">$25.000</td>
+                                    <td><span class="badge bg-warning text-dark">Salón Cama</span></td>
+                                    <td><span class="badge bg-success">Activo</span></td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-primary me-1" title="Editar" data-bs-toggle="modal" data-bs-target="#modalEditarProducto" onclick="cargarProducto('chiloe')">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Producto 7: Talca -->
+                                <tr>
+                                    <td><strong>#PROD-07</strong></td>
+                                    <td>
+                                        <img src="Img/Buses.png" alt="Talca" width="50" height="35" class="rounded object-fit-cover border bg-light">
+                                    </td>
+                                    <td class="fw-semibold">Santiago ➔ Talca</td>
+                                    <td class="text-success fw-bold">$20.000</td>
+                                    <td><span class="badge bg-info text-dark">Semi Cama</span></td>
+                                    <td><span class="badge bg-success">Activo</span></td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-primary me-1" title="Editar" data-bs-toggle="modal" data-bs-target="#modalEditarProducto" onclick="cargarProducto('talca')">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Producto 8: Pichilemu -->
+                                <tr>
+                                    <td><strong>#PROD-08</strong></td>
+                                    <td>
+                                        <img src="Img/Buses.png" alt="Pichilemu" width="50" height="35" class="rounded object-fit-cover border bg-light">
+                                    </td>
+                                    <td class="fw-semibold">Santiago ➔ Pichilemu</td>
+                                    <td class="text-success fw-bold">$20.000</td>
+                                    <td><span class="badge bg-info text-dark">Semi Cama</span></td>
+                                    <td><span class="badge bg-success">Activo</span></td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-primary me-1" title="Editar" data-bs-toggle="modal" data-bs-target="#modalEditarProducto" onclick="cargarProducto('pichilemu')">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Producto 9: Quintero -->
+                                <tr>
+                                    <td><strong>#PROD-09</strong></td>
+                                    <td>
+                                        <img src="Img/Buses.png" alt="Quintero" width="50" height="35" class="rounded object-fit-cover border bg-light">
+                                    </td>
+                                    <td class="fw-semibold">Santiago ➔ Quintero</td>
+                                    <td class="text-success fw-bold">$15.000</td>
+                                    <td><span class="badge bg-secondary">Clásico</span></td>
+                                    <td><span class="badge bg-success">Activo</span></td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-primary me-1" title="Editar" data-bs-toggle="modal" data-bs-target="#modalEditarProducto" onclick="cargarProducto('quintero')">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Producto 10: Viña del Mar -->
+                                <tr>
+                                    <td><strong>#PROD-10</strong></td>
+                                    <td>
+                                        <img src="Img/Buses.png" alt="Viña del Mar" width="50" height="35" class="rounded object-fit-cover border bg-light">
+                                    </td>
+                                    <td class="fw-semibold">Santiago ➔ Viña del Mar</td>
+                                    <td class="text-success fw-bold">$15.000</td>
+                                    <td><span class="badge bg-secondary">Clásico</span></td>
+                                    <td><span class="badge bg-success">Activo</span></td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-primary me-1" title="Editar" data-bs-toggle="modal" data-bs-target="#modalEditarProducto" onclick="cargarProducto('vina')">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Producto 11: Antofagasta -->
+                                <tr>
+                                    <td><strong>#PROD-11</strong></td>
+                                    <td>
+                                        <img src="Img/Buses.png" alt="Antofagasta" width="50" height="35" class="rounded object-fit-cover border bg-light">
+                                    </td>
+                                    <td class="fw-semibold">Santiago ➔ Antofagasta</td>
+                                    <td class="text-success fw-bold">$30.000</td>
+                                    <td><span class="badge bg-dark text-white">Premium</span></td>
+                                    <td><span class="badge bg-success">Activo</span></td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-primary me-1" title="Editar" data-bs-toggle="modal" data-bs-target="#modalEditarProducto" onclick="cargarProducto('antofagasta')">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Producto 12: Arica -->
+                                <tr>
+                                    <td><strong>#PROD-12</strong></td>
+                                    <td>
+                                        <img src="Img/Buses.png" alt="Arica" width="50" height="35" class="rounded object-fit-cover border bg-light">
+                                    </td>
+                                    <td class="fw-semibold">Santiago ➔ Arica</td>
+                                    <td class="text-success fw-bold">$35.000</td>
+                                    <td><span class="badge bg-dark text-white">Premium</span></td>
+                                    <td><span class="badge bg-success">Activo</span></td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-primary me-1" title="Editar" data-bs-toggle="modal" data-bs-target="#modalEditarProducto" onclick="cargarProducto('arica')">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+    </div>
+
+    <!-- MODAL PARA EDITAR / CREAR PRODUCTO (ÚNICO Y FORMATEADO) -->
+    <div class="modal fade" id="modalEditarProducto" tabindex="-1" aria-labelledby="modalEditarProductoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header text-white" style="background-color: #0a2540;">
+                    <h5 class="modal-title fw-bold" id="modalEditarProductoLabel">
+                        <i class="bi bi-pencil-square me-2"></i>Editar Producto / Pasaje
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <form id="formProducto" onsubmit="event.preventDefault();">
+                    <div class="modal-body p-4">
+                        <div class="row g-3">
+                            
+                            <!-- ID / Código -->
+                            <div class="col-md-4">
+                                <label for="prodId" class="form-label fw-semibold small text-secondary">Código ID</label>
+                                <input type="text" class="form-control" id="prodId" value="PROD-01" readonly>
+                            </div>
+
+                            <!-- Título / Destino -->
+                            <div class="col-md-8">
+                                <label for="prodTitle" class="form-label fw-semibold small text-secondary">Nombre del Pasaje / Destino</label>
+                                <input type="text" class="form-control" id="prodTitle" value="Pasaje Santiago - Puerto Montt" required>
+                            </div>
+
+                            <!-- Precio -->
+                            <div class="col-md-6">
+                                <label for="prodPrice" class="form-label fw-semibold small text-secondary">Precio ($ CLP)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="prodPrice" value="35000" required>
+                                </div>
+                            </div>
+
+                            <!-- Tipo de Servicio -->
+                            <div class="col-md-6">
+                                <label for="prodType" class="form-label fw-semibold small text-secondary">Tipo de Servicio</label>
+                                <select class="form-select" id="prodType">
+                                    <option value="Clásico">Clásico</option>
+                                    <option value="Semi Cama">Semi Cama</option>
+                                    <option value="Salón Cama" selected>Salón Cama</option>
+                                    <option value="Premium">Premium</option>
+                                </select>
+                            </div>
+
+                            <!-- Ruta Imagen Principal -->
+                            <div class="col-md-8">
+                                <label for="prodImg" class="form-label fw-semibold small text-secondary">Ruta o URL de la Imagen</label>
+                                <input type="text" class="form-control" id="prodImg" value="Img/Buses.png">
+                            </div>
+
+                            <!-- Estado del Producto -->
+                            <div class="col-md-4">
+                                <label for="prodStatus" class="form-label fw-semibold small text-secondary">Estado</label>
+                                <select class="form-select" id="prodStatus">
+                                    <option value="Activo" selected>Activo</option>
+                                    <option value="Agotado">Agotado</option>
+                                    <option value="Inactivo">Inactivo</option>
+                                </select>
+                            </div>
+
+                            <!-- Descripción -->
+                            <div class="col-12">
+                                <label for="prodDesc" class="form-label fw-semibold small text-secondary">Descripción del Viaje</label>
+                                <textarea class="form-control" id="prodDesc" rows="3">Viaje directo equipado con aire acondicionado, Wi-Fi a bordo y puertos USB de carga.</textarea>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-secondary btn-sm px-4" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success btn-sm px-4">
+                            <i class="bi bi-check-lg me-1"></i> Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+    <!-- Script con Persistencia en localStorage -->
+    <script>
+        // 1. Datos iniciales por defecto (si es la primera vez que se abre la app)
+        const productosIniciales = [
+            { id: 'PROD-01', titulo: 'Santiago ➔ Puerto Montt', precio: 35000, tipo: 'Salón Cama', estado: 'Activo', img: 'Img/Buses.png', desc: 'Viaje directo con Wi-Fi y puertos USB.' },
+            { id: 'PROD-02', titulo: 'Santiago ➔ Valparaíso', precio: 10000, tipo: 'Clásico', estado: 'Activo', img: 'Img/Buses.png', desc: 'Salidas continuas.' },
+            { id: 'PROD-03', titulo: 'Santiago ➔ La Serena', precio: 18500, tipo: 'Semi Cama', estado: 'Activo', img: 'Img/Buses.png', desc: 'Asientos confortables.' },
+            { id: 'PROD-04', titulo: 'Santiago ➔ Concepción', precio: 22000, tipo: 'Salón Cama', estado: 'Activo', img: 'Img/Buses.png', desc: 'Servicio diurno y nocturno.' },
+            { id: 'PROD-05', titulo: 'Santiago ➔ Pucón', precio: 28000, tipo: 'Salón Cama', estado: 'Agotado', img: 'Img/Buses.png', desc: 'Directo a Pucón centro.' },
+            { id: 'PROD-06', titulo: 'Santiago ➔ Chiloé', precio: 25000, tipo: 'Salón Cama', estado: 'Activo', img: 'Img/Buses.png', desc: 'Incluye trasbordo en ferry.' }
+        ];
+
+        // 2. Obtener productos desde localStorage o cargar los iniciales
+        function obtenerProductos() {
+            const guardados = localStorage.getItem('productos_viajes');
+            if (guardados) {
+                return JSON.parse(guardados);
+            } else {
+                localStorage.setItem('productos_viajes', JSON.stringify(productosIniciales));
+                return productosIniciales;
+            }
+        }
+
+        let productos = obtenerProductos();
+        let idEditando = null;
+
+        // 3. Renderizar la tabla dinámica
+        function renderizarTabla() {
+            const tbody = document.querySelector('table tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            productos.forEach((p) => {
+                let badgeTipo = 'bg-secondary';
+                if (p.tipo === 'Salón Cama') badgeTipo = 'bg-warning text-dark';
+                if (p.tipo === 'Semi Cama') badgeTipo = 'bg-info text-dark';
+                if (p.tipo === 'Premium') badgeTipo = 'bg-dark text-white';
+
+                let badgeEstado = p.estado === 'Activo' ? 'bg-success' : 'bg-danger';
+                let precioFormateado = '$' + Number(p.precio).toLocaleString('es-CL');
+
+                let fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td><strong>#${p.id}</strong></td>
+                    <td><img src="${p.img || 'Img/Buses.png'}" alt="${p.titulo}" width="50" height="35" class="rounded object-fit-cover border bg-light"></td>
+                    <td class="fw-semibold">${p.titulo}</td>
+                    <td class="text-success fw-bold">${precioFormateado}</td>
+                    <td><span class="badge ${badgeTipo}">${p.tipo}</span></td>
+                    <td><span class="badge ${badgeEstado}">${p.estado}</span></td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-primary me-1" title="Editar" data-bs-toggle="modal" data-bs-target="#modalEditarProducto" onclick="cargarProducto('${p.id}')">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" title="Eliminar" onclick="eliminarProducto('${p.id}')">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(fila);
+            });
+        }
+
+        // 4. Cargar producto en el modal
+        function cargarProducto(id) {
+            idEditando = id;
+            const prod = productos.find(p => p.id === id);
+            if (prod) {
+                document.getElementById('modalEditarProductoLabel').innerText = "Editar Producto (" + id + ")";
+                document.getElementById('prodId').value = prod.id;
+                document.getElementById('prodTitle').value = prod.titulo;
+                document.getElementById('prodPrice').value = prod.precio;
+                document.getElementById('prodType').value = prod.tipo;
+                document.getElementById('prodStatus').value = prod.estado;
+                document.getElementById('prodImg').value = prod.img || 'Img/Buses.png';
+                if (document.getElementById('prodDesc')) {
+                    document.getElementById('prodDesc').value = prod.desc || '';
+                }
+            }
+        }
+
+        // 5. Limpiar formulario para nuevo producto
+        function limpiarFormulario() {
+            idEditando = null;
+            document.getElementById('modalEditarProductoLabel').innerText = "Añadir Nuevo Producto";
+            document.getElementById('formProducto').reset();
+            document.getElementById('prodId').value = "PROD-" + String(Math.floor(Math.random() * 90) + 10);
+        }
+
+        // 6. Eliminar producto
+        function eliminarProducto(id) {
+            if (confirm("¿Estás seguro de eliminar el pasaje " + id + "?")) {
+                productos = productos.filter(p => p.id !== id);
+                localStorage.setItem('productos_viajes', JSON.stringify(productos));
+                renderizarTabla();
+            }
+        }
+
+        // 7. Guardar cambios / Crear nuevo pasaje
+        document.getElementById('formProducto').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const id = document.getElementById('prodId').value;
+            const titulo = document.getElementById('prodTitle').value;
+            const precio = Number(document.getElementById('prodPrice').value);
+            const tipo = document.getElementById('prodType').value;
+            const estado = document.getElementById('prodStatus').value;
+            const img = document.getElementById('prodImg').value || 'Img/Buses.png';
+            const desc = document.getElementById('prodDesc') ? document.getElementById('prodDesc').value : '';
+
+            if (idEditando) {
+                // Modificar producto existente
+                const idx = productos.findIndex(p => p.id === idEditando);
+                if (idx !== -1) {
+                    productos[idx] = { id, titulo, precio, tipo, estado, img, desc };
+                }
+            } else {
+                // Agregar nuevo producto
+                productos.push({ id, titulo, precio, tipo, estado, img, desc });
+            }
+
+            // GUARDAR EN MEMORIA NAVEGADOR
+            localStorage.setItem('productos_viajes', JSON.stringify(productos));
+
+            // REFRESCAR TABLA
+            renderizarTabla();
+
+            // CERRAR MODAL
+            let modalElement = document.getElementById('modalEditarProducto');
+            let modal = bootstrap.Modal.getInstance(modalElement);
+            if (!modal) modal = new bootstrap.Modal(modalElement);
+            modal.hide();
+        });
+
+        // Ejecutar al cargar la página
+        document.addEventListener('DOMContentLoaded', renderizarTabla);
+    </script>
+</body>
+</html>
