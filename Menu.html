@@ -30,7 +30,7 @@
                     <li class="nav-item d-flex align-items-center gap-2">
                         <i class="bi bi-person-circle fs-2 text-secondary"></i>
                         <img src="Img/cropped_circle_image.png" alt="Icono usuario" width="70" height="70" >
-                        <a class="btn btn-turquesa rounded-1 px-3 fw-semibold text-white" href="cuenta.html">
+                        <a class="btn btn-turquesa rounded-1 px-3 fw-semibold text-white" href="index.html">
                             Mi cuenta
                         </a>
                     </li>
@@ -49,9 +49,15 @@
                     </li>
 
                     <li class="nav-item">
-                        <a href="#" class="text-turquesa fs-4">
-                            <i class="bi bi-facebook"></i>
+                        <a href="blog.html" class="btn btn-turquesa rounded-1 px-3 fw-semibold text-white">
+                            <i class="bi bi-journal-text me-1"></i> Blog
                         </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <button type="button" class="btn btn-turquesa rounded-1 px-3 fw-semibold text-white" data-bs-toggle="offcanvas" data-bs-target="#panelCarrito" aria-controls="panelCarrito">
+                            <i class="bi bi-cart3 me-1"></i> Carrito <span id="contadorCarrito" class="badge bg-danger d-none">0</span>
+                        </button>
                     </li>
 
                    
@@ -68,7 +74,7 @@
     </div>
 <section class="hero-search py-5" style="background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('Img/bus-banner.jpg') center/cover no-repeat; min-height: 380px;">
         <div class="container py-4">
-            <form action="#" method="GET">
+            <form id="formCalculadoraViaje" action="#" method="GET">
                 <div class="row g-2 align-items-end bg-dark bg-opacity-50 p-3 rounded-3 shadow">
                     
                     <!-- Origen -->
@@ -76,7 +82,9 @@
                         <label class="form-label fw-semibold text-white mb-1 small">¿De dónde partes?</label>
                         <div class="input-group">
                             <span class="input-group-text bg-white border-end-0">🇨🇱</span>
-                            <input type="text" class="form-control border-start-0" placeholder="Origen" required>
+                            <select id="ciudadOrigen" class="form-select border-start-0" required>
+                                <option value="">Selecciona origen</option>
+                            </select>
                         </div>
                     </div>
 
@@ -85,7 +93,9 @@
                         <label class="form-label fw-semibold text-white mb-1 small">¿A dónde quieres ir?</label>
                         <div class="input-group">
                             <span class="input-group-text bg-white border-end-0">🇨🇱</span>
-                            <input type="text" class="form-control border-start-0" placeholder="Destino" required>
+                            <select id="ciudadDestino" class="form-select border-start-0" required>
+                                <option value="">Selecciona destino</option>
+                            </select>
                         </div>
                     </div>
 
@@ -103,9 +113,23 @@
 
                     <!-- Botón Buscar -->
                     <div class="col-lg-2 col-md-12">
-                        <button type="submit" class="btn btn-turquesa w-100 fw-bold text-uppercase py-2v text-white">
-                            Buscar
+                        <button type="submit" class="btn btn-turquesa w-100 fw-bold text-uppercase py-2 text-white">
+                            Calcular precio
                         </button>
+                    </div>
+
+                    <div id="resultadoViaje" class="col-12 d-none mt-3 p-3 bg-white rounded-3">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                            <div>
+                                <strong id="rutaCalculada" class="d-block"></strong>
+                                <small id="distanciaCalculada" class="text-muted"></small>
+                            </div>
+                            <strong id="precioCalculado" class="fs-4 text-success"></strong>
+                            <button id="btnAgregarViajeCalculado" type="button" class="btn btn-success">
+                                <i class="bi bi-cart-plus me-1"></i>Añadir al carrito
+                            </button>
+                        </div>
+                        <div id="avisoCalculadora" class="alert alert-danger d-none mt-3 mb-0 py-2" role="alert"></div>
                     </div>
 
                   
@@ -337,7 +361,7 @@
     </div>
 </div>
 
-<button class="btn btn-outline-light me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#panelAdmin" aria-controls="panelAdmin">
+<button class="btn btn-light text-dark border-dark me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#panelAdmin" aria-controls="panelAdmin">
     <i class="bi bi-sliders"></i> Panel
 </button>
 
@@ -371,6 +395,20 @@
     </div>
 </div>
 
+<div class="offcanvas offcanvas-end" tabindex="-1" id="panelCarrito" aria-labelledby="panelCarritoLabel">
+    <div class="offcanvas-header">
+        <h5 id="panelCarritoLabel"><i class="bi bi-cart3 me-2"></i>Tu carrito</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div id="listaCarrito"></div>
+        <div class="border-top mt-3 pt-3 d-flex justify-content-between fw-bold">
+            <span>Total</span><span id="totalCarrito">$0</span>
+        </div>
+        <button type="button" id="btnVaciarCarrito" class="btn btn-outline-danger w-100 mt-3">Vaciar carrito</button>
+    </div>
+</div>
+
 <script>
     document.querySelectorAll('.carousel-item .card').forEach(card => {
         const enlaceDetalle = card.querySelector('a[href^="Detalle.html?prod="]');
@@ -384,6 +422,7 @@
         });
     });
 </script>
+<script src="main.js"></script>
 </body>
 
 </html>

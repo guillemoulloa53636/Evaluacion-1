@@ -171,6 +171,178 @@ const productosJSON = {
 
 const productosIniciales = Object.values(productosJSON);
 
+const ciudadesJSON = {
+    santiago: { nombre: "Santiago", distanciaDesdeSantiago: 0 },
+    valparaiso: { nombre: "Valparaíso", distanciaDesdeSantiago: 120 },
+    vina: { nombre: "Viña del Mar", distanciaDesdeSantiago: 130 },
+    quintero: { nombre: "Quintero", distanciaDesdeSantiago: 160 },
+    talca: { nombre: "Talca", distanciaDesdeSantiago: 255 },
+    pichilemu: { nombre: "Pichilemu", distanciaDesdeSantiago: 210 },
+    concepcion: { nombre: "Concepción", distanciaDesdeSantiago: 500 },
+    pucon: { nombre: "Pucón", distanciaDesdeSantiago: 785 },
+    puertomontt: { nombre: "Puerto Montt", distanciaDesdeSantiago: 1030 },
+    chiloe: { nombre: "Chiloé", distanciaDesdeSantiago: 1150 },
+    laserena: { nombre: "La Serena", distanciaDesdeSantiago: 475 },
+    antofagasta: { nombre: "Antofagasta", distanciaDesdeSantiago: 1365 },
+    arica: { nombre: "Arica", distanciaDesdeSantiago: 2050 }
+};
+
+const tarifasEspecialesJSON = {
+    "antofagasta-arica": 15000,
+    "arica-laserena": 15000,
+    "arica-pichilemu": 25000,
+    "arica-quintero": 25000,
+    "arica-santiago": 25000,
+    "arica-vina": 25000,
+    "arica-chiloe": 45000,
+    "arica-concepcion": 45000,
+    "arica-pucon": 45000,
+    "arica-puertomontt": 45000,
+    "arica-talca": 45000
+};
+
+function calcularPrecioViaje(origen, destino) {
+    const ciudadOrigen = ciudadesJSON[origen];
+    const ciudadDestino = ciudadesJSON[destino];
+    if (!ciudadOrigen || !ciudadDestino || origen === destino) return null;
+
+    const distancia = Math.abs(ciudadDestino.distanciaDesdeSantiago - ciudadOrigen.distanciaDesdeSantiago);
+    const tarifaEspecial = tarifasEspecialesJSON[[origen, destino].sort().join('-')];
+    const precio = tarifaEspecial || Math.max(4500, Math.round((4500 + distancia * 12) / 500) * 500);
+    return { distancia, precio, ciudadOrigen, ciudadDestino };
+}
+
+function prepararCalculadoraViaje() {
+    const origen = document.getElementById('ciudadOrigen');
+    const destino = document.getElementById('ciudadDestino');
+    const formulario = document.getElementById('formCalculadoraViaje');
+    const resultado = document.getElementById('resultadoViaje');
+    const botonAgregar = document.getElementById('btnAgregarViajeCalculado');
+    if (!origen || !destino || !formulario || !resultado || !botonAgregar) return;
+
+    const opciones = Object.entries(ciudadesJSON).map(([clave, ciudad]) =>
+        `<option value="${clave}">${ciudad.nombre}</option>`
+    ).join('');
+    origen.insertAdjacentHTML('beforeend', opciones);
+    destino.insertAdjacentHTML('beforeend', opciones);
+
+    let viajeCalculado = null;
+    formulario.addEventListener('submit', event => {
+        event.preventDefault();
+        viajeCalculado = calcularPrecioViaje(origen.value, destino.value);
+        const aviso = document.getElementById('avisoCalculadora');
+
+        if (!viajeCalculado) {
+            resultado.classList.remove('d-none');
+            aviso.innerText = 'Selecciona dos ciudades diferentes para calcular el precio.';
+            aviso.classList.remove('d-none');
+            return;
+        }
+
+        document.getElementById('rutaCalculada').innerText = `${viajeCalculado.ciudadOrigen.nombre} a ${viajeCalculado.ciudadDestino.nombre}`;
+        document.getElementById('distanciaCalculada').innerText = `${viajeCalculado.distancia.toLocaleString('es-CL')} km aproximadamente`;
+        document.getElementById('precioCalculado').innerText = `$${viajeCalculado.precio.toLocaleString('es-CL')}`;
+        aviso.classList.add('d-none');
+        resultado.classList.remove('d-none');
+    });
+
+    botonAgregar.addEventListener('click', () => {
+        if (!viajeCalculado) return;
+        const slug = `calculado-${origen.value}-${destino.value}`;
+        const carrito = obtenerCarrito();
+        const itemExistente = carrito.find(item => item.slug === slug);
+        if (itemExistente) {
+            itemExistente.cantidad += 1;
+        } else {
+            carrito.push({
+                slug,
+                titulo: `Pasaje ${viajeCalculado.ciudadOrigen.nombre} - ${viajeCalculado.ciudadDestino.nombre}`,
+                precio: viajeCalculado.precio,
+                cantidad: 1
+            });
+        }
+        guardarCarrito(carrito);
+        actualizarContadorCarrito();
+        renderizarCarrito();
+        botonAgregar.innerHTML = '<i class="bi bi-check-lg me-1"></i>Añadido al carrito';
+        window.setTimeout(() => {
+            botonAgregar.innerHTML = '<i class="bi bi-cart-plus me-1"></i>Añadir al carrito';
+        }, 1800);
+    });
+}
+
+// ==========================================
+// MANEJO DE USUARIOS Y AUTENTICACION
+// ==========================================
+const usuariosIniciales = [
+    {
+        nombre: "Guillermo",
+        correo: "guillermo@gmail.com",
+        password: "Guillermo123",
+        telefono: "",
+        region: "",
+        comuna: ""
+    },
+    {
+        nombre: "Maria Vargas",
+        correo: "maria@gmail.com",
+        password: "maria123",
+        telefono: "",
+        region: "",
+        comuna: ""
+    },
+    {
+        nombre: "Juan Perez",
+        correo: "juanito@gmail.com",
+        password: "juanito5566",
+        telefono: "",
+        region: "",
+        comuna: ""
+    }
+];
+
+function obtenerUsuarios() {
+    try {
+        const usuariosGuardados = localStorage.getItem("usuariosDB");
+        if (!usuariosGuardados) {
+            localStorage.setItem("usuariosDB", JSON.stringify(usuariosIniciales));
+            return [...usuariosIniciales];
+        }
+
+        const usuarios = JSON.parse(usuariosGuardados);
+        if (!Array.isArray(usuarios)) return [...usuariosIniciales];
+
+        const cuentaInicial = usuariosIniciales[0];
+        if (!usuarios.some(usuario => usuario.correo === cuentaInicial.correo)) {
+            usuarios.unshift(cuentaInicial);
+            localStorage.setItem("usuariosDB", JSON.stringify(usuarios));
+        }
+        return usuarios;
+    } catch (error) {
+        localStorage.setItem("usuariosDB", JSON.stringify(usuariosIniciales));
+        return [...usuariosIniciales];
+    }
+}
+
+function guardarUsuarios(usuarios) {
+    localStorage.setItem("usuariosDB", JSON.stringify(usuarios));
+}
+
+function renderizarTablaClientes() {
+    const tbody = document.getElementById("tablaClientesAdmin");
+    if (!tbody) return;
+
+    tbody.innerHTML = obtenerUsuarios().map(usuario => `
+        <tr>
+            <td class="fw-semibold">${escaparHTML(usuario.nombre || "Sin nombre")}</td>
+            <td>${escaparHTML(usuario.correo)}</td>
+            <td>${escaparHTML(usuario.telefono || "No informado")}</td>
+            <td>${escaparHTML(usuario.comuna || "No informada")}</td>
+            <td><span class="badge bg-success">Activo</span></td>
+        </tr>
+    `).join("");
+}
+
 // ==========================================
 // MANEJO DE LOCALSTORAGE CON AUTORREPARACIÓN
 // ==========================================
@@ -356,6 +528,104 @@ function eliminarProducto(slug) {
 }
 
 // ==========================================
+// CARRITO DE VIAJES
+// ==========================================
+function obtenerCarrito() {
+    try {
+        const carrito = JSON.parse(localStorage.getItem('carritoDB') || '[]');
+        return Array.isArray(carrito) ? carrito : [];
+    } catch (error) {
+        return [];
+    }
+}
+
+function guardarCarrito(carrito) {
+    localStorage.setItem('carritoDB', JSON.stringify(carrito));
+}
+
+function actualizarContadorCarrito() {
+    const contador = document.getElementById('contadorCarrito');
+    if (!contador) return;
+
+    const cantidadTotal = obtenerCarrito().reduce((total, item) => total + item.cantidad, 0);
+    contador.innerText = cantidadTotal;
+    contador.classList.toggle('d-none', cantidadTotal === 0);
+}
+
+function renderizarCarrito() {
+    const lista = document.getElementById('listaCarrito');
+    const total = document.getElementById('totalCarrito');
+    if (!lista || !total) return;
+
+    const carrito = obtenerCarrito();
+    if (carrito.length === 0) {
+        lista.innerHTML = '<p class="text-muted text-center mb-0">Tu carrito está vacío.</p>';
+        total.innerText = '$0';
+        return;
+    }
+
+    lista.innerHTML = carrito.map(item => `
+        <div class="d-flex justify-content-between align-items-center border-bottom py-3 gap-3">
+            <div>
+                <strong class="d-block">${escaparHTML(item.titulo)}</strong>
+                <small class="text-muted">${item.cantidad} pasaje(s) x $${Number(item.precio).toLocaleString('es-CL')}</small>
+            </div>
+            <div class="text-end">
+                <strong class="d-block text-success">$${(item.precio * item.cantidad).toLocaleString('es-CL')}</strong>
+                <button type="button" class="btn btn-sm btn-link text-danger p-0" onclick="quitarDelCarrito('${escaparHTML(item.slug)}')">Quitar</button>
+            </div>
+        </div>
+    `).join('');
+
+    const totalCarrito = carrito.reduce((suma, item) => suma + item.precio * item.cantidad, 0);
+    total.innerText = '$' + totalCarrito.toLocaleString('es-CL');
+}
+
+function agregarAlCarrito() {
+    const slug = new URLSearchParams(window.location.search).get('prod') || 'puertomontt';
+    const producto = obtenerProductos().find(item => item.slug === slug);
+    const cantidad = Number(document.getElementById('cantidad')?.value || 1);
+
+    if (!producto || producto.estado !== 'Activo') return;
+
+    const carrito = obtenerCarrito();
+    const itemExistente = carrito.find(item => item.slug === producto.slug);
+    if (itemExistente) {
+        itemExistente.cantidad += cantidad;
+    } else {
+        carrito.push({
+            slug: producto.slug,
+            titulo: producto.titulo,
+            precio: Number(producto.precio) || 0,
+            cantidad
+        });
+    }
+
+    guardarCarrito(carrito);
+    actualizarContadorCarrito();
+    renderizarCarrito();
+
+    const aviso = document.getElementById('avisoCarrito');
+    if (aviso) {
+        aviso.innerText = 'Viaje añadido al carrito';
+        aviso.classList.remove('d-none');
+        window.setTimeout(() => aviso.classList.add('d-none'), 2500);
+    }
+}
+
+function quitarDelCarrito(slug) {
+    guardarCarrito(obtenerCarrito().filter(item => item.slug !== slug));
+    actualizarContadorCarrito();
+    renderizarCarrito();
+}
+
+function vaciarCarrito() {
+    guardarCarrito([]);
+    actualizarContadorCarrito();
+    renderizarCarrito();
+}
+
+// ==========================================
 // VISTA PÚBLICA (DETALLE DE PRODUCTO)
 // ==========================================
 function cambiarProducto(slugProducto) {
@@ -365,6 +635,17 @@ function cambiarProducto(slugProducto) {
     if (producto) {
         if (document.getElementById('product-title')) document.getElementById('product-title').innerText = producto.titulo;
         if (document.getElementById('product-price')) document.getElementById('product-price').innerText = "$" + Number(producto.precio).toLocaleString('es-CL');
+        const disponibilidad = document.getElementById('product-availability');
+        const botonCarrito = document.getElementById('btnAgregarCarrito');
+        const disponible = producto.estado === 'Activo';
+        if (disponibilidad) {
+            disponibilidad.className = `badge ${disponible ? 'bg-success' : 'bg-danger'} fs-6`;
+            disponibilidad.innerHTML = `<i class="bi ${disponible ? 'bi-check-circle' : 'bi-x-circle'} me-1"></i>${disponible ? 'Disponible' : 'No disponible'}`;
+        }
+        if (botonCarrito) {
+            botonCarrito.disabled = !disponible;
+            botonCarrito.innerHTML = disponible ? '<i class="bi bi-cart-plus me-2"></i>Añadir al carrito' : '<i class="bi bi-cart-x me-2"></i>Viaje no disponible';
+        }
         if (document.getElementById('product-description')) document.getElementById('product-description').innerText = producto.descripcion || producto.desc;
         if (document.getElementById('product-breadcrumb')) document.getElementById('product-breadcrumb').innerText = producto.breadcrumb || producto.titulo;
         if (document.getElementById('product-img')) document.getElementById('product-img').src = obtenerImagenProducto(producto);
@@ -432,6 +713,16 @@ function cambiarImagenPrincipal(src) {
 // ==========================================
 document.addEventListener("DOMContentLoaded", function () {
     renderizarTablaAdmin();
+    renderizarTablaClientes();
+    actualizarContadorCarrito();
+    renderizarCarrito();
+    prepararCalculadoraViaje();
+
+    const botonCarrito = document.getElementById('btnAgregarCarrito');
+    if (botonCarrito) botonCarrito.addEventListener('click', agregarAlCarrito);
+
+    const botonVaciarCarrito = document.getElementById('btnVaciarCarrito');
+    if (botonVaciarCarrito) botonVaciarCarrito.addEventListener('click', vaciarCarrito);
 
     const formProducto = document.getElementById('formProducto');
     if (formProducto) {
@@ -446,19 +737,62 @@ document.addEventListener("DOMContentLoaded", function () {
     if (formLogin) {
         formLogin.addEventListener('submit', function(event) {
             event.preventDefault();
-            const configValidacion = { "dominiosPermitidos": ["@gmail.com", "@duoc.cl", "@profesor.duoc.cl"] };
             const inputEmail = document.getElementById('rutOEmail').value.trim().toLowerCase();
+            const inputPassword = document.getElementById('password').value;
             const errorMensaje = document.getElementById('errorMensaje');
+            const usuario = obtenerUsuarios().find(cuenta => cuenta.correo === inputEmail && cuenta.password === inputPassword);
 
-            const esValido = configValidacion.dominiosPermitidos.some(dominio => inputEmail.endsWith(dominio));
-
-            if (esValido) {
+            if (usuario) {
                 if (errorMensaje) errorMensaje.classList.add('d-none');
+                localStorage.setItem('usuarioActivo', JSON.stringify({ nombre: usuario.nombre, correo: usuario.correo }));
                 window.location.href = "Menu.html";
             } else if (errorMensaje) {
-                errorMensaje.innerText = "Ingresa un correo válido";
+                errorMensaje.innerText = "El correo o la contraseña no son correctos";
                 errorMensaje.classList.remove('d-none');
             }
+        });
+    }
+
+    const formRegistro = document.getElementById('formRegistro');
+    if (formRegistro) {
+        formRegistro.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const correo = document.getElementById('correo').value.trim().toLowerCase();
+            const confirmarCorreo = document.getElementById('confirmarCorreo').value.trim().toLowerCase();
+            const password = document.getElementById('password').value;
+            const confirmarPassword = document.getElementById('confirmarPassword').value;
+            const errorMensaje = document.getElementById('errorRegistro');
+            const usuarios = obtenerUsuarios();
+
+            if (correo !== confirmarCorreo) {
+                errorMensaje.innerText = 'Los correos electrónicos no coinciden';
+                errorMensaje.classList.remove('d-none');
+                return;
+            }
+
+            if (password !== confirmarPassword) {
+                errorMensaje.innerText = 'Las contraseñas no coinciden';
+                errorMensaje.classList.remove('d-none');
+                return;
+            }
+
+            if (usuarios.some(usuario => usuario.correo === correo)) {
+                errorMensaje.innerText = 'Ya existe una cuenta con ese correo';
+                errorMensaje.classList.remove('d-none');
+                return;
+            }
+
+            usuarios.push({
+                nombre: document.getElementById('nombre').value.trim(),
+                correo,
+                password,
+                telefono: document.getElementById('telefono').value.trim(),
+                region: document.getElementById('region').selectedOptions[0].text,
+                comuna: document.getElementById('comuna').selectedOptions[0].text
+            });
+            guardarUsuarios(usuarios);
+            window.location.href = "index.html?registro=exitoso";
         });
     }
 });

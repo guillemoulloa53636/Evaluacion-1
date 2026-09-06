@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog & Noticias - Viajes por Chile</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Tu archivo CSS personalizado -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- NAVBAR BASE -->
+    <nav class="navbar navbar-expand-lg navbar-dark border-bottom py-3" style="background-color: #0a2540;">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand d-flex align-items-center fw-bold" href="index.html">
+                <img src="Img/Buses.png" alt="logo viajes por chile" width="60" height="60" class="me-2">
+                <span>Viajes por chile<small class="text-muted fs-6">.cl</small></span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNavegacion">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="menuNavegacion">
+                <ul class="navbar-nav ms-auto align-items-center gap-2">
+                    <li class="nav-item">
+                        <a class="btn btn-outline-light btn-sm px-3" href="Menu.html">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-turquesa text-white btn-sm px-3 fw-semibold" href="blog.html">Blog</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-light btn-sm px-3" href="nosotros.html">Nosotros</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ENCABEZADO -->
+    <header class="bg-light py-5 text-center border-bottom">
+        <div class="container py-2">
+            <h1 class="fw-bold display-5 text-dark">Blog & Datos Curiosos 🚌</h1>
+            <p class="lead text-muted mx-auto" style="max-width: 650px;">
+                Descubre noticias sobre transporte, consejos de viaje y datos fascinantes sobre recorridos en bus a lo largo de Chile.
+            </p>
+        </div>
+    </header>
+
+    <!-- SECCIÓN DE TARJETAS DE BLOG -->
+    <main class="container my-5">
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            
+            <!-- TARJETA BLOG 1 -->
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
+                    <div class="position-relative">
+                        <img src="Img/Mont.jpg" class="card-img-top" alt="Ruta al Sur de Chile" style="height: 240px; object-fit: cover;">
+                        <span class="badge bg-primary position-absolute top-0 start-0 m-3 px-3 py-2 rounded-pill">Dato Curioso</span>
+                    </div>
+                    <div class="card-body d-flex flex-column p-4">
+                        <div class="text-muted small mb-2">
+                            <i class="bi bi-calendar3 me-1"></i> 10 de Septiembre, 2026 | <i class="bi bi-clock me-1"></i> 4 min de lectura
+                        </div>
+                        <h4 class="card-title fw-bold text-dark mb-3">¿Sabías cuál es la ruta de bus más larga de Chile?</h4>
+                        <p class="card-text text-muted flex-grow-1">
+                            Recorre más de 3.000 kilómetros conectando el desierto de Arica con los paisajes del sur chileno. Te contamos los detalles de esta gran travesía sobre ruedas.
+                        </p>
+                        <!-- Botón que activa el Modal del Detalle 1 -->
+                        <button type="button" class="btn btn-turquesa text-white fw-semibold w-100 mt-3 py-2" data-bs-toggle="modal" data-bs-target="#modalBlog1">
+                            Leer artículo completo <i class="bi bi-arrow-right ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TARJETA BLOG 2 -->
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
+                    <div class="position-relative">
+                        <img src="Img/Valpo.webp" class="card-img-top" alt="Consejos para el bus" style="height: 240px; object-fit: cover;">
+                        <span class="badge bg-success position-absolute top-0 start-0 m-3 px-3 py-2 rounded-pill">Consejos de Viaje</span>
+                    </div>
+                    <div class="card-body d-flex flex-column p-4">
+                        <div class="text-muted small mb-2">
+                            <i class="bi bi-calendar3 me-1"></i> 12 de Septiembre, 2026 | <i class="bi bi-clock me-1"></i> 3 min de lectura
+                        </div>
+                        <h4 class="card-title fw-bold text-dark mb-3">5 Consejos esenciales para tu equipaje en viajes nocturnos</h4>
+                        <p class="card-text text-muted flex-grow-1">
+                            Aprende qué cosas debes llevar siempre en tu bolso de mano y cómo organizar tus pertenencias para viajar cómodo y seguro en trayectos largos.
+                        </p>
+                        <!-- Botón que activa el Modal del Detalle 2 -->
+                        <button type="button" class="btn btn-turquesa text-white fw-semibold w-100 mt-3 py-2" data-bs-toggle="modal" data-bs-target="#modalBlog2">
+                            Leer artículo completo <i class="bi bi-arrow-right ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ================= MODALES CON EL DETALLE DE CADA BLOG ================= -->
+
+    <!-- MODAL DETALLE BLOG 1 -->
+    <div class="modal fade" id="modalBlog1" tabindex="-1" aria-labelledby="modalBlog1Label" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <span class="badge bg-primary px-3 py-2 rounded-pill">Dato Curioso</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 p-md-5">
+                    <h2 class="fw-bold text-dark mb-3" id="modalBlog1Label">¿Sabías cuál es la ruta de bus más larga de Chile?</h2>
+                    
+                    <p class="text-muted small mb-4">
+                        <i class="bi bi-calendar3 me-1"></i> Publicado el 10 de Septiembre, 2026 | <i class="bi bi-person me-1"></i> Por Equipo Viajes por Chile
+                    </p>
+
+                    <!-- Imagen Detalle 1 -->
+                    <img src="Img/Mont.jpg" class="img-fluid rounded-4 mb-4 w-100" style="max-height: 380px; object-fit: cover;" alt="Ruta al sur">
+
+                    <!-- Descripción Larga 1 -->
+                    <div class="lh-lg text-secondary fs-6">
+                        <p>
+                            Chile es reconocido mundialmente por su geografía única: una larga y angosta franja de tierra comprimida entre la majestuosa Cordillera de los Andes y el Océano Pacífico. Esta particularidad geográfica convierte a las rutas terrestres del país en verdaderas hazañas logísticas para las empresas de transporte de pasajeros.
+                        </p>
+                        <p>
+                            La ruta de bus continuo más extensa dentro del territorio nacional conecta la ciudad norteña de <strong>Arica con Puerto Montt</strong> (e incluso con conexiones hasta la Isla de Chiloé), cubriendo más de 3.100 kilómetros a lo largo de la célebre Ruta 5. Este impresionante trayecto toma aproximadamente 40 horas en bus de larga distancia.
+                        </p>
+                        <h5 class="fw-bold text-dark mt-4">¿Por qué elegir el bus para tramos largos?</h5>
+                        <p>
+                            A diferencia del avión, viajar en bus ofrece la oportunidad única de presenciar la rápida transición de los paisajes chilenos: desde las pampas desérticas y áridas del Norte Grande, pasando por las zonas agrícolas y vitivinícolas del valle central, hasta llegar a los verdes bosques, ríos y lagos del sur. Además, las unidades de categoría Salón Cama y Cama Premium actuales ofrecen asientos reclinables hasta en 180°, puertos USB, climatización y snacks, compitiendo en comodidad con la primera clase aérea a un costo mucho más accesible.
+                        </p>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-secondary px-4 fw-semibold" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DETALLE BLOG 2 -->
+    <div class="modal fade" id="modalBlog2" tabindex="-1" aria-labelledby="modalBlog2Label" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <span class="badge bg-success px-3 py-2 rounded-pill">Consejos de Viaje</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 p-md-5">
+                    <h2 class="fw-bold text-dark mb-3" id="modalBlog2Label">5 Consejos esenciales para tu equipaje en viajes nocturnos</h2>
+                    
+                    <p class="text-muted small mb-4">
+                        <i class="bi bi-calendar3 me-1"></i> Publicado el 12 de Septiembre, 2026 | <i class="bi bi-person me-1"></i> Por Equipo Viajes por Chile
+                    </p>
+
+                    <!-- Imagen Detalle 2 -->
+                    <img src="Img/Valpo.webp" class="img-fluid rounded-4 mb-4 w-100" style="max-height: 380px; object-fit: cover;" alt="Consejos de viaje">
+
+                    <!-- Descripción Larga 2 -->
+                    <div class="lh-lg text-secondary fs-6">
+                        <p>
+                            Los viajes nocturnos en bus son la opción preferida por miles de chilenos diariamente: te permiten ahorrar la tarifa de una noche de hospedaje y amanecer directamente en tu destino con el día por delante. Sin embargo, para garantizar un descanso óptimo durante la noche en carretera, es fundamental organizar inteligentemente tu equipaje.
+                        </p>
+                        
+                        <h5 class="fw-bold text-dark mt-4">1. Elementos imprescindibles en el bolso de mano</h5>
+                        <p>
+                            Todo equipaje guardado en la bodega del bus permanecerá inaccesible hasta llegar al terminal de destino. Por ello, en tu bolso pequeño de cabina debes llevar: una manta ligera o polerón (el aire acondicionado del bus suele enfriar la cabina de noche), una almohada de cuello ergonómica, audífonos con cancelación de ruido y tus medicamentos de uso diario.
+                        </p>
+
+                        <h5 class="fw-bold text-dark mt-4">2. Documentos y objetos de valor</h5>
+                        <p>
+                            Jamás guardes en la bodega tu cédula de identidad, pasajes físicos o digitales, dinero en efectivo o equipos electrónicos de alto valor (notebooks, cámaras). Estos objetos deben viajar siempre a tus pies o en el compartimento superior sobre tu asiento.
+                        </p>
+
+                        <h5 class="fw-bold text-dark mt-4">3. Hidratación y preparación para dormir</h5>
+                        <p>
+                            Procura llevar una botella de agua recargable y evita comidas pesadas antes de abordar. Tapones para oídos y un antifaz para dormir completarán el kit perfecto para despertar descansado y listo para disfrutar tu destino.
+                        </p>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-secondary px-4 fw-semibold" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle (Requerido para el funcionamiento de los Modales) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
