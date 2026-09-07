@@ -332,15 +332,118 @@ function renderizarTablaClientes() {
     const tbody = document.getElementById("tablaClientesAdmin");
     if (!tbody) return;
 
-    tbody.innerHTML = obtenerUsuarios().map(usuario => `
+    const usuarios = obtenerUsuarios();
+
+    tbody.innerHTML = usuarios.map((usuario, index) => `
         <tr>
             <td class="fw-semibold">${escaparHTML(usuario.nombre || "Sin nombre")}</td>
             <td>${escaparHTML(usuario.correo)}</td>
             <td>${escaparHTML(usuario.telefono || "No informado")}</td>
             <td>${escaparHTML(usuario.comuna || "No informada")}</td>
             <td><span class="badge bg-success">Activo</span></td>
+            <td class="text-end">
+                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#modalUsuario" onclick="cargarUsuarioEdicion(${index})">
+                    <i class="bi bi-pencil"></i> Editar
+                </button>
+            </td>
         </tr>
     `).join("");
+}
+
+function limpiarFormularioUsuario() {
+    const formulario = document.getElementById('formUsuario');
+    if (formulario) formulario.reset();
+    if (document.getElementById('usuarioIndex')) document.getElementById('usuarioIndex').value = '';
+    const label = document.getElementById('modalUsuarioLabel');
+    if (label) {
+        label.innerHTML = '<i class="bi bi-person-plus me-2"></i>Ingresar Nuevo Usuario';
+    }
+    const passwordInput = document.getElementById('usuarioPassword');
+    if (passwordInput) {
+        passwordInput.required = true;
+        passwordInput.placeholder = 'Ingrese contraseña';
+    }
+}
+
+function cargarUsuarioEdicion(index) {
+    const usuarios = obtenerUsuarios();
+    const usuario = usuarios[index];
+    if (!usuario) return;
+
+    if (document.getElementById('usuarioIndex')) document.getElementById('usuarioIndex').value = index;
+    if (document.getElementById('usuarioNombre')) document.getElementById('usuarioNombre').value = usuario.nombre || '';
+    if (document.getElementById('usuarioCorreo')) document.getElementById('usuarioCorreo').value = usuario.correo || '';
+    if (document.getElementById('usuarioPassword')) {
+        document.getElementById('usuarioPassword').value = usuario.password || '';
+        document.getElementById('usuarioPassword').required = false;
+    }
+    if (document.getElementById('usuarioTelefono')) document.getElementById('usuarioTelefono').value = usuario.telefono || '';
+    if (document.getElementById('usuarioRegion')) document.getElementById('usuarioRegion').value = usuario.region || '';
+    if (document.getElementById('usuarioComuna')) document.getElementById('usuarioComuna').value = usuario.comuna || '';
+
+    const label = document.getElementById('modalUsuarioLabel');
+    if (label) {
+        label.innerHTML = '<i class="bi bi-pencil-square me-2"></i>Editar Usuario';
+    }
+}
+
+function guardarUsuarioFormulario(event) {
+    event.preventDefault();
+
+    const index = document.getElementById('usuarioIndex')?.value;
+    const usuarios = obtenerUsuarios();
+    const nombre = document.getElementById('usuarioNombre').value.trim();
+    const correo = document.getElementById('usuarioCorreo').value.trim().toLowerCase();
+    const password = document.getElementById('usuarioPassword').value.trim();
+    const telefono = document.getElementById('usuarioTelefono').value.trim();
+    const region = document.getElementById('usuarioRegion').value.trim();
+    const comuna = document.getElementById('usuarioComuna').value.trim();
+
+    if (!nombre || !correo) return;
+
+    if (index !== '') {
+        const usuarioActual = usuarios[Number(index)];
+        if (!usuarioActual) return;
+
+        const correoDuplicado = usuarios.some((usuario, i) => i !== Number(index) && usuario.correo && usuario.correo.toLowerCase() === correo);
+        if (correoDuplicado) {
+            alert('Ya existe un usuario con ese correo electrónico.');
+            return;
+        }
+
+        usuarioActual.nombre = nombre;
+        usuarioActual.correo = correo;
+        usuarioActual.telefono = telefono;
+        usuarioActual.region = region;
+        usuarioActual.comuna = comuna;
+        if (password) {
+            usuarioActual.password = password;
+        }
+    } else {
+        const correoDuplicado = usuarios.some(usuario => usuario.correo && usuario.correo.toLowerCase() === correo);
+        if (correoDuplicado) {
+            alert('Ya existe un usuario con ese correo electrónico.');
+            return;
+        }
+
+        usuarios.push({
+            nombre,
+            correo,
+            password: password || '123456',
+            telefono,
+            region,
+            comuna
+        });
+    }
+
+    guardarUsuarios(usuarios);
+    renderizarTablaClientes();
+
+    const modalUsuario = document.getElementById('modalUsuario');
+    if (modalUsuario) {
+        const modalInstance = bootstrap.Modal.getInstance(modalUsuario) || new bootstrap.Modal(modalUsuario);
+        modalInstance.hide();
+    }
 }
 
 // ==========================================
@@ -581,8 +684,24 @@ function renderizarCarrito() {
     total.innerText = '$' + totalCarrito.toLocaleString('es-CL');
 }
 
+function obtenerSlugProductoActivo() {
+    const slugActual = document.body?.dataset?.productSlug || document.getElementById('product-title')?.dataset?.slug;
+    if (slugActual) return slugActual;
+
+    const slugDesdeURL = new URLSearchParams(window.location.search).get('prod');
+    if (slugDesdeURL) return slugDesdeURL;
+
+    const tituloActual = document.getElementById('product-title')?.textContent?.trim();
+    if (tituloActual) {
+        const productoActual = obtenerProductos().find(item => item.titulo === tituloActual || item.breadcrumb === tituloActual);
+        if (productoActual) return productoActual.slug;
+    }
+
+    return obtenerProductos()[0]?.slug || 'puertomontt';
+}
+
 function agregarAlCarrito() {
-    const slug = new URLSearchParams(window.location.search).get('prod') || 'puertomontt';
+    const slug = obtenerSlugProductoActivo();
     const producto = obtenerProductos().find(item => item.slug === slug);
     const cantidad = Number(document.getElementById('cantidad')?.value || 1);
 
@@ -633,7 +752,16 @@ function cambiarProducto(slugProducto) {
     const producto = productos.find(p => p.slug === slugProducto);
 
     if (producto) {
-        if (document.getElementById('product-title')) document.getElementById('product-title').innerText = producto.titulo;
+        document.body.dataset.productSlug = producto.slug;
+        const url = new URL(window.location.href);
+        url.searchParams.set('prod', producto.slug);
+        window.history.replaceState({}, '', url);
+
+        const tituloElem = document.getElementById('product-title');
+        if (tituloElem) {
+            tituloElem.innerText = producto.titulo;
+            tituloElem.dataset.slug = producto.slug;
+        }
         if (document.getElementById('product-price')) document.getElementById('product-price').innerText = "$" + Number(producto.precio).toLocaleString('es-CL');
         const disponibilidad = document.getElementById('product-availability');
         const botonCarrito = document.getElementById('btnAgregarCarrito');
@@ -729,8 +857,13 @@ document.addEventListener("DOMContentLoaded", function () {
         formProducto.addEventListener('submit', guardarProductoFormulario);
     }
 
+    const formUsuario = document.getElementById('formUsuario');
+    if (formUsuario) {
+        formUsuario.addEventListener('submit', guardarUsuarioFormulario);
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
-    const prodSlug = urlParams.get('prod') || 'puertomontt';
+    const prodSlug = urlParams.get('prod') || obtenerSlugProductoActivo();
     cambiarProducto(prodSlug);
 
     const formLogin = document.getElementById('formLogin');
