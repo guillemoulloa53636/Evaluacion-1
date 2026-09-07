@@ -1,3 +1,4 @@
+
 const productosJSON = {
     "puertomontt": {
         "id": "PROD-01",
@@ -169,7 +170,9 @@ const productosJSON = {
     }
 };
 
+
 const productosIniciales = Object.values(productosJSON);
+
 
 const ciudadesJSON = {
     santiago: { nombre: "Santiago", distanciaDesdeSantiago: 0 },
@@ -187,6 +190,7 @@ const ciudadesJSON = {
     arica: { nombre: "Arica", distanciaDesdeSantiago: 2050 }
 };
 
+
 const tarifasEspecialesJSON = {
     "antofagasta-arica": 15000,
     "arica-laserena": 15000,
@@ -201,6 +205,7 @@ const tarifasEspecialesJSON = {
     "arica-talca": 45000
 };
 
+
 function calcularPrecioViaje(origen, destino) {
     const ciudadOrigen = ciudadesJSON[origen];
     const ciudadDestino = ciudadesJSON[destino];
@@ -211,6 +216,7 @@ function calcularPrecioViaje(origen, destino) {
     const precio = tarifaEspecial || Math.max(4500, Math.round((4500 + distancia * 12) / 500) * 500);
     return { distancia, precio, ciudadOrigen, ciudadDestino };
 }
+
 
 function prepararCalculadoraViaje() {
     const origen = document.getElementById('ciudadOrigen');
@@ -271,9 +277,8 @@ function prepararCalculadoraViaje() {
     });
 }
 
-// ==========================================
-// MANEJO DE USUARIOS Y AUTENTICACION
-// ==========================================
+
+
 const usuariosIniciales = [
     {
         nombre: "Guillermo",
@@ -300,6 +305,8 @@ const usuariosIniciales = [
         comuna: ""
     }
 ];
+//
+
 
 function obtenerUsuarios() {
     try {
@@ -324,9 +331,11 @@ function obtenerUsuarios() {
     }
 }
 
+
 function guardarUsuarios(usuarios) {
     localStorage.setItem("usuariosDB", JSON.stringify(usuarios));
 }
+
 
 function renderizarTablaClientes() {
     const tbody = document.getElementById("tablaClientesAdmin");
@@ -350,6 +359,7 @@ function renderizarTablaClientes() {
     `).join("");
 }
 
+
 function limpiarFormularioUsuario() {
     const formulario = document.getElementById('formUsuario');
     if (formulario) formulario.reset();
@@ -364,6 +374,7 @@ function limpiarFormularioUsuario() {
         passwordInput.placeholder = 'Ingrese contraseña';
     }
 }
+
 
 function cargarUsuarioEdicion(index) {
     const usuarios = obtenerUsuarios();
@@ -386,6 +397,7 @@ function cargarUsuarioEdicion(index) {
         label.innerHTML = '<i class="bi bi-pencil-square me-2"></i>Editar Usuario';
     }
 }
+
 
 function guardarUsuarioFormulario(event) {
     event.preventDefault();
@@ -446,9 +458,7 @@ function guardarUsuarioFormulario(event) {
     }
 }
 
-// ==========================================
-// MANEJO DE LOCALSTORAGE CON AUTORREPARACIÓN
-// ==========================================
+
 function obtenerProductos() {
     try {
         const productosGuardados = localStorage.getItem("productosDB");
@@ -469,9 +479,11 @@ function obtenerProductos() {
     }
 }
 
+
 function guardarProductos(listaActualizada) {
     localStorage.setItem("productosDB", JSON.stringify(listaActualizada));
 }
+
 
 function obtenerImagenProducto(producto) {
     const imagenes = [
@@ -486,9 +498,7 @@ function obtenerImagenProducto(producto) {
     return 'Img/Buses.png';
 }
 
-// ==========================================
-// RENDERIZADO DE TABLA ADMINISTRADOR
-// ==========================================
+
 function renderizarTablaAdmin() {
     const tbody = document.getElementById("tablaProductosAdmin");
     if (!tbody) return;
@@ -529,9 +539,7 @@ function renderizarTablaAdmin() {
     }).join('');
 }
 
-// ==========================================
-// FUNCIONES DEL MODAL (CREAR / EDITAR)
-// ==========================================
+
 function limpiarFormulario() {
     if (document.getElementById('prodSlug')) document.getElementById('prodSlug').value = '';
     if (document.getElementById('prodId')) document.getElementById('prodId').value = 'PROD-' + String(Math.floor(Math.random() * 90 + 10));
@@ -547,6 +555,7 @@ function limpiarFormulario() {
         labelModal.innerHTML = '<i class="bi bi-plus-lg me-2"></i>Añadir Nuevo Producto / Pasaje';
     }
 }
+
 
 function cargarProducto(slug) {
     const productos = obtenerProductos();
@@ -569,6 +578,7 @@ function cargarProducto(slug) {
     }
 }
 
+
 function guardarProductoFormulario(e) {
     if (e) e.preventDefault();
 
@@ -576,7 +586,7 @@ function guardarProductoFormulario(e) {
     const productos = obtenerProductos();
 
     if (slug) {
-        // Modo Edición
+        
         const index = productos.findIndex(p => p.slug === slug);
         if (index !== -1) {
             productos[index].id = document.getElementById('prodId').value;
@@ -590,7 +600,7 @@ function guardarProductoFormulario(e) {
             productos[index].desc = document.getElementById('prodDesc').value;
         }
     } else {
-        // Modo Creación
+        
         const tituloNuevo = document.getElementById('prodTitle').value;
         const slugNuevo = tituloNuevo.toLowerCase().replace(/[^a-z0-9]/g, '') || 'pasaje-' + Date.now();
         
@@ -621,6 +631,7 @@ function guardarProductoFormulario(e) {
     }
 }
 
+
 function eliminarProducto(slug) {
     if (confirm("¿Estás seguro de que deseas eliminar este producto?")) {
         let productos = obtenerProductos();
@@ -630,9 +641,7 @@ function eliminarProducto(slug) {
     }
 }
 
-// ==========================================
-// CARRITO DE VIAJES
-// ==========================================
+
 function obtenerCarrito() {
     try {
         const carrito = JSON.parse(localStorage.getItem('carritoDB') || '[]');
@@ -642,9 +651,11 @@ function obtenerCarrito() {
     }
 }
 
+
 function guardarCarrito(carrito) {
     localStorage.setItem('carritoDB', JSON.stringify(carrito));
 }
+
 
 function actualizarContadorCarrito() {
     const contador = document.getElementById('contadorCarrito');
@@ -654,6 +665,7 @@ function actualizarContadorCarrito() {
     contador.innerText = cantidadTotal;
     contador.classList.toggle('d-none', cantidadTotal === 0);
 }
+
 
 function renderizarCarrito() {
     const lista = document.getElementById('listaCarrito');
@@ -684,6 +696,7 @@ function renderizarCarrito() {
     total.innerText = '$' + totalCarrito.toLocaleString('es-CL');
 }
 
+
 function obtenerSlugProductoActivo() {
     const slugActual = document.body?.dataset?.productSlug || document.getElementById('product-title')?.dataset?.slug;
     if (slugActual) return slugActual;
@@ -699,6 +712,7 @@ function obtenerSlugProductoActivo() {
 
     return obtenerProductos()[0]?.slug || 'puertomontt';
 }
+
 
 function agregarAlCarrito() {
     const slug = obtenerSlugProductoActivo();
@@ -732,11 +746,13 @@ function agregarAlCarrito() {
     }
 }
 
+
 function quitarDelCarrito(slug) {
     guardarCarrito(obtenerCarrito().filter(item => item.slug !== slug));
     actualizarContadorCarrito();
     renderizarCarrito();
 }
+
 
 function vaciarCarrito() {
     guardarCarrito([]);
@@ -744,9 +760,7 @@ function vaciarCarrito() {
     renderizarCarrito();
 }
 
-// ==========================================
-// VISTA PÚBLICA (DETALLE DE PRODUCTO)
-// ==========================================
+
 function cambiarProducto(slugProducto) {
     const productos = obtenerProductos();
     const producto = productos.find(p => p.slug === slugProducto);
@@ -789,6 +803,7 @@ function cambiarProducto(slugProducto) {
     }
 }
 
+
 function escaparHTML(valor) {
     return String(valor)
         .replace(/&/g, '&amp;')
@@ -797,6 +812,7 @@ function escaparHTML(valor) {
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
 }
+
 
 function renderizarProductosRelacionados() {
     const contenedor = document.getElementById('relacionadosLista');
@@ -831,14 +847,13 @@ function renderizarProductosRelacionados() {
         </div>`).join('');
 }
 
+
 function cambiarImagenPrincipal(src) {
     const imgElem = document.getElementById('product-img');
     if (imgElem) imgElem.src = src;
 }
 
-// ==========================================
-// EVENTOS AL CARGAR LA PÁGINA
-// ==========================================
+
 document.addEventListener("DOMContentLoaded", function () {
     renderizarTablaAdmin();
     renderizarTablaClientes();
