@@ -803,6 +803,24 @@ function cambiarProducto(slugProducto) {
     }
 }
 
+function irAMiCuenta(event) {
+    if (event) {
+        event.preventDefault(); // Evita que el enlace recargue la página o salte arriba
+    }
+
+    // 1. Obtenemos el usuario guardado en localStorage (o sessionStorage)
+    const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo')) || JSON.parse(sessionStorage.getItem('usuarioActivo'));
+
+    // 2. Evaluamos si la sesión está iniciada
+    if (usuarioActivo) {
+        // Sesión iniciada -> redirigir al panel de administración
+        window.location.href = 'admin.html';
+    } else {
+        // No hay sesión -> redirigir al login (index.html)
+        window.location.href = 'index.html';
+    }
+}
+
 
 function escaparHTML(valor) {
     return String(valor)
