@@ -586,7 +586,6 @@ function guardarProductoFormulario(e) {
     const productos = obtenerProductos();
 
     if (slug) {
-        
         const index = productos.findIndex(p => p.slug === slug);
         if (index !== -1) {
             productos[index].id = document.getElementById('prodId').value;
@@ -600,7 +599,6 @@ function guardarProductoFormulario(e) {
             productos[index].desc = document.getElementById('prodDesc').value;
         }
     } else {
-        
         const tituloNuevo = document.getElementById('prodTitle').value;
         const slugNuevo = tituloNuevo.toLowerCase().replace(/[^a-z0-9]/g, '') || 'pasaje-' + Date.now();
         
@@ -622,7 +620,7 @@ function guardarProductoFormulario(e) {
     }
 
     guardarProductos(productos);
-    renderizarTablaAdmin();
+    if (typeof renderizarTablaAdmin === 'function') renderizarTablaAdmin();
 
     const modalElem = document.getElementById('modalEditarProducto');
     if (modalElem) {
@@ -637,7 +635,7 @@ function eliminarProducto(slug) {
         let productos = obtenerProductos();
         productos = productos.filter(p => p.slug !== slug);
         guardarProductos(productos);
-        renderizarTablaAdmin();
+        if (typeof renderizarTablaAdmin === 'function') renderizarTablaAdmin();
     }
 }
 
@@ -679,15 +677,17 @@ function renderizarCarrito() {
         return;
     }
 
+    const fnEscapar = typeof escaparHTML === 'function' ? escaparHTML : str => str;
+
     lista.innerHTML = carrito.map(item => `
         <div class="d-flex justify-content-between align-items-center border-bottom py-3 gap-3">
             <div>
-                <strong class="d-block">${escaparHTML(item.titulo)}</strong>
+                <strong class="d-block">${fnEscapar(item.titulo)}</strong>
                 <small class="text-muted">${item.cantidad} pasaje(s) x $${Number(item.precio).toLocaleString('es-CL')}</small>
             </div>
             <div class="text-end">
                 <strong class="d-block text-success">$${(item.precio * item.cantidad).toLocaleString('es-CL')}</strong>
-                <button type="button" class="btn btn-sm btn-link text-danger p-0" onclick="quitarDelCarrito('${escaparHTML(item.slug)}')">Quitar</button>
+                <button type="button" class="btn btn-sm btn-link text-danger p-0" onclick="quitarDelCarrito('${fnEscapar(item.slug)}')">Quitar</button>
             </div>
         </div>
     `).join('');
@@ -701,7 +701,7 @@ function obtenerSlugProductoActivo() {
     const slugActual = document.body?.dataset?.productSlug || document.getElementById('product-title')?.dataset?.slug;
     if (slugActual) return slugActual;
 
-    const slugDesdeURL = new URLSearchParams(window.location.search).get('prod');
+    const slugDesdeURL = new URLSearchParams(window.location.search).get('prod') || new URLSearchParams(window.location.search).get('id');
     if (slugDesdeURL) return slugDesdeURL;
 
     const tituloActual = document.getElementById('product-title')?.textContent?.trim();
@@ -716,10 +716,10 @@ function obtenerSlugProductoActivo() {
 
 function agregarAlCarrito() {
     const slug = obtenerSlugProductoActivo();
-    const producto = obtenerProductos().find(item => item.slug === slug);
+    const producto = obtenerProductos().find(item => item.slug === slug || item.id === slug);
     const cantidad = Number(document.getElementById('cantidad')?.value || 1);
 
-    if (!producto || producto.estado !== 'Activo') return;
+    if (!producto || producto.estado === 'Inactivo') return;
 
     const carrito = obtenerCarrito();
     const itemExistente = carrito.find(item => item.slug === producto.slug);
@@ -763,7 +763,7 @@ function vaciarCarrito() {
 
 function cambiarProducto(slugProducto) {
     const productos = obtenerProductos();
-    const producto = productos.find(p => p.slug === slugProducto);
+    const producto = productos.find(p => p.slug === slugProducto || p.id === slugProducto);
 
     if (producto) {
         document.body.dataset.productSlug = producto.slug;
@@ -777,9 +777,11 @@ function cambiarProducto(slugProducto) {
             tituloElem.dataset.slug = producto.slug;
         }
         if (document.getElementById('product-price')) document.getElementById('product-price').innerText = "$" + Number(producto.precio).toLocaleString('es-CL');
+        
         const disponibilidad = document.getElementById('product-availability');
         const botonCarrito = document.getElementById('btnAgregarCarrito');
-        const disponible = producto.estado === 'Activo';
+        const disponible = producto.estado !== 'Inactivo';
+        
         if (disponibilidad) {
             disponibilidad.className = `badge ${disponible ? 'bg-success' : 'bg-danger'} fs-6`;
             disponibilidad.innerHTML = `<i class="bi ${disponible ? 'bi-check-circle' : 'bi-x-circle'} me-1"></i>${disponible ? 'Disponible' : 'No disponible'}`;
@@ -788,9 +790,14 @@ function cambiarProducto(slugProducto) {
             botonCarrito.disabled = !disponible;
             botonCarrito.innerHTML = disponible ? '<i class="bi bi-cart-plus me-2"></i>Añadir al carrito' : '<i class="bi bi-cart-x me-2"></i>Viaje no disponible';
         }
-        if (document.getElementById('product-description')) document.getElementById('product-description').innerText = producto.descripcion || producto.desc;
+        if (document.getElementById('product-description')) document.getElementById('product-description').innerText = producto.descripcion || producto.desc || '';
         if (document.getElementById('product-breadcrumb')) document.getElementById('product-breadcrumb').innerText = producto.breadcrumb || producto.titulo;
-        if (document.getElementById('product-img')) document.getElementById('product-img').src = obtenerImagenProducto(producto);
+        
+        const imgElem = document.getElementById('product-img');
+        if (imgElem) {
+            const imgSrc = typeof obtenerImagenProducto === 'function' ? obtenerImagenProducto(producto) : (producto.imagen || producto.img || 'Img/Buses.png');
+            imgElem.src = imgSrc;
+        }
 
         const galeriaContenedor = document.getElementById('product-gallery');
         if (galeriaContenedor && producto.galeria) {
@@ -799,9 +806,113 @@ function cambiarProducto(slugProducto) {
             ).join('');
         }
 
-        renderizarProductosRelacionados();
+        if (typeof renderizarProductosRelacionados === 'function') {
+            renderizarProductosRelacionados();
+        }
     }
 }
+
+
+// --- MANEJO DEL BUSCADOR DE PASAJES ---
+function buscarPasajes(e) {
+    if (e) e.preventDefault();
+
+    const origenElem = document.getElementById('origenSelect') || document.getElementById('origen');
+    const destinoElem = document.getElementById('destinoSelect') || document.getElementById('destino');
+
+    const origen = origenElem ? origenElem.value.trim().toLowerCase() : '';
+    const destino = destinoElem ? destinoElem.value.trim().toLowerCase() : '';
+
+    if (origen && destino && origen === destino) {
+        alert("El origen y el destino no pueden ser la misma ciudad.");
+        return;
+    }
+
+    const productos = obtenerProductos();
+
+    // Buscar el producto que contenga la información del origen y destino
+    let coincidencia = productos.find(p => {
+        const texto = ((p.titulo || '') + ' ' + (p.slug || '') + ' ' + (p.descripcion || p.desc || '')).toLowerCase();
+        return (origen === '' || texto.includes(origen)) && (destino === '' || texto.includes(destino));
+    });
+
+    // Si no hay coincidencia exacta pero hay lista de productos, tomamos el primero
+    if (!coincidencia && productos.length > 0) {
+        coincidencia = productos[0];
+    }
+
+    if (coincidencia) {
+        // Redirige directamente a la vista de detalle
+        window.location.href = `Detalle.html?prod=${coincidencia.slug}`;
+    } else {
+        alert("No se encontraron pasajes para la búsqueda realizada.");
+    }
+}
+
+// Vincular el submit del formulario del buscador al cargar
+document.addEventListener('DOMContentLoaded', () => {
+    const formBuscador = document.getElementById('formBuscador') || document.querySelector('.hero-section form') || document.querySelector('form');
+    if (formBuscador) {
+        formBuscador.addEventListener('submit', buscarPasajes);
+    }
+});
+
+// --- CARGA AUTOMÁTICA AL ABRIR DETALLE.HTML ---
+document.addEventListener('DOMContentLoaded', () => {
+    // Detecta si estamos en la página de detalle
+    const esPaginaDetalle = document.getElementById('product-title') || document.getElementById('product-price');
+    
+    if (esPaginaDetalle) {
+        // Extrae el valor de 'prod' desde la URL (?prod=nombre)
+        const urlParams = new URLSearchParams(window.location.search);
+        const slugURL = urlParams.get('prod');
+
+        if (slugURL) {
+            cambiarProducto(slugURL);
+        } else {
+            // Si no viene parámetro en la URL, carga el primer producto disponible
+            const slugPorDefecto = obtenerSlugProductoActivo();
+            cambiarProducto(slugPorDefecto);
+        }
+    }
+});
+
+// --- CONTACTO / SERVICIO AL CLIENTE ---
+document.addEventListener('DOMContentLoaded', () => {
+    const formContacto = document.getElementById('formContacto');
+
+    if (formContacto) {
+        formContacto.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Muestra la confirmación de envío
+            alert("¡Mensaje enviado exitosamente!\n\nEl tiempo estimado de respuesta es de 5 días hábiles.");
+
+            // Reinicia los campos del formulario
+            formContacto.reset();
+        });
+    }
+});
+
+// --- CONTACTO / SERVICIO AL CLIENTE ---
+document.addEventListener('DOMContentLoaded', () => {
+    const formContacto = document.getElementById('formContacto');
+
+    if (formContacto) {
+        formContacto.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // 1. Mensaje de confirmación
+            alert("¡Mensaje enviado exitosamente!\n\nEl tiempo estimado de respuesta es de 5 días hábiles.");
+
+            // 2. Limpiar formulario
+            formContacto.reset();
+
+            // 3. Redirigir al inicio
+            window.location.href = "Menu.html"; // Cambia a "index.html" si ese es el nombre de tu página principal
+        });
+    }
+});
 
 function irAMiCuenta(event) {
     if (event) {
