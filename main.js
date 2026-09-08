@@ -170,9 +170,12 @@ const productosJSON = {
     }
 };
 
-
 const productosIniciales = Object.values(productosJSON);
 
+function obtenerProductos() {
+    const guardados = localStorage.getItem('productosAdmin');
+    return guardados ? JSON.parse(guardados) : productosIniciales;
+}
 
 const ciudadesJSON = {
     santiago: { nombre: "Santiago", distanciaDesdeSantiago: 0 },
@@ -190,7 +193,6 @@ const ciudadesJSON = {
     arica: { nombre: "Arica", distanciaDesdeSantiago: 2050 }
 };
 
-
 const tarifasEspecialesJSON = {
     "antofagasta-arica": 15000,
     "arica-laserena": 15000,
@@ -205,7 +207,6 @@ const tarifasEspecialesJSON = {
     "arica-talca": 45000
 };
 
-
 function calcularPrecioViaje(origen, destino) {
     const ciudadOrigen = ciudadesJSON[origen];
     const ciudadDestino = ciudadesJSON[destino];
@@ -216,7 +217,6 @@ function calcularPrecioViaje(origen, destino) {
     const precio = tarifaEspecial || Math.max(4500, Math.round((4500 + distancia * 12) / 500) * 500);
     return { distancia, precio, ciudadOrigen, ciudadDestino };
 }
-
 
 function prepararCalculadoraViaje() {
     const origen = document.getElementById('ciudadOrigen');
@@ -255,7 +255,7 @@ function prepararCalculadoraViaje() {
     botonAgregar.addEventListener('click', () => {
         if (!viajeCalculado) return;
         const slug = `calculado-${origen.value}-${destino.value}`;
-        const carrito = obtenerCarrito();
+        const carrito = typeof obtenerCarrito === 'function' ? obtenerCarrito() : [];
         const itemExistente = carrito.find(item => item.slug === slug);
         if (itemExistente) {
             itemExistente.cantidad += 1;
@@ -267,9 +267,9 @@ function prepararCalculadoraViaje() {
                 cantidad: 1
             });
         }
-        guardarCarrito(carrito);
-        actualizarContadorCarrito();
-        renderizarCarrito();
+        if (typeof guardarCarrito === 'function') guardarCarrito(carrito);
+        if (typeof actualizarContadorCarrito === 'function') actualizarContadorCarrito();
+        if (typeof renderizarCarrito === 'function') renderizarCarrito();
         botonAgregar.innerHTML = '<i class="bi bi-check-lg me-1"></i>Añadido al carrito';
         window.setTimeout(() => {
             botonAgregar.innerHTML = '<i class="bi bi-cart-plus me-1"></i>Añadir al carrito';
@@ -277,8 +277,87 @@ function prepararCalculadoraViaje() {
     });
 }
 
+// --- RENDERIZADO SEGURO DE PRODUCTOS EN MENU.HTML ---
+function renderizarMenuPasajes(origen = '', destino = '') {
+    const contenedor = document.getElementById('resultadosBusqueda');
+    if (!contenedor) return; // Si no estamos en Menu.html, detiene la ejecución limpiamente
+
+    const productos = obtenerProductos();
+
+    const filtrados = productos.filter(p => {
+        const texto = ((p.titulo || '') + ' ' + (p.slug || '') + ' ' + (p.descripcion || p.desc || '')).toLowerCase();
+        const coincideOrigen = origen ? texto.includes(origen.toLowerCase()) : true;
+        const coincideDestino = destino ? texto.includes(destino.toLowerCase()) : true;
+        return coincideOrigen && coincideDestino;
+    });
+
+    if (filtrados.length === 0) {
+        contenedor.innerHTML = `
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-exclamation-circle text-warning fs-1"></i>
+                <h3 class="mt-3">No se encontraron pasajes</h3>
+                <p class="text-muted">No hay pasajes disponibles para el origen y destino seleccionados.</p>
+            </div>`;
+        return;
+    }
+
+    contenedor.innerHTML = filtrados.map(p => `
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 rounded-4">
+                <img src="${p.imagen || p.img || 'Img/Buses.png'}" class="card-img-top rounded-top-4" alt="${p.titulo}" style="height: 200px; object-fit: cover;">
+                <div class="card-body d-flex flex-column">
+                    <span class="badge bg-primary mb-2 w-auto align-self-start">${p.tipo || 'Pasaje'}</span>
+                    <h5 class="card-title fw-bold">${p.titulo}</h5>
+                    <p class="card-text text-muted flex-grow-1">${p.descripcion || p.desc || ''}</p>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="fs-4 fw-bold text-success">$${Number(p.precio).toLocaleString('es-CL')}</span>
+                        <a href="Detalle.html?prod=${p.slug}" class="btn btn-outline-primary fw-semibold">
+                            Ver detalle
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// INICIALIZACIÓN AL CARGAR
+document.addEventListener('DOMContentLoaded', () => {
+    prepararCalculadoraViaje();
+
+    const formBuscador = document.getElementById('formBuscador');
+    if (formBuscador) {
+        // Renderizado inicial sin alertas
+        const urlParams = new URLSearchParams(window.location.search);
+        const prodParam = urlParams.get('prod') || '';
+        
+        renderizarMenuPasajes('', prodParam);
+
+        // Búsqueda interactiva manual (solo cuando presiona submit)
+        formBuscador.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const origenVal = document.getElementById('origenSelect') ? document.getElementById('origenSelect').value : '';
+            const destinoVal = document.getElementById('destinoSelect') ? document.getElementById('destinoSelect').value : '';
+
+            if (origenVal && destinoVal && origenVal === destinoVal) {
+                alert("El origen y el destino no pueden ser la misma ciudad.");
+                return;
+            }
+
+            renderizarMenuPasajes(origenVal, destinoVal);
+        });
+    }
+});
 
 
+// --- FUNCIÓN AUXILIAR DE SEGURIDAD ---
+function escaparHTML(str) {
+    return String(str || '').replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+    });
+}
+
+// --- GESTIÓN DE USUARIOS ---
 const usuariosIniciales = [
     {
         nombre: "Guillermo",
@@ -305,8 +384,6 @@ const usuariosIniciales = [
         comuna: ""
     }
 ];
-//
-
 
 function obtenerUsuarios() {
     try {
@@ -331,11 +408,9 @@ function obtenerUsuarios() {
     }
 }
 
-
 function guardarUsuarios(usuarios) {
     localStorage.setItem("usuariosDB", JSON.stringify(usuarios));
 }
-
 
 function renderizarTablaClientes() {
     const tbody = document.getElementById("tablaClientesAdmin");
@@ -359,7 +434,6 @@ function renderizarTablaClientes() {
     `).join("");
 }
 
-
 function limpiarFormularioUsuario() {
     const formulario = document.getElementById('formUsuario');
     if (formulario) formulario.reset();
@@ -374,7 +448,6 @@ function limpiarFormularioUsuario() {
         passwordInput.placeholder = 'Ingrese contraseña';
     }
 }
-
 
 function cargarUsuarioEdicion(index) {
     const usuarios = obtenerUsuarios();
@@ -397,7 +470,6 @@ function cargarUsuarioEdicion(index) {
         label.innerHTML = '<i class="bi bi-pencil-square me-2"></i>Editar Usuario';
     }
 }
-
 
 function guardarUsuarioFormulario(event) {
     event.preventDefault();
@@ -458,7 +530,7 @@ function guardarUsuarioFormulario(event) {
     }
 }
 
-
+// --- GESTIÓN DE PRODUCTOS ---
 function obtenerProductos() {
     try {
         const productosGuardados = localStorage.getItem("productosDB");
@@ -479,11 +551,9 @@ function obtenerProductos() {
     }
 }
 
-
 function guardarProductos(listaActualizada) {
     localStorage.setItem("productosDB", JSON.stringify(listaActualizada));
 }
-
 
 function obtenerImagenProducto(producto) {
     const imagenes = [
@@ -497,7 +567,6 @@ function obtenerImagenProducto(producto) {
     if (producto.slug === 'valparaiso') return 'Img/Valpo.webp';
     return 'Img/Buses.png';
 }
-
 
 function renderizarTablaAdmin() {
     const tbody = document.getElementById("tablaProductosAdmin");
@@ -521,8 +590,8 @@ function renderizarTablaAdmin() {
         return `
             <tr>
                 <td><strong>#${prod.id || 'PROD-00'}</strong></td>
-                <td><img src="${imagenMostrar}" alt="${prod.titulo}" width="50" height="35" class="rounded object-fit-cover border bg-light"></td>
-                <td class="fw-semibold">${prod.titulo}</td>
+                <td><img src="${imagenMostrar}" alt="${escaparHTML(prod.titulo)}" width="50" height="35" class="rounded object-fit-cover border bg-light"></td>
+                <td class="fw-semibold">${escaparHTML(prod.titulo)}</td>
                 <td class="text-success fw-bold">$${precioFormateado}</td>
                 <td><span class="badge ${badgeTipo}">${prod.tipo || 'Clásico'}</span></td>
                 <td><span class="badge ${badgeEstado}">${prod.estado || 'Activo'}</span></td>
@@ -538,7 +607,6 @@ function renderizarTablaAdmin() {
         `;
     }).join('');
 }
-
 
 function limpiarFormulario() {
     if (document.getElementById('prodSlug')) document.getElementById('prodSlug').value = '';
@@ -556,7 +624,6 @@ function limpiarFormulario() {
     }
 }
 
-
 function cargarProducto(slug) {
     const productos = obtenerProductos();
     const prod = productos.find(p => p.slug === slug);
@@ -567,7 +634,7 @@ function cargarProducto(slug) {
         if (document.getElementById('prodTitle')) document.getElementById('prodTitle').value = prod.titulo || '';
         if (document.getElementById('prodPrice')) document.getElementById('prodPrice').value = prod.precio || 0;
         if (document.getElementById('prodType')) document.getElementById('prodType').value = prod.tipo || 'Clásico';
-        if (document.getElementById('prodImg')) document.getElementById('prodImg').value = prod.imagen || prod.img || 'Img/Buses.png';
+        if (document.getElementById('prodImg')) document.getElementById('prodImg').value = obtenerImagenProducto(prod);
         if (document.getElementById('prodStatus')) document.getElementById('prodStatus').value = prod.estado || 'Activo';
         if (document.getElementById('prodDesc')) document.getElementById('prodDesc').value = prod.descripcion || prod.desc || '';
 
@@ -582,39 +649,39 @@ function cargarProducto(slug) {
 function guardarProductoFormulario(e) {
     if (e) e.preventDefault();
 
-    const slug = document.getElementById('prodSlug').value;
+    const slug = document.getElementById('prodSlug')?.value;
     const productos = obtenerProductos();
 
     if (slug) {
         const index = productos.findIndex(p => p.slug === slug);
         if (index !== -1) {
-            productos[index].id = document.getElementById('prodId').value;
-            productos[index].titulo = document.getElementById('prodTitle').value;
-            productos[index].precio = parseInt(document.getElementById('prodPrice').value) || 0;
-            productos[index].tipo = document.getElementById('prodType').value;
-            productos[index].img = document.getElementById('prodImg').value;
-            productos[index].imagen = document.getElementById('prodImg').value;
-            productos[index].estado = document.getElementById('prodStatus').value;
-            productos[index].descripcion = document.getElementById('prodDesc').value;
-            productos[index].desc = document.getElementById('prodDesc').value;
+            productos[index].id = document.getElementById('prodId')?.value || productos[index].id;
+            productos[index].titulo = document.getElementById('prodTitle')?.value || productos[index].titulo;
+            productos[index].precio = parseInt(document.getElementById('prodPrice')?.value) || 0;
+            productos[index].tipo = document.getElementById('prodType')?.value || productos[index].tipo;
+            productos[index].img = document.getElementById('prodImg')?.value || productos[index].img;
+            productos[index].imagen = document.getElementById('prodImg')?.value || productos[index].imagen;
+            productos[index].estado = document.getElementById('prodStatus')?.value || productos[index].estado;
+            productos[index].descripcion = document.getElementById('prodDesc')?.value || productos[index].descripcion;
+            productos[index].desc = document.getElementById('prodDesc')?.value || productos[index].desc;
         }
     } else {
-        const tituloNuevo = document.getElementById('prodTitle').value;
+        const tituloNuevo = document.getElementById('prodTitle')?.value || 'Nuevo Pasaje';
         const slugNuevo = tituloNuevo.toLowerCase().replace(/[^a-z0-9]/g, '') || 'pasaje-' + Date.now();
         
         const nuevoProducto = {
-            id: document.getElementById('prodId').value || 'PROD-99',
+            id: document.getElementById('prodId')?.value || 'PROD-' + Math.floor(Math.random() * 90 + 10),
             slug: slugNuevo,
             titulo: tituloNuevo,
-            precio: parseInt(document.getElementById('prodPrice').value) || 0,
-            tipo: document.getElementById('prodType').value,
-            estado: document.getElementById('prodStatus').value,
-            img: document.getElementById('prodImg').value || 'Img/Buses.png',
-            imagen: document.getElementById('prodImg').value || 'Img/Buses.png',
-            descripcion: document.getElementById('prodDesc').value,
-            desc: document.getElementById('prodDesc').value,
+            precio: parseInt(document.getElementById('prodPrice')?.value) || 0,
+            tipo: document.getElementById('prodType')?.value || 'Clásico',
+            estado: document.getElementById('prodStatus')?.value || 'Activo',
+            img: document.getElementById('prodImg')?.value || 'Img/Buses.png',
+            imagen: document.getElementById('prodImg')?.value || 'Img/Buses.png',
+            descripcion: document.getElementById('prodDesc')?.value || '',
+            desc: document.getElementById('prodDesc')?.value || '',
             breadcrumb: tituloNuevo,
-            galeria: [document.getElementById('prodImg').value || 'Img/Buses.png']
+            galeria: [document.getElementById('prodImg')?.value || 'Img/Buses.png']
         };
         productos.push(nuevoProducto);
     }
@@ -629,7 +696,6 @@ function guardarProductoFormulario(e) {
     }
 }
 
-
 function eliminarProducto(slug) {
     if (confirm("¿Estás seguro de que deseas eliminar este producto?")) {
         let productos = obtenerProductos();
@@ -638,7 +704,6 @@ function eliminarProducto(slug) {
         if (typeof renderizarTablaAdmin === 'function') renderizarTablaAdmin();
     }
 }
-
 
 function obtenerCarrito() {
     try {
@@ -649,11 +714,9 @@ function obtenerCarrito() {
     }
 }
 
-
 function guardarCarrito(carrito) {
     localStorage.setItem('carritoDB', JSON.stringify(carrito));
 }
-
 
 function actualizarContadorCarrito() {
     const contador = document.getElementById('contadorCarrito');
@@ -663,7 +726,6 @@ function actualizarContadorCarrito() {
     contador.innerText = cantidadTotal;
     contador.classList.toggle('d-none', cantidadTotal === 0);
 }
-
 
 function renderizarCarrito() {
     const lista = document.getElementById('listaCarrito');
@@ -677,7 +739,7 @@ function renderizarCarrito() {
         return;
     }
 
-    const fnEscapar = typeof escaparHTML === 'function' ? escaparHTML : str => str;
+    const fnEscapar = typeof escapingHTML === 'function' ? escapingHTML : (typeof escaparHTML === 'function' ? escaparHTML : str => str);
 
     lista.innerHTML = carrito.map(item => `
         <div class="d-flex justify-content-between align-items-center border-bottom py-3 gap-3">
@@ -696,7 +758,6 @@ function renderizarCarrito() {
     total.innerText = '$' + totalCarrito.toLocaleString('es-CL');
 }
 
-
 function obtenerSlugProductoActivo() {
     const slugActual = document.body?.dataset?.productSlug || document.getElementById('product-title')?.dataset?.slug;
     if (slugActual) return slugActual;
@@ -712,7 +773,6 @@ function obtenerSlugProductoActivo() {
 
     return obtenerProductos()[0]?.slug || 'puertomontt';
 }
-
 
 function agregarAlCarrito() {
     const slug = obtenerSlugProductoActivo();
@@ -746,20 +806,17 @@ function agregarAlCarrito() {
     }
 }
 
-
 function quitarDelCarrito(slug) {
     guardarCarrito(obtenerCarrito().filter(item => item.slug !== slug));
     actualizarContadorCarrito();
     renderizarCarrito();
 }
 
-
 function vaciarCarrito() {
     guardarCarrito([]);
     actualizarContadorCarrito();
     renderizarCarrito();
 }
-
 
 function cambiarProducto(slugProducto) {
     const productos = obtenerProductos();
@@ -812,7 +869,6 @@ function cambiarProducto(slugProducto) {
     }
 }
 
-
 // --- MANEJO DEL BUSCADOR DE PASAJES ---
 function buscarPasajes(e) {
     if (e) e.preventDefault();
@@ -830,118 +886,80 @@ function buscarPasajes(e) {
 
     const productos = obtenerProductos();
 
-    // Buscar el producto que contenga la información del origen y destino
     let coincidencia = productos.find(p => {
         const texto = ((p.titulo || '') + ' ' + (p.slug || '') + ' ' + (p.descripcion || p.desc || '')).toLowerCase();
         return (origen === '' || texto.includes(origen)) && (destino === '' || texto.includes(destino));
     });
 
-    // Si no hay coincidencia exacta pero hay lista de productos, tomamos el primero
     if (!coincidencia && productos.length > 0) {
         coincidencia = productos[0];
     }
 
     if (coincidencia) {
-        // Redirige directamente a la vista de detalle
         window.location.href = `Detalle.html?prod=${coincidencia.slug}`;
     } else {
         alert("No se encontraron pasajes para la búsqueda realizada.");
     }
 }
 
-// Vincular el submit del formulario del buscador al cargar
-document.addEventListener('DOMContentLoaded', () => {
-    const formBuscador = document.getElementById('formBuscador') || document.querySelector('.hero-section form') || document.querySelector('form');
-    if (formBuscador) {
-        formBuscador.addEventListener('submit', buscarPasajes);
+// --- BÚSQUEDA Y FILTRADO DE DESTINOS DESDE EL MENÚ ---
+function filtrarProductosPorBusqueda(origen, destino) {
+    const contenedor = document.getElementById('contenedorProductos') || document.getElementById('listaProductos');
+    if (!contenedor) return;
+
+    const productos = obtenerProductos();
+
+    const filtro = productos.filter(prod => {
+        const titulo = (prod.titulo || '').toLowerCase();
+        const coincideOrigen = origen ? titulo.includes(origen.toLowerCase()) : true;
+        const coincideDestino = destino ? titulo.includes(destino.toLowerCase()) : true;
+        return coincideOrigen && coincideDestino;
+    });
+
+    if (filtro.length === 0) {
+        contenedor.innerHTML = `
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-exclamation-circle text-warning fs-1"></i>
+                <h3 class="mt-3">No se encontraron pasajes</h3>
+                <p class="text-muted">No hay viajes disponibles para "${origen} ${destino}". Intenta con otra ciudad.</p>
+            </div>`;
+        return;
     }
-});
 
-// --- CARGA AUTOMÁTICA AL ABRIR DETALLE.HTML ---
-document.addEventListener('DOMContentLoaded', () => {
-    // Detecta si estamos en la página de detalle
-    const esPaginaDetalle = document.getElementById('product-title') || document.getElementById('product-price');
-    
-    if (esPaginaDetalle) {
-        // Extrae el valor de 'prod' desde la URL (?prod=nombre)
-        const urlParams = new URLSearchParams(window.location.search);
-        const slugURL = urlParams.get('prod');
+    const fnEscapar = typeof escaparHTML === 'function' ? escaparHTML : str => str;
 
-        if (slugURL) {
-            cambiarProducto(slugURL);
-        } else {
-            // Si no viene parámetro en la URL, carga el primer producto disponible
-            const slugPorDefecto = obtenerSlugProductoActivo();
-            cambiarProducto(slugPorDefecto);
-        }
-    }
-});
-
-// --- CONTACTO / SERVICIO AL CLIENTE ---
-document.addEventListener('DOMContentLoaded', () => {
-    const formContacto = document.getElementById('formContacto');
-
-    if (formContacto) {
-        formContacto.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // Muestra la confirmación de envío
-            alert("¡Mensaje enviado exitosamente!\n\nEl tiempo estimado de respuesta es de 5 días hábiles.");
-
-            // Reinicia los campos del formulario
-            formContacto.reset();
-        });
-    }
-});
-
-// --- CONTACTO / SERVICIO AL CLIENTE ---
-document.addEventListener('DOMContentLoaded', () => {
-    const formContacto = document.getElementById('formContacto');
-
-    if (formContacto) {
-        formContacto.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // 1. Mensaje de confirmación
-            alert("¡Mensaje enviado exitosamente!\n\nEl tiempo estimado de respuesta es de 5 días hábiles.");
-
-            // 2. Limpiar formulario
-            formContacto.reset();
-
-            // 3. Redirigir al inicio
-            window.location.href = "Menu.html"; // Cambia a "index.html" si ese es el nombre de tu página principal
-        });
-    }
-});
+    contenedor.innerHTML = filtro.map(prod => `
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm border-0 rounded-4">
+                <img src="${prod.imagen || prod.img || 'Img/Buses.png'}" class="card-img-top rounded-top-4" alt="${fnEscapar(prod.titulo)}" style="height: 200px; object-fit: cover;">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title fw-bold">${fnEscapar(prod.titulo)}</h5>
+                    <p class="card-text text-muted flex-grow-1">${fnEscapar(prod.descripcion || prod.desc || 'Sin descripción disponible.')}</p>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="fs-4 fw-bold text-success">$${Number(prod.precio || 0).toLocaleString('es-CL')}</span>
+                        <a href="Detalle.html?prod=${prod.slug}" class="btn btn-primary">
+                            <i class="bi bi-cart-plus me-1"></i> Comprar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
 
 function irAMiCuenta(event) {
     if (event) {
-        event.preventDefault(); // Evita que el enlace recargue la página o salte arriba
+        event.preventDefault();
     }
 
-    // 1. Obtenemos el usuario guardado en localStorage (o sessionStorage)
     const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo')) || JSON.parse(sessionStorage.getItem('usuarioActivo'));
 
-    // 2. Evaluamos si la sesión está iniciada
     if (usuarioActivo) {
-        // Sesión iniciada -> redirigir al panel de administración
         window.location.href = 'admin.html';
     } else {
-        // No hay sesión -> redirigir al login (index.html)
         window.location.href = 'index.html';
     }
 }
-
-
-function escaparHTML(valor) {
-    return String(valor)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-}
-
 
 function renderizarProductosRelacionados() {
     const contenedor = document.getElementById('relacionadosLista');
@@ -954,21 +972,23 @@ function renderizarProductosRelacionados() {
         grupos.push(productos.slice(indice, indice + 5));
     }
 
+    const fnEscapar = typeof escaparHTML === 'function' ? escaparHTML : str => str;
+
     contenedor.innerHTML = grupos.map((grupo, indiceGrupo) => `
         <div class="carousel-item${indiceGrupo === 0 ? ' active' : ''}">
             <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3">
                 ${grupo.map(producto => {
-                    const imagen = obtenerImagenProducto(producto);
+                    const imagen = typeof obtenerImagenProducto === 'function' ? obtenerImagenProducto(producto) : (producto.imagen || producto.img);
                     const precio = Number(producto.precio || 0).toLocaleString('es-CL');
                     return `
                         <div class="col">
                             <div class="card h-100 border rounded-3 shadow-sm p-2 text-center">
                                 <div class="bg-light rounded mb-2 d-flex align-items-center justify-content-center" style="height: 120px;">
-                                    <img src="${escaparHTML(imagen)}" class="img-fluid" style="max-height: 110px; max-width: 100%; object-fit: cover;" alt="${escaparHTML(producto.titulo)}">
+                                    <img src="${fnEscapar(imagen)}" class="img-fluid" style="max-height: 110px; max-width: 100%; object-fit: cover;" alt="${fnEscapar(producto.titulo)}">
                                 </div>
-                                <h6 class="fw-bold small mb-1" style="color: #0a2540;">${escaparHTML(producto.titulo)}</h6>
+                                <h6 class="fw-bold small mb-1" style="color: #0a2540;">${fnEscapar(producto.titulo)}</h6>
                                 <span class="text-success fw-bold small mb-2">$${precio}</span>
-                                <button type="button" onclick="cambiarProducto('${escaparHTML(producto.slug)}')" class="btn btn-sm btn-outline-dark rounded-2">Ver más</button>
+                                <button type="button" onclick="cambiarProducto('${fnEscapar(producto.slug)}')" class="btn btn-sm btn-outline-dark rounded-2">Ver más</button>
                             </div>
                         </div>`;
                 }).join('')}
@@ -976,46 +996,91 @@ function renderizarProductosRelacionados() {
         </div>`).join('');
 }
 
-
 function cambiarImagenPrincipal(src) {
     const imgElem = document.getElementById('product-img');
     if (imgElem) imgElem.src = src;
 }
 
-
+// --- INICIALIZACIÓN GLOBAL UNIFICADA ---
 document.addEventListener("DOMContentLoaded", function () {
+    // Renderizado de vistas administrativas y estado del carrito
     renderizarTablaAdmin();
     renderizarTablaClientes();
     actualizarContadorCarrito();
     renderizarCarrito();
-    prepararCalculadoraViaje();
+    
+    if (typeof prepararCalculadoraViaje === 'function') {
+        prepararCalculadoraViaje();
+    }
 
+    // Eventos del Carrito
     const botonCarrito = document.getElementById('btnAgregarCarrito');
     if (botonCarrito) botonCarrito.addEventListener('click', agregarAlCarrito);
 
     const botonVaciarCarrito = document.getElementById('btnVaciarCarrito');
     if (botonVaciarCarrito) botonVaciarCarrito.addEventListener('click', vaciarCarrito);
 
+    // Formularios de Administración
     const formProducto = document.getElementById('formProducto');
-    if (formProducto) {
-        formProducto.addEventListener('submit', guardarProductoFormulario);
-    }
+    if (formProducto) formProducto.addEventListener('submit', guardarProductoFormulario);
 
     const formUsuario = document.getElementById('formUsuario');
-    if (formUsuario) {
-        formUsuario.addEventListener('submit', guardarUsuarioFormulario);
+    if (formUsuario) formUsuario.addEventListener('submit', guardarUsuarioFormulario);
+
+    // Carga de Detalle del Producto
+    const esPaginaDetalle = document.getElementById('product-title') || document.getElementById('product-price');
+    if (esPaginaDetalle) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const slugURL = urlParams.get('prod') || obtenerSlugProductoActivo();
+        cambiarProducto(slugURL);
     }
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const prodSlug = urlParams.get('prod') || obtenerSlugProductoActivo();
-    cambiarProducto(prodSlug);
+    // Buscador principal
+    const formBuscador = document.getElementById('formBuscador') || document.getElementById('formBusqueda');
+    if (formBuscador) {
+        formBuscador.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const origenInput = document.getElementById('origenSelect') || document.getElementById('origen') || document.getElementById('origenBusqueda');
+            const destinoInput = document.getElementById('destinoSelect') || document.getElementById('destino') || document.getElementById('destinoBusqueda');
+            
+            const origenVal = origenInput ? origenInput.value.trim() : '';
+            const destinoVal = destinoInput ? destinoInput.value.trim() : '';
 
+            if (window.location.pathname.includes('Menu.html')) {
+                filtrarProductosPorBusqueda(origenVal, destinoVal);
+            } else {
+                buscarPasajes(e);
+            }
+        });
+    }
+
+    // Búsquedas guardadas
+    const origenGuardado = localStorage.getItem('busquedaOrigen');
+    const destinoGuardado = localStorage.getItem('busquedaDestino');
+    if (origenGuardado || destinoGuardado) {
+        filtrarProductosPorBusqueda(origenGuardado || '', destinoGuardado || '');
+        localStorage.removeItem('busquedaOrigen');
+        localStorage.removeItem('busquedaDestino');
+    }
+
+    // Formulario de Contacto
+    const formContacto = document.getElementById('formContacto');
+    if (formContacto) {
+        formContacto.addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert("¡Mensaje enviado exitosamente!\n\nEl tiempo estimado de respuesta es de 5 días hábiles.");
+            formContacto.reset();
+            window.location.href = "Menu.html";
+        });
+    }
+
+    // Formulario de Login
     const formLogin = document.getElementById('formLogin');
     if (formLogin) {
         formLogin.addEventListener('submit', function(event) {
             event.preventDefault();
-            const inputEmail = document.getElementById('rutOEmail').value.trim().toLowerCase();
-            const inputPassword = document.getElementById('password').value;
+            const inputEmail = document.getElementById('rutOEmail')?.value.trim().toLowerCase();
+            const inputPassword = document.getElementById('password')?.value;
             const errorMensaje = document.getElementById('errorMensaje');
             const usuario = obtenerUsuarios().find(cuenta => cuenta.correo === inputEmail && cuenta.password === inputPassword);
 
@@ -1030,43 +1095,53 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    // Formulario de Registro
     const formRegistro = document.getElementById('formRegistro');
     if (formRegistro) {
         formRegistro.addEventListener('submit', function(event) {
             event.preventDefault();
 
-            const correo = document.getElementById('correo').value.trim().toLowerCase();
-            const confirmarCorreo = document.getElementById('confirmarCorreo').value.trim().toLowerCase();
-            const password = document.getElementById('password').value;
-            const confirmarPassword = document.getElementById('confirmarPassword').value;
+            const correo = document.getElementById('correo')?.value.trim().toLowerCase();
+            const confirmarCorreo = document.getElementById('confirmarCorreo')?.value.trim().toLowerCase();
+            const password = document.getElementById('password')?.value;
+            const confirmarPassword = document.getElementById('confirmarPassword')?.value;
             const errorMensaje = document.getElementById('errorRegistro');
             const usuarios = obtenerUsuarios();
 
             if (correo !== confirmarCorreo) {
-                errorMensaje.innerText = 'Los correos electrónicos no coinciden';
-                errorMensaje.classList.remove('d-none');
+                if (errorMensaje) {
+                    errorMensaje.innerText = 'Los correos electrónicos no coinciden';
+                    errorMensaje.classList.remove('d-none');
+                }
                 return;
             }
 
             if (password !== confirmarPassword) {
-                errorMensaje.innerText = 'Las contraseñas no coinciden';
-                errorMensaje.classList.remove('d-none');
+                if (errorMensaje) {
+                    errorMensaje.innerText = 'Las contraseñas no coinciden';
+                    errorMensaje.classList.remove('d-none');
+                }
                 return;
             }
 
             if (usuarios.some(usuario => usuario.correo === correo)) {
-                errorMensaje.innerText = 'Ya existe una cuenta con ese correo';
-                errorMensaje.classList.remove('d-none');
+                if (errorMensaje) {
+                    errorMensaje.innerText = 'Ya existe una cuenta con ese correo';
+                    errorMensaje.classList.remove('d-none');
+                }
                 return;
             }
 
+            const regionElem = document.getElementById('region');
+            const comunaElem = document.getElementById('comuna');
+
             usuarios.push({
-                nombre: document.getElementById('nombre').value.trim(),
+                nombre: document.getElementById('nombre')?.value.trim() || '',
                 correo,
                 password,
-                telefono: document.getElementById('telefono').value.trim(),
-                region: document.getElementById('region').selectedOptions[0].text,
-                comuna: document.getElementById('comuna').selectedOptions[0].text
+                telefono: document.getElementById('telefono')?.value.trim() || '',
+                region: regionElem ? regionElem.selectedOptions[0]?.text : '',
+                comuna: comunaElem ? comunaElem.selectedOptions[0]?.text : ''
             });
             guardarUsuarios(usuarios);
             window.location.href = "index.html?registro=exitoso";

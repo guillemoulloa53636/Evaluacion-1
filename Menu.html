@@ -17,13 +17,13 @@
             
             <div class="d-flex align-items-center gap-3">
                 <a class="navbar-brand d-flex align-items-center fw-bold me-0" href="Menu.html">
-                    <img src="Img/Buses.png" alt="logo viajes por chile" width="50" height="50" class="me-2">
+                    <img src="Img/Buses.png" alt="Logo Viajes por Chile" width="50" height="50" class="me-2">
                     <span>Viajes por chile<small class="text-white-50 fs-6">.cl</small></span>
                 </a>
                 <a href="Menu.html" class="btn btn-outline-light btn-sm ms-2">Volver al inicio</a>
             </div>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNavegacion" aria-controls="menuNavegacion" aria-expanded="false" aria-label="Navegación de paleta">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNavegacion" aria-controls="menuNavegacion" aria-expanded="false" aria-label="Abrir menú de navegación">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
@@ -76,7 +76,7 @@
 
         <div class="card shadow-lg border-0 rounded-4 p-4 mb-5">
             <form id="formBuscador" class="row g-3 align-items-end">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label for="origenSelect" class="form-label fw-semibold">Origen</label>
                     <select id="origenSelect" class="form-select" required>
                         <option value="" disabled selected>Selecciona origen</option>
@@ -87,7 +87,7 @@
                         <option value="puerto_montt">Puerto Montt</option>
                     </select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label for="destinoSelect" class="form-label fw-semibold">Destino</label>
                     <select id="destinoSelect" class="form-select" required>
                         <option value="" disabled selected>Selecciona destino</option>
@@ -98,16 +98,24 @@
                         <option value="puerto_montt">Puerto Montt</option>
                     </select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <label for="fechaSelect" class="form-label fw-semibold">Fecha de Viaje</label>
+                    <input type="date" id="fechaSelect" class="form-control">
+                </div>
+                <div class="col-md-3 d-flex gap-2">
                     <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold" style="background-color: #0a2540;">
-                        <i class="bi bi-search me-2"></i>Buscar Pasajes
+                        <i class="bi bi-search me-1"></i> Buscar
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary py-2" onclick="location.reload()" title="Restablecer filtros">
+                        <i class="bi bi-arrow-clockwise"></i>
                     </button>
                 </div>
             </form>
         </div>
 
+        <!-- Contenedor dinámico de resultados -->
         <div id="resultadosBusqueda" class="row row-cols-1 row-cols-md-3 g-4">
-            <!-- Los pasajes se renderizan dinámicamente con JavaScript -->
+            <!-- Los pasajes se renderizan dinámicamente con JavaScript desde main.js -->
         </div>
     </main>
 
@@ -142,6 +150,7 @@
         </div>
     </footer>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="main.js"></script>
 </body>
