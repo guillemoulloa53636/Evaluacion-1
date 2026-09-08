@@ -289,7 +289,7 @@ const usuariosIniciales = [
         comuna: ""
     },
     {
-        nombre: "Maria Vargas",
+        nombre: "Maria Varga",
         correo: "maria@gmail.com",
         password: "maria123",
         telefono: "",

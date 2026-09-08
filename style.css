@@ -100,13 +100,6 @@ a {
     transform: scale(1.035);
 }
 
-.card-img-top {
-    transition: transform 0.4s ease;
-}
-
-.card:hover .card-img-top {
-    transform: scale(1.035);
-}
 
 #carruselRutas .carousel-item .row {
     justify-content: center;
