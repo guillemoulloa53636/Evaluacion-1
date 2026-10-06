@@ -1,0 +1,20 @@
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { imageUrl } from '../data/catalog.js';
+
+const articles = [
+  { title: 'La ruta de bus más larga de Chile', category: 'RUTAS', image: 'Mont.jpg', excerpt: 'Más de 3.000 kilómetros conectan el desierto del norte con los paisajes del sur.', body: 'La ruta entre Arica y Puerto Montt recorre más de 3.100 kilómetros por la Ruta 5. El viaje puede tomar alrededor de 40 horas y atraviesa desierto, valles agrícolas y bosques del sur. Para un trayecto largo, conviene planificar descansos y llevar agua y documentos a mano.' },
+  { title: 'Cinco ideas para viajar de noche', category: 'CONSEJOS', image: 'Valpo.webp', excerpt: 'Organiza tu equipaje de mano y llega con más comodidad a tu destino.', body: 'Lleva una capa de abrigo, una almohada de cuello, audífonos y tus medicamentos en el bolso de mano. Mantén documentos y objetos de valor contigo, lleva agua y prepara lo necesario para descansar durante el trayecto.' }
+];
+
+export function BlogPage() {
+  const [activeArticle, setActiveArticle] = useState(null);
+  return <><section className="editorial-hero"><div className="container"><span className="eyebrow">BITÁCORA DE RUTA</span><h1>Historias que<br />se mueven.</h1><p>Ideas, consejos y curiosidades para mirar Chile desde el camino.</p></div></section><section className="container article-grid page-section">{articles.map((article, index) => <article className="article-card" key={article.title}><img src={imageUrl(article.image)} alt="Paisaje de Chile" /><div className="article-copy"><span className="eyebrow">{article.category} · 0{index + 1}</span><h2>{article.title}</h2><p>{article.excerpt}</p><button className="text-button" onClick={() => setActiveArticle(index)}>Leer artículo <i className="bi bi-arrow-up-right" /></button></div></article>)}</section>{activeArticle !== null && <div className="drawer-backdrop" onMouseDown={(event) => event.target === event.currentTarget && setActiveArticle(null)}><article className="article-modal" role="dialog" aria-modal="true"><button className="icon-button modal-close" onClick={() => setActiveArticle(null)} aria-label="Cerrar"><i className="bi bi-x-lg" /></button><img src={imageUrl(articles[activeArticle].image)} alt="" /><div className="article-modal-copy"><span className="eyebrow">{articles[activeArticle].category}</span><h2>{articles[activeArticle].title}</h2><p>{articles[activeArticle].body}</p></div></article></div>}</>;
+}
+
+export function AboutPage() {
+  return <><section className="about-hero container page-section"><div><span className="eyebrow">SOBRE NOSOTROS</span><h1>Conectamos destinos y personas a lo largo de Chile.</h1><p>Facilitamos la búsqueda de rutas y la planificación de viajes en bus para que recorrer el país sea más simple.</p><Link to="/menu" className="button button-dark">Explorar rutas <i className="bi bi-arrow-right" /></Link></div><img src={imageUrl('Buses.png')} alt="Buses de Viajes por Chile" /></section><section className="mission-band"><div className="container mission-grid"><article><span className="eyebrow">01 / MISIÓN</span><h2>Viajar sin complicaciones.</h2><p>Ofrecer acceso sencillo a opciones de transporte interurbano por todo el territorio nacional.</p></article><article><span className="eyebrow">02 / VISIÓN</span><h2>Chile, más cerca.</h2><p>Ser una plataforma útil y confiable para quienes eligen descubrir el país por tierra.</p></article></div></section><section className="container team-section"><span className="eyebrow">QUIÉNES LO HACEN</span><h2>Equipo desarrollador</h2><p>Estudiantes detrás del diseño y desarrollo de este proyecto.</p><div className="team-grid"><article><img src={imageUrl('cropped_circle_image.png')} alt="" /><h3>Guillermo Ulloa</h3><span>Desarrollo frontend</span></article><article><img src={imageUrl('cropped_circle_image.png')} alt="" /><h3>María José Vargas</h3><span>Diseño UI/UX</span></article></div></section></>;
+}
+
+const InfoPages = { BlogPage, AboutPage };
+export default InfoPages;
