@@ -36,5 +36,5 @@ export function calculateTrip(origin, destination) {
   return { distance, price, from, to };
 }
 
-export const imageUrl = (filename) => `/Img/${filename}`;
+export const imageUrl = (filename) => `${import.meta.env.BASE_URL}Img/${encodeURIComponent(filename)}`;
 export const formatPrice = (price) => `$${Number(price).toLocaleString('es-CL')}`;

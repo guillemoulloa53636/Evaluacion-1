@@ -24,6 +24,7 @@ img { max-width: 100%; }
 .container { max-width: 1180px; }
 .site-shell { min-height: 100vh; display: flex; flex-direction: column; }
 .site-main { flex: 1; }
+.database-alert { margin-top: 14px; padding: 12px 16px; border-left: 3px solid var(--accent); background: #fff0e8; color: #773a27; font-size: .84rem; }
 .site-header { position: sticky; top: 0; z-index: 20; background: rgba(245,247,244,.96); border-bottom: 1px solid var(--line); backdrop-filter: blur(14px); }
 .header-inner { min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 28px; }
 .brand { display: inline-flex; align-items: center; gap: 10px; font-size: .77rem; letter-spacing: .08em; font-weight: 800; }
@@ -194,7 +195,7 @@ img { max-width: 100%; }
 .admin-sidebar > a:not(.admin-brand) { padding: 12px 10px; color: #c5d2ce; }
 .admin-sidebar > a.active { background: rgba(255,255,255,.12); color: white; }
 .admin-sidebar > a i { margin-right: 9px; }
-.admin-sidebar .admin-logout { margin-top: auto; }
+.admin-sidebar .admin-logout { margin-top: auto; border: 0; background: transparent; text-align: left; font: inherit; cursor: pointer; }
 .admin-main { min-width: 0; padding: 35px clamp(20px, 4vw, 60px); }
 .admin-content { max-width: 1200px; margin: 0 auto; }
 .admin-topline { display: flex; align-items: center; justify-content: space-between; gap: 18px; }

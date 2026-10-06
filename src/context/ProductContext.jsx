@@ -1,43 +1,50 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { initialProducts } from '../data/catalog.js';
+import { apiRequest } from '../lib/api.js';
 
 const ProductContext = createContext(null);
 
-function normalizeProduct(product) {
-  const image = product.image || product.imagen || product.img || 'Buses.png';
-  const title = product.title || product.titulo || product.breadcrumb || 'Ruta sin nombre';
-  return {
-    ...product,
-    id: product.id || `PROD-${product.slug || Date.now()}`,
-    slug: product.slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
-    title,
-    destination: product.destination || product.breadcrumb || title.replace(/^Pasaje\s+/i, '').replace(/^Santiago\s*[-a]\s*/i, ''),
-    price: Number(product.price ?? product.precio ?? 0),
-    type: product.type || product.tipo || 'Clásico',
-    status: product.status || product.estado || 'Activo',
-    image,
-    description: product.description || product.descripcion || product.desc || '',
-    gallery: product.gallery || product.galeria || [image]
-  };
-}
-
-function readProducts() {
-  try {
-    const saved = JSON.parse(localStorage.getItem('productosDB') || 'null');
-    return Array.isArray(saved) && saved.length ? saved.map(normalizeProduct) : initialProducts;
-  } catch {
-    return initialProducts;
-  }
-}
-
 export function ProductProvider({ children }) {
-  const [products, setProducts] = useState(readProducts);
+  const [products, setProducts] = useState(initialProducts);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    localStorage.setItem('productosDB', JSON.stringify(products));
-  }, [products]);
+    let active = true;
+    apiRequest('products.php')
+      .then((data) => {
+        if (active) {
+          setProducts(data);
+          setError('');
+        }
+      })
+      .catch((requestError) => {
+        if (active) setError(requestError.message);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => { active = false; };
+  }, []);
 
-  return <ProductContext.Provider value={{ products, setProducts }}>{children}</ProductContext.Provider>;
+  async function saveProduct(product, originalSlug = null) {
+    const path = originalSlug ? `products.php?slug=${encodeURIComponent(originalSlug)}` : 'products.php';
+    const result = await apiRequest(path, {
+      method: originalSlug ? 'PUT' : 'POST',
+      body: JSON.stringify(product)
+    });
+    setProducts((current) => originalSlug
+      ? current.map((item) => item.slug === originalSlug ? result.product : item)
+      : [...current, result.product]);
+    return result.product;
+  }
+
+  async function deleteProduct(slug) {
+    await apiRequest(`products.php?slug=${encodeURIComponent(slug)}`, { method: 'DELETE' });
+    setProducts((current) => current.filter((product) => product.slug !== slug));
+  }
+
+  return <ProductContext.Provider value={{ products, loading, error, saveProduct, deleteProduct }}>{children}</ProductContext.Provider>;
 }
 
 export function useProducts() {

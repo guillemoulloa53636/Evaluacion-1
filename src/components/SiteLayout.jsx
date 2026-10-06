@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { formatPrice } from '../data/catalog.js';
+import { formatPrice, imageUrl } from '../data/catalog.js';
 import { useCart } from '../context/CartContext.jsx';
+import { useProducts } from '../context/ProductContext.jsx';
 
 const links = [
   ['/menu', 'Rutas'], ['/blog', 'Blog'], ['/nosotros', 'Nosotros'], ['/servicio', 'Ayuda']
@@ -11,13 +12,14 @@ export default function SiteLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const { items, count, total, removeItem, clearCart } = useCart();
+  const { error: databaseError } = useProducts();
 
   return (
     <div className="site-shell">
       <header className="site-header">
         <div className="container header-inner">
           <NavLink className="brand" to="/menu" aria-label="Viajes por Chile, inicio">
-            <img src="/Img/Buses.png" alt="" />
+            <img src={imageUrl('Buses.png')} alt="" />
             <span>VIAJES <b>POR CHILE</b></span>
           </NavLink>
           <button className="menu-toggle" onClick={() => setMenuOpen((open) => !open)} aria-label="Abrir navegación" aria-expanded={menuOpen}>
@@ -33,7 +35,10 @@ export default function SiteLayout() {
         </div>
       </header>
 
-      <main className="site-main"><Outlet /></main>
+      <main className="site-main">
+        {databaseError && <div className="container database-alert" role="status"><i className="bi bi-database-exclamation" /> Base de datos desconectada: {databaseError}</div>}
+        <Outlet />
+      </main>
 
       <footer className="site-footer">
         <div className="container footer-inner"><span>Viajes por Chile</span><span>Recorre más, planifica mejor.</span><NavLink to="/servicio">Contacto</NavLink></div>
