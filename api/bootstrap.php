@@ -1,11 +1,10 @@
 <?php
 declare(strict_types=1);
 
-const DB_HOST = '127.0.0.1';
-const DB_NAME = 'viajes_chile';
-const DB_USER = 'root';
-const DB_PASSWORD = '';
-
+define('DB_HOST', '127.0.0.1;port=3306');
+define('DB_NAME', 'viajes_chile');
+define('DB_USER', 'root');
+define('DB_PASSWORD', '');
 function start_api(): void
 {
     header('Content-Type: application/json; charset=utf-8');
