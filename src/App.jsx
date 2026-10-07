@@ -3,6 +3,7 @@ import AdminLayout from './components/AdminLayout.jsx';
 import SiteLayout from './components/SiteLayout.jsx';
 import AccountPages from './pages/AccountPages.jsx';
 import AdminPage from './pages/AdminPage.jsx';
+import AdminUsersPage from './pages/AdminUsersPage.jsx';
 import InfoPages from './pages/InfoPages.jsx';
 import ShopPages from './pages/ShopPages.jsx';
 
@@ -20,6 +21,7 @@ export default function App() {
       </Route>
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminPage />} />
+        <Route path="usuarios" element={<AdminUsersPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

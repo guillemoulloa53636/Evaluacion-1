@@ -8,7 +8,13 @@ export function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isAdminLogin, setIsAdminLogin] = useState(false);
   const navigate = useNavigate();
+
+  function toggleLoginMode() {
+    setIsAdminLogin((current) => !current);
+    setError('');
+  }
 
   async function submit(event) {
     event.preventDefault();
@@ -18,6 +24,10 @@ export function LoginPage() {
         method: 'POST',
         body: JSON.stringify({ email, password })
       });
+      if (isAdminLogin && user.role !== 'admin') {
+        setError('Esta cuenta no tiene acceso al menú de administración.');
+        return;
+      }
       navigate(user.role === 'admin' ? '/admin' : '/menu');
     } catch (requestError) {
       setError(requestError.message);
@@ -26,8 +36,12 @@ export function LoginPage() {
 
   return <section className="account-page container">
     <div className="account-aside"><span className="eyebrow">PRÓXIMA PARADA</span><h1>Hay mucho Chile por conocer.</h1><p>Guarda tus rutas y prepara tu próximo viaje.</p><img src={imageUrl('Valdi.JPG')} alt="Paisaje del sur de Chile" /></div>
-    <div className="account-form-wrap"><span className="eyebrow">BIENVENIDO DE VUELTA</span><h2>Inicia sesión</h2><p className="muted">Accede para gestionar tus pasajes.</p>{params.get('registro') === 'exitoso' && <div className="form-success" role="status">Cuenta creada. Ya puedes iniciar sesión.</div>}
-      <form className="stack-form" onSubmit={submit}><label>Correo electrónico<input type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></label><label>Contraseña<input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required /></label>{error && <p className="form-error" role="alert">{error}</p>}<button className="button button-dark w-100">Ingresar a mi cuenta <i className="bi bi-arrow-right" /></button></form>
+    <div className="account-form-wrap">
+      <button type="button" className="admin-login-toggle" onClick={toggleLoginMode}>
+        {isAdminLogin ? 'Volver al inicio de sesión' : 'Ingresar como administrador'}
+      </button>
+      <span className="eyebrow">{isAdminLogin ? 'ACCESO ADMINISTRADOR' : 'BIENVENIDO DE VUELTA'}</span><h2>{isAdminLogin ? 'Inicia sesión como administrador' : 'Inicia sesión'}</h2><p className="muted">{isAdminLogin ? 'Ingresa tus credenciales de administrador para acceder al menú.' : 'Accede para gestionar tus pasajes.'}</p>{params.get('registro') === 'exitoso' && !isAdminLogin && <div className="form-success" role="status">Cuenta creada. Ya puedes iniciar sesión.</div>}
+      <form className="stack-form" onSubmit={submit}><label>Correo electrónico<input type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></label><label>Contraseña<input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required /></label>{error && <p className="form-error" role="alert">{error}</p>}<button className="button button-dark w-100">{isAdminLogin ? 'Ingresar al menú administrador' : 'Ingresar a mi cuenta'} <i className="bi bi-arrow-right" /></button></form>
       <p className="account-switch">¿No tienes una cuenta? <Link to="/registro">Regístrate</Link></p>
       <p className="demo-note">Tus datos se validan en la base MariaDB local.</p>
     </div>

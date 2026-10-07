@@ -52,6 +52,6 @@ Después abre [http://localhost/Evaluacion-1/](http://localhost/Evaluacion-1/). 
 ## Base de datos y seguridad
 
 - `database/schema.sql` crea `products`, `users` y `contact_messages`, y carga el catálogo inicial.
-- `api/` contiene los endpoints PHP; el panel necesita una sesión con rol `admin` para consultar clientes o modificar rutas.
+- `api/` contiene los endpoints PHP; el panel necesita una sesión con rol `admin` para consultar usuarios compradores o modificar rutas. La sección **Usuarios** muestra solo cuentas con rol `customer`.
 - Las contraseñas se almacenan con hash. No uses la configuración local `root` sin contraseña en un servidor público.
 - El carrito sigue en `localStorage`; todavía no hay proceso de compra ni tabla de órdenes.
