@@ -4,6 +4,10 @@ CREATE DATABASE IF NOT EXISTS viajes_chile
 
 USE viajes_chile;
 
+-- --------------------------------------------------------
+-- Estructura de tabla para `products`
+-- --------------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS products (
   id VARCHAR(32) NOT NULL PRIMARY KEY,
   slug VARCHAR(100) NOT NULL UNIQUE,
@@ -18,6 +22,10 @@ CREATE TABLE IF NOT EXISTS products (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- --------------------------------------------------------
+-- Estructura de tabla para `users`
+-- --------------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS users (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(150) NOT NULL,
@@ -30,6 +38,10 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- --------------------------------------------------------
+-- Estructura de tabla para `contact_messages`
+-- --------------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS contact_messages (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(150) NOT NULL,
@@ -37,6 +49,10 @@ CREATE TABLE IF NOT EXISTS contact_messages (
   message TEXT NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- --------------------------------------------------------
+-- Inserción de datos para `products`
+-- --------------------------------------------------------
 
 INSERT INTO products (id, slug, title, destination, price, type, status, image, description, gallery) VALUES
 ('PROD-01', 'puertomontt', 'Santiago - Puerto Montt', 'Puerto Montt', 35000, 'Salón Cama', 'Activo', 'Mont.jpg', 'La puerta de entrada a la Patagonia chilena y la Región de Los Lagos. Viaje directo con Wi-Fi y puertos USB.', '["Mont.jpg","Mont2.jpg"]'),
@@ -52,3 +68,32 @@ INSERT INTO products (id, slug, title, destination, price, type, status, image, 
 ('PROD-11', 'antofagasta', 'Santiago - Antofagasta', 'Antofagasta', 30000, 'Premium', 'Activo', 'Antofa.jpg', 'La Perla del Norte: ciudad costera e industrial con servicio a bordo.', '["Antofa.jpg","Anto2.jpg"]'),
 ('PROD-12', 'arica', 'Santiago - Arica', 'Arica', 35000, 'Premium', 'Activo', 'Arica.jpg', 'La Ciudad de la Eterna Primavera, con clima templado y asientos cama de 180°.', '["Arica.jpg","Arica2.jpg"]')
 ON DUPLICATE KEY UPDATE slug = VALUES(slug);
+
+-- --------------------------------------------------------
+-- Inserción de usuarios por defecto
+-- --------------------------------------------------------
+
+INSERT INTO users (name, email, password_hash, telephone, region, commune, role) VALUES
+(
+  'guillermo',
+  'guillermo@gmail.com',
+  '$2y$10$U.yT7q1bC7X5S7j92l9Vge606dO7C31sN30P9bQd8gO1H6I9.yvOa',
+  '+56912345678',
+  'Región Metropolitana',
+  'La Florida',
+  'customer'
+),
+(
+  'maria',
+  'cote@gmail.com',
+  '$2y$10$9GfM9t/Wp97h0x6U8Y/v2.LgRzKk2R7Q8sT10v/Z.wG3B/xH7o.xG',
+  '+56987654321',
+  'Región Metropolitana',
+  'La Florida',
+  'customer'
+)
+ON DUPLICATE KEY UPDATE 
+  name = VALUES(name),
+  password_hash = VALUES(password_hash),
+  region = VALUES(region),
+  commune = VALUES(commune);
