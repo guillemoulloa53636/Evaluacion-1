@@ -41,13 +41,15 @@ Desde la raíz del proyecto:
 
 ```powershell
 npm run build
-New-Item -ItemType Directory -Force C:\xampp\htdocs\Evaluacion-1 | Out-Null
-Get-ChildItem .\dist -Force | Copy-Item -Destination C:\xampp\htdocs\Evaluacion-1 -Recurse -Force
+$projectName = Split-Path (Get-Location) -Leaf
+$htdocsPath = "C:\xampp\htdocs\$projectName"
+New-Item -ItemType Directory -Force $htdocsPath | Out-Null
+Get-ChildItem .\dist -Force | Copy-Item -Destination $htdocsPath -Recurse -Force
 New-Item -ItemType Directory -Force C:\xampp\htdocs\api | Out-Null
 Copy-Item .\api\*.php C:\xampp\htdocs\api -Force
 ```
 
-Después abre [http://localhost/Evaluacion-1/](http://localhost/Evaluacion-1/). El `.htaccess` incluido permite que React Router atienda rutas como `/Evaluacion-1/menu` y `/Evaluacion-1/admin`. Si al recargar una ruta Apache responde 404, comprueba que `mod_rewrite` esté habilitado y que Apache permita `.htaccess` (`AllowOverride All`).
+Después abre `http://localhost/$projectName/`. Vite configura automáticamente ese prefijo a partir del nombre de la carpeta del proyecto, y el `.htaccess` permite recargar rutas React sin fijar el nombre de la carpeta. Si al recargar una ruta Apache responde 404, comprueba que `mod_rewrite` esté habilitado y que Apache permita `.htaccess` (`AllowOverride All`).
 
 ## Base de datos y seguridad
 
