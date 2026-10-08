@@ -35,6 +35,10 @@ SPA en React + Vite con API PHP y MariaDB de XAMPP. El catálogo, las cuentas y 
 
 Vite reenvía `/api` a Apache. Por eso deben estar activos Apache y MySQL también mientras trabajas en desarrollo.
 
+## Pruebas
+
+Ejecuta `npm test` para comprobar el renderizado de las listas de rutas, inventario, compradores y carrito, incluyendo actualizaciones al rerenderizar los componentes.
+
 ## Publicar dentro de htdocs
 
 Desde la raíz del proyecto:
