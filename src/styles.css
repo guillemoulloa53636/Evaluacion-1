@@ -81,8 +81,11 @@ img { max-width: 100%; }
 .discount-prices del { color: var(--ink-soft); }
 .discount-prices strong { color: var(--accent-dark); font-size: 1.2rem; }
 .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 22px; }
+.route-controls { display: flex; align-items: end; gap: 18px; }
 .route-filter { display: flex; align-items: center; gap: 9px; padding: 9px 12px; border-bottom: 1px solid var(--line); color: var(--ink-soft); }
 .route-filter input { width: 190px; border: 0; outline: 0; background: transparent; }
+.route-category { display: grid; gap: 5px; color: var(--ink-soft); font-size: .78rem; font-weight: 700; }
+.route-category select { min-height: 40px; min-width: 155px; padding: 7px 10px; border: 1px solid var(--line); background: white; color: var(--ink); }
 .route-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
 .route-card { min-width: 0; overflow: hidden; background: white; border: 1px solid var(--line); transition: transform .22s ease, box-shadow .22s ease; }
 .route-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
@@ -313,7 +316,8 @@ img { max-width: 100%; }
   .search-form { grid-template-columns: 1fr; padding: 15px; }
   .quote-result { align-items: flex-start; flex-direction: column; }
   .section-heading { align-items: flex-start; flex-direction: column; }
-  .route-filter, .route-filter input { width: 100%; }
+  .route-controls, .route-filter, .route-filter input, .route-category, .route-category select { width: 100%; }
+  .route-controls { align-items: stretch; flex-direction: column; gap: 10px; }
   .route-grid, .related-grid { grid-template-columns: 1fr; }
   .route-image { height: 230px; }
   .detail-grid, .account-page, .contact-page, .about-hero, .article-grid, .mission-grid { grid-template-columns: 1fr; }

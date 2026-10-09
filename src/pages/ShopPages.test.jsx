@@ -1,6 +1,7 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
+import userEvent from '@testing-library/user-event';
 import { MenuPage } from './ShopPages.jsx';
 import { useCart } from '../context/CartContext.jsx';
 import { useProducts } from '../context/ProductContext.jsx';
@@ -50,5 +51,20 @@ describe('MenuPage', () => {
     firstProducts.forEach(({ destination }) => {
       expect(screen.queryByRole('heading', { name: destination })).toBeNull();
     });
+  });
+
+  it('filtra rutas por tipo de servicio y permite volver a mostrar todos', async () => {
+    const user = userEvent.setup();
+    render(renderMenuPage());
+
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Filtrar por tipo de servicio' }), 'Premium');
+
+    expect(screen.getByRole('heading', { name: 'Beta' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Alfa' })).not.toBeInTheDocument();
+
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Filtrar por tipo de servicio' }), '');
+
+    expect(screen.getByRole('heading', { name: 'Alfa' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Beta' })).toBeInTheDocument();
   });
 });

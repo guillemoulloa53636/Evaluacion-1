@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import TicketsPage from './TicketsPage.jsx';
+import TicketsPage, { buildTicketHtml } from './TicketsPage.jsx';
 import { apiRequest } from '../lib/api.js';
 
 vi.mock('../lib/api.js', () => ({ apiRequest: vi.fn() }));
@@ -46,5 +46,42 @@ describe('TicketsPage', () => {
     expect(screen.getByText('15% descuento · Normal $10.000')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Imprimir/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Descargar boletos/ })).toBeInTheDocument();
+  });
+
+  it('genera un archivo HTML imprimible que escapa el contenido recibido', () => {
+    const html = buildTicketHtml({
+      tickets: [{
+        trip_title: '<script>alert(1)</script>',
+        destination: 'Valparaíso & alrededores',
+        passenger_name: 'Ana <Pérez>',
+        passenger_rut: '12345678-9',
+        schedule_date: '2099-04-20',
+        departure_time: '09:30',
+        platform: '4',
+        seat_number: 1,
+        ticket_code: 'ticket-1',
+        price_paid: 8500,
+        original_price: 10000,
+        discount_percent: 15
+      }]
+    });
+
+    expect(html).toContain('&lt;script&gt;alert(1)&lt;/script&gt;');
+    expect(html).toContain('Valparaíso &amp; alrededores');
+    expect(html).toContain('Ana &lt;Pérez&gt;');
+    expect(html).toContain('15% de descuento aplicado');
+  });
+
+  it('muestra los errores al no encontrar un boleto', async () => {
+    apiRequest.mockRejectedValue(new Error('Compra no encontrada.'));
+
+    render(
+      <MemoryRouter initialEntries={['/boletos/no-existe']}>
+        <Routes><Route path="/boletos/:saleCode" element={<TicketsPage />} /></Routes>
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Compra no encontrada.');
+    expect(screen.getByRole('link', { name: 'Volver a rutas' })).toHaveAttribute('href', '/menu');
   });
 });

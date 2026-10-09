@@ -46,6 +46,12 @@ Vite reenvía `/api` a Apache. Por eso deben estar activos Apache y MySQL tambi�
 
 Ejecuta `npm test` para correr las pruebas con Vitest o `npm run coverage` para generar el informe de cobertura. Las pruebas específicas de descuentos y reportes están en `src/pages/DescuentosPage.test.jsx` y `src/pages/ReportesPage.test.jsx`. El panel de reportes usa cifras locales de demostración, señaladas en la interfaz; no son ventas ni eventos persistidos en la base de datos.
 
+### Documentos de evaluación
+
+- [Especificación de Requisitos de Software (ERS)](docs/ERS-viajes-por-chile.md)
+- [Informe de cobertura de pruebas](docs/cobertura-de-pruebas.md)
+- [Guía de estudio y exposición individual](docs/guia-exposicion-individual.md)
+
 ## Publicar dentro de htdocs
 
 Desde la raíz del proyecto:

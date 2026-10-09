@@ -18,10 +18,15 @@ export function MenuPage() {
   const [date, setDate] = useState('');
   const [quote, setQuote] = useState(null);
   const [query, setQuery] = useState('');
+  const [serviceType, setServiceType] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const matchingProducts = useMemo(() => products.filter((product) => `${product.title} ${product.destination}`.toLowerCase().includes(query.toLowerCase())), [products, query]);
+  const serviceTypes = useMemo(() => [...new Set(products.map((product) => product.type).filter(Boolean))].sort((left, right) => left.localeCompare(right, 'es')), [products]);
+  const matchingProducts = useMemo(() => products.filter((product) => (
+    `${product.title} ${product.destination}`.toLowerCase().includes(query.toLowerCase())
+    && (!serviceType || product.type === serviceType)
+  )), [products, query, serviceType]);
 
   function submitTrip(event) {
     event.preventDefault();
@@ -58,8 +63,8 @@ export function MenuPage() {
     </section>
 
     <section className="destinations container" id="rutas">
-      <div className="section-heading"><div><span className="eyebrow">RUTAS SELECCIONADAS</span><h2>Tu próximo lugar</h2></div><label className="route-filter"><i className="bi bi-search" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar destino" aria-label="Buscar destino" /></label></div>
-      {matchingProducts.length ? <div className="route-grid">{matchingProducts.map((product) => <ProductCard product={product} key={product.slug} />)}</div> : <div className="empty-results">No encontramos rutas con “{query}”.</div>}
+      <div className="section-heading"><div><span className="eyebrow">RUTAS SELECCIONADAS</span><h2>Tu próximo lugar</h2></div><div className="route-controls"><label className="route-filter"><i className="bi bi-search" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar destino" aria-label="Buscar destino" /></label><label className="route-category">Categoría<select value={serviceType} onChange={(event) => setServiceType(event.target.value)} aria-label="Filtrar por tipo de servicio"><option value="">Todos los servicios</option>{serviceTypes.map((type) => <option key={type} value={type}>{type}</option>)}</select></label></div></div>
+      {matchingProducts.length ? <div className="route-grid">{matchingProducts.map((product) => <ProductCard product={product} key={product.slug} />)}</div> : <div className="empty-results">No encontramos rutas{serviceType ? ` del servicio ${serviceType}` : ''}{query ? ` con “${query}”` : ''}.</div>}
       <div className="text-center mt-4"><button className="text-button" onClick={() => navigate('/blog')}>Ideas para el viaje <i className="bi bi-arrow-up-right" /></button></div>
     </section>
   </>;

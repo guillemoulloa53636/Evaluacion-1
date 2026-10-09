@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { formatPrice, imageUrl } from '../data/catalog.js';
 import { apiRequest } from '../lib/api.js';
 
-function ticketHtml(sale) {
+export function buildTicketHtml(sale) {
   const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (character) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   })[character]);
@@ -38,7 +38,7 @@ export default function TicketsPage() {
   }, [saleCode]);
 
   function downloadTickets() {
-    const file = new Blob([ticketHtml(sale)], { type: 'text/html;charset=utf-8' });
+    const file = new Blob([buildTicketHtml(sale)], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(file);
     const link = document.createElement('a');
     link.href = url;
