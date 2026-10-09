@@ -40,6 +40,8 @@ describe('SiteLayout', () => {
 
   it('muestra todos los artículos del carrito y refleja los cambios al rerenderizar', () => {
     const view = render(renderSiteLayout());
+    expect(screen.getByRole('link', { name: 'Descuentos' })).toHaveAttribute('href', '/descuentos');
+    expect(screen.queryByRole('link', { name: 'Reportes' })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /Abrir carrito/ }));
 
     const getCartLines = () => document.querySelectorAll('.cart-line');

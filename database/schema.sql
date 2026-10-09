@@ -19,8 +19,14 @@ CREATE TABLE IF NOT EXISTS products (
   image VARCHAR(255) NOT NULL,
   description TEXT NOT NULL,
   gallery LONGTEXT NOT NULL,
+  discount_percent TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  schedules LONGTEXT NOT NULL DEFAULT '[]',
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE products
+  ADD COLUMN IF NOT EXISTS discount_percent TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS schedules LONGTEXT NOT NULL DEFAULT '[]';
 
 -- --------------------------------------------------------
 -- Estructura de tabla para `users`
@@ -48,6 +54,34 @@ CREATE TABLE IF NOT EXISTS contact_messages (
   email VARCHAR(190) NOT NULL,
   message TEXT NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS sales (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  sale_code CHAR(32) NOT NULL UNIQUE,
+  total_amount INT UNSIGNED NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS tickets (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  sale_id BIGINT UNSIGNED NOT NULL,
+  ticket_code CHAR(32) NOT NULL UNIQUE,
+  product_id VARCHAR(32) NOT NULL,
+  trip_title VARCHAR(180) NOT NULL,
+  destination VARCHAR(120) NOT NULL,
+  schedule_date DATE NOT NULL,
+  departure_time TIME NOT NULL,
+  platform VARCHAR(40) NOT NULL,
+  seat_number SMALLINT UNSIGNED NOT NULL,
+  passenger_name VARCHAR(150) NOT NULL,
+  passenger_rut VARCHAR(20) NOT NULL,
+  original_price INT UNSIGNED NOT NULL,
+  discount_percent TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  price_paid INT UNSIGNED NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT tickets_sale_fk FOREIGN KEY (sale_id) REFERENCES sales(id) ON DELETE CASCADE,
+  UNIQUE KEY ticket_schedule_seat (product_id, schedule_date, departure_time, seat_number)
 );
 
 -- --------------------------------------------------------

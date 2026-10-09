@@ -5,7 +5,9 @@ define('DB_HOST', '127.0.0.1');
 define('DB_PORT', '3308');
 define('DB_NAME', 'viajes_chile');
 define('DB_USER', 'root');
-define('DB_PASSWORD', '');
+$dbPassword = getenv('DB_PASSWORD');
+define('DB_PASSWORD', $dbPassword === false ? '' : $dbPassword);
+
 function start_api(): void
 {
     header('Content-Type: application/json; charset=utf-8');

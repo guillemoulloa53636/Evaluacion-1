@@ -1,4 +1,5 @@
-import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import AdminPage from './AdminPage.jsx';
@@ -64,5 +65,38 @@ describe('AdminPage', () => {
     firstProducts.forEach(({ title }) => {
       expect(within(document.querySelector('.admin-table tbody')).queryByText(title)).toBeNull();
     });
+  });
+
+  it('permite configurar porcentaje de descuento y salidas al editar una ruta', async () => {
+      const saveProduct = vi.fn().mockResolvedValue({});
+      useProducts.mockReturnValue({
+        products: [{ ...firstProducts[0], discount_percent: 15, schedules: [] }],
+        saveProduct,
+        deleteProduct: vi.fn(),
+        error: ''
+      });
+      const user = userEvent.setup();
+      render(renderAdminPage());
+      await screen.findByRole('heading', { name: 'Panel de administración' });
+      await user.click(screen.getByRole('button', { name: 'Editar' }));
+
+      expect(screen.getByLabelText('Descuento (%)')).toHaveValue(15);
+      await user.clear(screen.getByLabelText('Descuento (%)'));
+      await user.type(screen.getByLabelText('Descuento (%)'), '20');
+      fireEvent.change(screen.getByLabelText('Fecha'), { target: { value: '2099-04-20' } });
+      fireEvent.change(screen.getByLabelText('Hora'), { target: { value: '09:30' } });
+      await user.type(screen.getByLabelText('Andén'), '4');
+      await user.click(screen.getByRole('button', { name: 'Agregar salida' }));
+      await user.click(screen.getByRole('button', { name: 'Guardar ruta' }));
+
+      await waitFor(() => expect(saveProduct).toHaveBeenCalledWith(expect.objectContaining({
+        discount_percent: 20,
+        schedules: [expect.objectContaining({
+          date: '2099-04-20',
+          time: '09:30',
+          platform: '4',
+          capacity: 40
+        })]
+      }), 'alfa'));
   });
 });

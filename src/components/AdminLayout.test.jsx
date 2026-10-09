@@ -9,13 +9,13 @@ describe('AdminLayout', () => {
   it('conserva todos los enlaces de navegación al rerenderizar', () => {
     const view = render(<MemoryRouter><AdminLayout /></MemoryRouter>);
 
-    ['Panel', 'Usuarios', 'Ver sitio'].forEach((label) => {
+    ['Panel', 'Usuarios', 'Reportes', 'Ver sitio'].forEach((label) => {
       expect(screen.getByRole('link', { name: new RegExp(label) })).toBeTruthy();
     });
 
     view.rerender(<MemoryRouter><AdminLayout /></MemoryRouter>);
 
-    ['Panel', 'Usuarios', 'Ver sitio'].forEach((label) => {
+    ['Panel', 'Usuarios', 'Reportes', 'Ver sitio'].forEach((label) => {
       expect(screen.getByRole('link', { name: new RegExp(label) })).toBeTruthy();
     });
   });

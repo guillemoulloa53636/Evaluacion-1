@@ -19,16 +19,29 @@ export function CartProvider({ children }) {
   }, [items]);
 
   function addItem(product, quantity = 1) {
+    const cartKey = product.scheduleId ? `${product.slug}:${product.scheduleId}` : product.slug;
     setItems((current) => {
-      const exists = current.some((item) => item.slug === product.slug);
+      const exists = current.some((item) => (item.cartKey || item.slug) === cartKey);
       return exists
-        ? current.map((item) => item.slug === product.slug ? { ...item, quantity: (item.quantity || item.cantidad || 0) + quantity } : item)
-        : [...current, { slug: product.slug, title: product.title || product.titulo, price: Number(product.price ?? product.precio), quantity }];
+        ? current.map((item) => (item.cartKey || item.slug) === cartKey ? { ...item, quantity: (item.quantity || item.cantidad || 0) + quantity } : item)
+        : [...current, {
+          cartKey,
+          slug: product.slug,
+          title: product.title || product.titulo,
+          price: Number(product.price ?? product.precio),
+          originalPrice: Number(product.originalPrice ?? product.price ?? product.precio),
+          discountPercent: Number(product.discountPercent ?? product.discount_percent ?? 0),
+          scheduleId: product.scheduleId || '',
+          scheduleDate: product.scheduleDate || '',
+          departureTime: product.departureTime || '',
+          platform: product.platform || '',
+          quantity
+        }];
     });
   }
 
-  function removeItem(slug) {
-    setItems((current) => current.filter((item) => item.slug !== slug));
+  function removeItem(cartKey) {
+    setItems((current) => current.filter((item) => (item.cartKey || item.slug) !== cartKey));
   }
 
   function clearCart() {

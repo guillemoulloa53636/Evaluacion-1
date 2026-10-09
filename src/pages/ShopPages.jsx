@@ -77,12 +77,17 @@ export function TripDetailPage() {
   const { addItem } = useCart();
   const [image, setImage] = useState('');
   const [quantity, setQuantity] = useState(1);
+  const [scheduleId, setScheduleId] = useState('');
   const [added, setAdded] = useState(false);
   const product = products.find((item) => item.slug === slug);
 
   if (!product) return <section className="container page-section"><h1>Ruta no encontrada</h1><Link to="/menu">Volver a destinos</Link></section>;
 
   const gallery = product.gallery?.length ? product.gallery : [product.image];
+  const schedules = (product.schedules || []).filter((schedule) => schedule.date >= new Date().toISOString().slice(0, 10));
+  const schedule = schedules.find((item) => item.id === scheduleId) || schedules[0];
+  const discountPercent = Number(product.discount_percent || 0);
+  const discountedPrice = Math.round(Number(product.price) * (100 - discountPercent) / 100);
   const currentImage = gallery.includes(image) ? image : product.image;
   const related = products.filter((item) => item.slug !== product.slug).slice(0, 4);
 
@@ -90,7 +95,7 @@ export function TripDetailPage() {
     <div className="breadcrumb-line"><Link to="/menu">Rutas</Link><i className="bi bi-chevron-right" /><span>{product.destination}</span></div>
     <div className="detail-grid">
       <div><div className="detail-image"><img src={imageUrl(currentImage)} alt={`Paisaje de ${product.destination}`} /></div><div className="detail-thumbs">{gallery.map((photo) => <button key={photo} className={currentImage === photo ? 'is-active' : ''} onClick={() => setImage(photo)} aria-label="Ver otra imagen"><img src={imageUrl(photo)} alt="" /></button>)}</div></div>
-      <div className="detail-copy"><span className="eyebrow">VIAJE INTERURBANO · {product.type}</span><h1>{product.title}</h1><p>{product.description}</p><div className="availability"><span className={product.status === 'Activo' ? 'status-dot' : 'status-dot is-unavailable'} />{product.status === 'Activo' ? 'Disponible para reservar' : 'Agotado'}</div><div className="detail-price">{formatPrice(product.price)} <small>/ pasaje</small></div><label className="quantity-control">Pasajes<select value={quantity} onChange={(event) => setQuantity(Number(event.target.value))}>{[1, 2, 3, 4].map((value) => <option key={value}>{value}</option>)}</select></label><button disabled={product.status !== 'Activo'} className="button button-dark detail-add" onClick={() => { addItem(product, quantity); setAdded(true); }}>{added ? 'Añadido al carrito' : 'Añadir al carrito'} <i className="bi bi-bag-plus" /></button></div>
+      <div className="detail-copy"><span className="eyebrow">VIAJE INTERURBANO · {product.type}</span><h1>{product.title}</h1><p>{product.description}</p><div className="availability"><span className={product.status === 'Activo' ? 'status-dot' : 'status-dot is-unavailable'} />{product.status === 'Activo' ? 'Disponible para reservar' : 'Agotado'}</div>{discountPercent > 0 ? <><del className="detail-original-price">{formatPrice(product.price)}</del><div className="detail-price">{formatPrice(discountedPrice)} <small>/ pasaje · {discountPercent}% de descuento</small></div></> : <div className="detail-price">{formatPrice(product.price)} <small>/ pasaje</small></div>}{schedules.length > 0 ? <label className="departure-control">Fecha y horario<select value={schedule?.id || ''} onChange={(event) => { setScheduleId(event.target.value); setAdded(false); }} required>{schedules.map((item) => <option key={item.id} value={item.id}>{item.date} · {item.time} · Andén {item.platform} · {item.capacity} cupos</option>)}</select></label> : <p className="form-error">No hay salidas disponibles publicadas para esta ruta.</p>}<label className="quantity-control">Pasajes<select value={quantity} onChange={(event) => setQuantity(Number(event.target.value))}>{[1, 2, 3, 4].map((value) => <option key={value}>{value}</option>)}</select></label><button disabled={product.status !== 'Activo' || !schedule} className="button button-dark detail-add" onClick={() => { addItem({ ...product, price: discountedPrice, originalPrice: product.price, discountPercent, scheduleId: schedule.id, scheduleDate: schedule.date, departureTime: schedule.time, platform: schedule.platform }, quantity); setAdded(true); }}>{added ? 'Añadido al carrito' : 'Añadir al carrito'} <i className="bi bi-bag-plus" /></button></div>
     </div>
     <div className="related-section"><div className="section-heading"><div><span className="eyebrow">SIGUE EXPLORANDO</span><h2>Otras rutas</h2></div><Link className="text-button" to="/menu">Ver todas</Link></div><div className="route-grid related-grid">{related.map((item) => <ProductCard product={item} key={item.slug} />)}</div></div>
   </section>;
