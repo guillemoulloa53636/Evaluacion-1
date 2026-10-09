@@ -23,13 +23,13 @@ SPA en React + Vite con API PHP y MariaDB de XAMPP. El catálogo, las cuentas y 
 
 	Comprueba la conexión abriendo [http://localhost/api/products.php](http://localhost/api/products.php). Debe aparecer un JSON con 12 productos.
 
-6. Crea la primera cuenta administradora desde la raíz del proyecto:
+6. Crea una cuenta administradora desde la raíz del proyecto. Si el correo ya existe, el comando actualiza su contraseña y le asigna el rol de administrador:
 
 	```powershell
 	C:\xampp\php\php.exe .\api\create_admin.php
 	```
 
-	El script pedirá correo y contraseña; esta última se guarda con `password_hash`.
+	El script pedirá correo y contraseña; esta última se guarda con `password_hash`. Puedes usarlo también para recuperar el acceso a una cuenta existente.
 
 7. Instala dependencias y arranca Vite:
 
@@ -64,7 +64,11 @@ Después abre `http://localhost/$projectName/`. Vite configura automáticamente 
 
 ## Base de datos y seguridad
 
-- `database/schema.sql` crea `products`, `users` y `contact_messages`, y carga el catálogo inicial.
+- `database/schema.sql` crea las tablas de catálogo, usuarios, ventas, boletos y mensajes de contacto, y carga el catálogo inicial.
 - `api/` contiene los endpoints PHP; el panel necesita una sesión con rol `admin` para consultar usuarios compradores o modificar rutas. La sección **Usuarios** muestra solo cuentas con rol `customer`.
 - Las contraseñas se almacenan con hash. No uses la configuración local `root` sin contraseña en un servidor público.
-- El carrito sigue en `localStorage`; todavía no hay proceso de compra ni tabla de órdenes.
+- El carrito se conserva en `localStorage`; las compras simuladas y los boletos emitidos se registran en MariaDB.
+
+### Datos para demostraciones locales
+
+Importa `database/seeds/demo_trips.sql` en `viajes_chile` para habilitar ofertas con distintos porcentajes y salidas próximas en cinco rutas. El script actualiza los descuentos y solo agrega horarios cuando la ruta aún no tiene salidas configuradas; está pensado para la base local de demostración, no para producción. Los reportes actuales muestran métricas ilustrativas y no se derivan de ventas reales.

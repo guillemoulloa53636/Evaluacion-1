@@ -17,7 +17,8 @@ function CartProbe() {
         scheduleId: 'departure-1',
         scheduleDate: '2099-04-20',
         departureTime: '09:30',
-        platform: '4'
+        platform: '4',
+        passengers: [{ name: 'Ana Pérez', rut: '12345678-9' }]
       })}>Agregar pasaje rebajado</button>
     </>
   );
@@ -41,7 +42,8 @@ describe('CartContext', () => {
       originalPrice: 10000,
       discountPercent: 15,
       scheduleId: 'departure-1',
-      platform: '4'
+      platform: '4',
+      passengers: [{ name: 'Ana Pérez', rut: '12345678-9' }]
     });
   });
 });

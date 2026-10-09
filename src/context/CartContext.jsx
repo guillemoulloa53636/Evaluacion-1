@@ -18,12 +18,16 @@ export function CartProvider({ children }) {
     localStorage.setItem('carritoDB', JSON.stringify(items));
   }, [items]);
 
-  function addItem(product, quantity = 1) {
+  function addItem(product, quantity = 1, passengers = product.passengers || []) {
     const cartKey = product.scheduleId ? `${product.slug}:${product.scheduleId}` : product.slug;
     setItems((current) => {
       const exists = current.some((item) => (item.cartKey || item.slug) === cartKey);
       return exists
-        ? current.map((item) => (item.cartKey || item.slug) === cartKey ? { ...item, quantity: (item.quantity || item.cantidad || 0) + quantity } : item)
+        ? current.map((item) => (item.cartKey || item.slug) === cartKey ? {
+          ...item,
+          quantity: (item.quantity || item.cantidad || 0) + quantity,
+          passengers: [...(item.passengers || []), ...passengers]
+        } : item)
         : [...current, {
           cartKey,
           slug: product.slug,
@@ -35,6 +39,7 @@ export function CartProvider({ children }) {
           scheduleDate: product.scheduleDate || '',
           departureTime: product.departureTime || '',
           platform: product.platform || '',
+          passengers,
           quantity
         }];
     });

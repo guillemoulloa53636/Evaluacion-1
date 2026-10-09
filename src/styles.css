@@ -124,6 +124,13 @@ img { max-width: 100%; }
 .quantity-control { display: flex; align-items: center; justify-content: space-between; max-width: 260px; margin-bottom: 18px; color: var(--ink-soft); font-size: .86rem; }
 .quantity-control select { min-width: 92px; padding: 9px; border: 1px solid var(--line); background: white; }
 .detail-add { width: min(100%, 360px); }
+.booking-toggle { display: flex; align-items: center; gap: 10px; width: fit-content; margin: 24px 0 14px; font-weight: 700; cursor: pointer; }
+.booking-toggle input { width: 18px; height: 18px; accent-color: var(--accent); }
+.booking-form { display: grid; gap: 14px; max-width: 420px; padding: 18px; border: 1px solid var(--line); background: white; }
+.booking-form > label, .booking-passenger label { display: grid; gap: 7px; color: var(--ink-soft); font-size: .86rem; }
+.booking-form select, .booking-form input { min-height: 44px; padding: 8px 10px; border: 1px solid var(--line); background: white; color: var(--ink); }
+.booking-passenger { display: grid; gap: 14px; margin: 0; padding: 14px; border: 1px solid var(--line); }
+.booking-passenger legend { float: none; width: auto; margin: 0; padding: 0 6px; color: var(--ink); font-size: .9rem; font-weight: 700; }
 .related-section { padding-top: 75px; }
 .related-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .related-grid .route-image { height: 155px; }

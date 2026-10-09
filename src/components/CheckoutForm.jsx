@@ -8,7 +8,9 @@ export default function CheckoutForm({ items, onCancel, onComplete }) {
     index,
     item
   })));
-  const [passengers, setPassengers] = useState(() => passengerFields.map(() => ({ name: '', rut: '' })));
+  const [passengers, setPassengers] = useState(() => passengerFields.map(({ item, index }) => (
+    item.passengers?.[index] || { name: '', rut: '' }
+  )));
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -57,7 +59,7 @@ export default function CheckoutForm({ items, onCancel, onComplete }) {
           <legend>Pasajero {index + 1} · {item.title}</legend>
           <p className="muted">{item.scheduleDate} · {item.departureTime} · Andén {item.platform} · Asiento asignado al confirmar</p>
           <label>Nombre completo<input autoComplete="name" value={passengers[index].name} onChange={(event) => updatePassenger(index, 'name', event.target.value)} required maxLength="150" /></label>
-          <label>RUT<input value={passengers[index].rut} onChange={(event) => updatePassenger(index, 'rut', event.target.value)} placeholder="12345678-9" required pattern="[0-9.kK-]{8,12}" title="Ingresa un RUT chileno válido" /></label>
+          <label>RUT<input value={passengers[index].rut} onChange={(event) => updatePassenger(index, 'rut', event.target.value)} placeholder="12345678-9" required pattern="(?:[0-9.kK]|-){8,12}" title="Ingresa un RUT chileno válido" /></label>
         </fieldset>
       ))}
       {error && <p className="form-error" role="alert">{error}</p>}

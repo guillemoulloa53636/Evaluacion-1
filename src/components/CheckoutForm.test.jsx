@@ -28,14 +28,15 @@ describe('CheckoutForm', () => {
         scheduleDate: '2099-04-20',
         departureTime: '09:30',
         platform: '4',
-        quantity: 1
+        quantity: 1,
+        passengers: [{ name: 'Ana Pérez', rut: '12345678-9' }]
       }]}
       onCancel={vi.fn()}
       onComplete={onComplete}
     />);
 
-    await user.type(screen.getByLabelText('Nombre completo'), 'Ana Pérez');
-    await user.type(screen.getByLabelText('RUT'), '12345678-9');
+    expect(screen.getByLabelText('Nombre completo')).toHaveValue('Ana Pérez');
+    expect(screen.getByLabelText('RUT')).toHaveValue('12345678-9');
     await user.click(screen.getByRole('button', { name: 'Confirmar compra y emitir boletos' }));
 
     expect(apiRequest).toHaveBeenCalledWith('purchase.php', expect.objectContaining({

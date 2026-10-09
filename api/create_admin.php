@@ -11,7 +11,8 @@ require_once __DIR__ . '/bootstrap.php';
 fwrite(STDOUT, "Correo del administrador: ");
 $email = strtolower(trim((string) fgets(STDIN)));
 fwrite(STDOUT, "Contraseña (mínimo 8 caracteres): ");
-$password = trim((string) fgets(STDIN));
+$passwordInput = fgets(STDIN);
+$password = $passwordInput === false ? '' : rtrim($passwordInput, "\r\n");
 
 if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($password) < 8) {
     fwrite(STDERR, "Correo o contraseña no válidos.\n");
@@ -19,9 +20,12 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($password) < 8) {
 }
 
 try {
-    $statement = database()->prepare("INSERT INTO users (name, email, password_hash, role) VALUES ('Administrador', ?, ?, 'admin')");
+    $statement = database()->prepare(
+        "INSERT INTO users (name, email, password_hash, role) VALUES ('Administrador', ?, ?, 'admin')
+        ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash), role = 'admin'"
+    );
     $statement->execute([$email, password_hash($password, PASSWORD_DEFAULT)]);
-    fwrite(STDOUT, "Administrador creado. Inicia sesión desde la página principal.\n");
+    fwrite(STDOUT, "Administrador creado o actualizado. Inicia sesión desde la página principal.\n");
 } catch (PDOException $error) {
     fwrite(STDERR, $error->getCode() === '23000' ? "Ese correo ya está registrado.\n" : "No se pudo crear el administrador: {$error->getMessage()}\n");
     exit(1);
