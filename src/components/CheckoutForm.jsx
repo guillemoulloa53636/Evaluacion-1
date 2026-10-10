@@ -32,6 +32,9 @@ export default function CheckoutForm({ items, onCancel, onComplete }) {
           items: items.map((item) => ({
             slug: item.slug,
             scheduleId: item.scheduleId,
+            customSchedule: item.customSchedule || false,
+            scheduleDate: item.scheduleDate,
+            departureTime: item.departureTime,
             passengers: passengerFields
               .map((field, index) => ({ field, passenger: passengers[index] }))
               .filter(({ field }) => field.cartKey === item.cartKey)

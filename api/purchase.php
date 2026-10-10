@@ -53,8 +53,9 @@ try {
     foreach ($items as $item) {
         $slug = strtolower(trim((string) ($item['slug'] ?? '')));
         $scheduleId = trim((string) ($item['scheduleId'] ?? ''));
+        $customSchedule = ($item['customSchedule'] ?? false) === true;
         $passengers = $item['passengers'] ?? null;
-        if ($slug === '' || $scheduleId === '' || !is_array($passengers) || count($passengers) < 1) {
+        if ($slug === '' || (!$customSchedule && $scheduleId === '') || !is_array($passengers) || count($passengers) < 1) {
             throw new InvalidArgumentException('Cada pasaje debe incluir ruta, salida y datos de sus pasajeros.');
         }
 
@@ -66,10 +67,26 @@ try {
 
         $schedules = json_decode($product['schedules'] ?? '[]', true) ?: [];
         $schedule = null;
-        foreach ($schedules as $candidate) {
-            if (($candidate['id'] ?? '') === $scheduleId) {
-                $schedule = $candidate;
-                break;
+        if ($customSchedule) {
+            $today = date('Y-m-d');
+            $publishedSchedules = array_filter($schedules, static fn (array $candidate): bool => ($candidate['date'] ?? '') >= $today);
+            $date = (string) ($item['scheduleDate'] ?? '');
+            $time = (string) ($item['departureTime'] ?? '');
+            $parsedDate = DateTime::createFromFormat('!Y-m-d', $date);
+            if ($publishedSchedules) {
+                throw new RuntimeException('Esta ruta ya tiene salidas publicadas. Selecciona una de ellas.');
+            }
+            if (!$parsedDate || $parsedDate->format('Y-m-d') !== $date || $date < $today ||
+                !preg_match('/^(?:[01]\d|2[0-3]):[0-5]\d$/', $time)) {
+                throw new InvalidArgumentException('Selecciona una fecha y hora de viaje válidas.');
+            }
+            $schedule = ['date' => $date, 'time' => $time, 'platform' => 'Por asignar', 'capacity' => null];
+        } else {
+            foreach ($schedules as $candidate) {
+                if (($candidate['id'] ?? '') === $scheduleId) {
+                    $schedule = $candidate;
+                    break;
+                }
             }
         }
         if (!$schedule || $schedule['date'] < date('Y-m-d')) {
@@ -86,9 +103,17 @@ try {
             $occupied[$seat] = true;
         }
         $availableSeats = [];
-        for ($seat = 1; $seat <= (int) $schedule['capacity']; $seat++) {
-            if (!isset($occupied[$seat])) {
-                $availableSeats[] = $seat;
+        if ($schedule['capacity'] === null) {
+            for ($seat = 1; $seat <= 65535 && count($availableSeats) < count($passengers); $seat++) {
+                if (!isset($occupied[$seat])) {
+                    $availableSeats[] = $seat;
+                }
+            }
+        } else {
+            for ($seat = 1; $seat <= (int) $schedule['capacity']; $seat++) {
+                if (!isset($occupied[$seat])) {
+                    $availableSeats[] = $seat;
+                }
             }
         }
         if (count($availableSeats) < count($passengers)) {

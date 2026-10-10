@@ -39,6 +39,7 @@ export function CartProvider({ children }) {
           scheduleDate: product.scheduleDate || '',
           departureTime: product.departureTime || '',
           platform: product.platform || '',
+          customSchedule: Boolean(product.customSchedule),
           passengers,
           quantity
         }];

@@ -68,7 +68,8 @@ describe('TripDetailPage con descuento', () => {
     }), 2);
   });
 
-  it('explica cuándo no hay salidas publicadas para reservar', async () => {
+  it('permite agendar una ruta sin salidas publicadas', async () => {
+    const addItem = vi.fn();
     useProducts.mockReturnValue({ products: [{
       slug: 'valparaiso',
       title: 'Santiago - Valparaíso',
@@ -77,7 +78,7 @@ describe('TripDetailPage con descuento', () => {
       status: 'Activo',
       schedules: []
     }] });
-    useCart.mockReturnValue({ addItem: vi.fn() });
+    useCart.mockReturnValue({ addItem });
     const user = userEvent.setup();
 
     render(
@@ -87,7 +88,22 @@ describe('TripDetailPage con descuento', () => {
     );
 
     await user.click(screen.getByRole('checkbox', { name: 'Reservar este viaje' }));
-    expect(screen.getByRole('status')).toHaveTextContent('El administrador debe agregar una salida antes de reservar.');
-    expect(screen.queryByRole('button', { name: /Añadir al carrito/ })).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Fecha de viaje')).toBeInTheDocument();
+    expect(screen.getByLabelText('Hora de salida')).toBeInTheDocument();
+    expect(screen.getByText(/no hay cupos preconfigurados/)).toBeInTheDocument();
+
+    await user.type(screen.getByLabelText('Nombre completo'), 'Ana Pérez');
+    await user.type(screen.getByLabelText('RUT'), '12345678-9');
+    await user.click(screen.getByRole('button', { name: /Añadir al carrito/ }));
+
+    expect(addItem).toHaveBeenCalledWith(expect.objectContaining({
+      slug: 'valparaiso',
+      scheduleId: expect.stringMatching(/^custom:/),
+      scheduleDate: expect.any(String),
+      departureTime: '09:00',
+      platform: 'Por asignar',
+      customSchedule: true,
+      passengers: [{ name: 'Ana Pérez', rut: '12345678-9' }]
+    }), 1);
   });
 });

@@ -40,7 +40,7 @@ SPA en React + Vite con API PHP y MariaDB de XAMPP. El catálogo, las cuentas y 
 
 8. Abre la URL que muestre Vite, normalmente [http://localhost:5173/](http://localhost:5173/). Inicia sesión con la cuenta administradora para entrar al panel; las cuentas normales acceden al menú de rutas.
 
-Vite reenvía `/api` a Apache. Por eso deben estar activos Apache y MySQL también mientras trabajas en desarrollo. La página de descuentos está en `/descuentos`; desde Administración, edita una ruta para configurar su porcentaje de descuento y sus salidas (fecha, hora, andén y cupos). El detalle permite seleccionar una salida y añadir asientos al carrito con el precio rebajado. Al confirmar la compra simulada se asignan asientos, se registran la venta y los boletos en MariaDB, y se abre `/boletos/<código>` para imprimir/guardar como PDF o descargar los boletos en HTML. El panel de reportes está en `/admin/reportes`.
+Vite reenvía `/api` a Apache. Por eso deben estar activos Apache y MySQL también mientras trabajas en desarrollo. La página de descuentos está en `/descuentos`; desde Administración, edita una ruta para configurar su porcentaje de descuento y sus salidas (fecha, hora, andén y cupos). Si una ruta no tiene salidas futuras publicadas, el cliente puede elegir fecha y hora al reservar; el andén queda por asignar y los asientos se asignan sin un cupo configurado. Al confirmar la compra simulada se asignan asientos, se registran la venta y los boletos en MariaDB, y se abre `/boletos/<código>` para imprimir/guardar como PDF o descargar los boletos en HTML. El panel de reportes está en `/admin/reportes`.
 
 ## Pruebas
 

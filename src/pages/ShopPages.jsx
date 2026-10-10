@@ -80,6 +80,12 @@ export function TripDetailPage() {
   const [added, setAdded] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [passengers, setPassengers] = useState([{ name: '', rut: '' }]);
+  const [customDate, setCustomDate] = useState(() => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
+  });
+  const [customTime, setCustomTime] = useState('09:00');
   const product = products.find((item) => item.slug === slug);
 
   if (!product) return <section className="container page-section"><h1>Ruta no encontrada</h1><Link to="/menu">Volver a destinos</Link></section>;
@@ -91,7 +97,13 @@ export function TripDetailPage() {
   const departureDates = [...new Set(schedules.map((item) => item.date))];
   const selectedDate = schedules.find((item) => item.id === scheduleId)?.date || departureDates[0] || '';
   const dateSchedules = schedules.filter((item) => item.date === selectedDate);
-  const schedule = dateSchedules.find((item) => item.id === scheduleId) || dateSchedules[0];
+  const customSchedule = {
+    id: `custom:${customDate}:${customTime}`,
+    date: customDate,
+    time: customTime,
+    platform: 'Por asignar'
+  };
+  const schedule = dateSchedules.find((item) => item.id === scheduleId) || dateSchedules[0] || (!schedules.length ? customSchedule : null);
   const discountPercent = Number(product.discount_percent || 0);
   const discountedPrice = Math.round(Number(product.price) * (100 - discountPercent) / 100);
   const currentImage = gallery.includes(image) ? image : product.image;
@@ -121,6 +133,7 @@ export function TripDetailPage() {
       scheduleDate: schedule.date,
       departureTime: schedule.time,
       platform: schedule.platform,
+      customSchedule: !schedules.length,
       passengers
     }, quantity);
     setAdded(true);
@@ -136,15 +149,19 @@ export function TripDetailPage() {
           {schedules.length ? <>
             <label>Fecha de viaje<select value={selectedDate} onChange={(event) => { const nextSchedule = schedules.find((item) => item.date === event.target.value); setScheduleId(nextSchedule?.id || ''); setAdded(false); }} required>{departureDates.map((date) => <option key={date} value={date}>{date}</option>)}</select></label>
             <label>Horario disponible<select value={schedule?.id || ''} onChange={(event) => { setScheduleId(event.target.value); setAdded(false); }} required>{dateSchedules.map((item) => <option key={item.id} value={item.id}>{item.time} · Andén {item.platform} · {item.capacity} cupos</option>)}</select></label>
-            <label>Cantidad de pasajes<select value={quantity} onChange={(event) => changeQuantity(Number(event.target.value))}>{[1, 2, 3, 4].map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
-            {passengers.map((passenger, index) => <fieldset className="booking-passenger" key={index}>
-              <legend>Pasajero {index + 1}</legend>
-              <label>Nombre completo<input autoComplete="name" value={passenger.name} onChange={(event) => updatePassenger(index, 'name', event.target.value)} maxLength="150" required /></label>
-              <label>RUT<input value={passenger.rut} onChange={(event) => updatePassenger(index, 'rut', event.target.value)} placeholder="12345678-9" pattern="(?:[0-9.kK]|-){8,12}" title="Ingresa un RUT chileno válido" required /></label>
-            </fieldset>)}
-            <button disabled={product.status !== 'Activo' || !schedule} className="button button-dark detail-add">{added ? 'Añadido al carrito' : 'Añadir al carrito'} <i className="bi bi-bag-plus" /></button>
-            {added && <p className="form-success" role="status">Pasajes añadidos al carrito con sus datos de viaje.</p>}
-          </> : <p className="form-error" role="status">Esta ruta no tiene horarios publicados. El administrador debe agregar una salida antes de reservar.</p>}
+          </> : <>
+            <p className="muted">Esta ruta no tiene salidas publicadas. Elige una fecha y hora; el andén se asignará posteriormente y no hay cupos preconfigurados.</p>
+            <label>Fecha de viaje<input type="date" value={customDate} min={todayString} onChange={(event) => { setCustomDate(event.target.value); setAdded(false); }} required /></label>
+            <label>Hora de salida<input type="time" value={customTime} onChange={(event) => { setCustomTime(event.target.value); setAdded(false); }} required /></label>
+          </>}
+          <label>Cantidad de pasajes<select value={quantity} onChange={(event) => changeQuantity(Number(event.target.value))}>{[1, 2, 3, 4].map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
+          {passengers.map((passenger, index) => <fieldset className="booking-passenger" key={index}>
+            <legend>Pasajero {index + 1}</legend>
+            <label>Nombre completo<input autoComplete="name" value={passenger.name} onChange={(event) => updatePassenger(index, 'name', event.target.value)} maxLength="150" required /></label>
+            <label>RUT<input value={passenger.rut} onChange={(event) => updatePassenger(index, 'rut', event.target.value)} placeholder="12345678-9" pattern="(?:[0-9.kK]|-){8,12}" title="Ingresa un RUT chileno válido" required /></label>
+          </fieldset>)}
+          <button disabled={product.status !== 'Activo' || !schedule} className="button button-dark detail-add">{added ? 'Añadido al carrito' : 'Añadir al carrito'} <i className="bi bi-bag-plus" /></button>
+          {added && <p className="form-success" role="status">Pasajes añadidos al carrito con sus datos de viaje.</p>}
         </form>}
       </div>
     </div>
