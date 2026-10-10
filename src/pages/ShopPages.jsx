@@ -11,6 +11,12 @@ function ProductCard({ product }) {
   </article>;
 }
 
+const travelZones = [
+  { id: 'viajes-nortinos', name: 'Viajes nortinos', slugs: ['laserena', 'antofagasta', 'arica'] },
+  { id: 'zona-centro', name: 'Zona centro', slugs: ['valparaiso', 'talca', 'pichilemu', 'quintero', 'vina'] },
+  { id: 'zona-austral', name: 'Zona austral', slugs: ['concepcion', 'pucon', 'puertomontt', 'chiloe'] }
+];
+
 export function MenuPage() {
   const { products } = useProducts();
   const [origin, setOrigin] = useState('');
@@ -27,6 +33,13 @@ export function MenuPage() {
     `${product.title} ${product.destination}`.toLowerCase().includes(query.toLowerCase())
     && (!serviceType || product.type === serviceType)
   )), [products, query, serviceType]);
+  const productsByZone = travelZones.map((zone) => ({
+    ...zone,
+    products: matchingProducts.filter((product) => (
+      zone.slugs.includes(product.slug)
+      || (zone.id === 'zona-centro' && !travelZones.some((knownZone) => knownZone.slugs.includes(product.slug)))
+    ))
+  }));
 
   function submitTrip(event) {
     event.preventDefault();
@@ -64,7 +77,15 @@ export function MenuPage() {
 
     <section className="destinations container" id="rutas">
       <div className="section-heading"><div><span className="eyebrow">RUTAS SELECCIONADAS</span><h2>Tu próximo lugar</h2></div><div className="route-controls"><label className="route-filter"><i className="bi bi-search" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar destino" aria-label="Buscar destino" /></label><label className="route-category">Categoría<select value={serviceType} onChange={(event) => setServiceType(event.target.value)} aria-label="Filtrar por tipo de servicio"><option value="">Todos los servicios</option>{serviceTypes.map((type) => <option key={type} value={type}>{type}</option>)}</select></label></div></div>
-      {matchingProducts.length ? <div className="route-grid">{matchingProducts.map((product) => <ProductCard product={product} key={product.slug} />)}</div> : <div className="empty-results">No encontramos rutas{serviceType ? ` del servicio ${serviceType}` : ''}{query ? ` con “${query}”` : ''}.</div>}
+      <nav className="travel-zone-links" aria-label="Zonas de viaje">
+        {travelZones.map((zone) => <a className="button button-light" href={`#${zone.id}`} key={zone.id}>{zone.name}</a>)}
+      </nav>
+      {matchingProducts.length ? productsByZone.map((zone) => (
+        <section className="travel-zone" id={zone.id} aria-labelledby={`${zone.id}-title`} key={zone.id}>
+          <h3 id={`${zone.id}-title`}>{zone.name}</h3>
+          {zone.products.length > 0 && <div className="route-grid">{zone.products.map((product) => <ProductCard product={product} key={product.slug} />)}</div>}
+        </section>
+      )) : <div className="empty-results">No encontramos rutas{serviceType ? ` del servicio ${serviceType}` : ''}{query ? ` con “${query}”` : ''}.</div>}
       <div className="text-center mt-4"><button className="text-button" onClick={() => navigate('/blog')}>Ideas para el viaje <i className="bi bi-arrow-up-right" /></button></div>
     </section>
   </>;

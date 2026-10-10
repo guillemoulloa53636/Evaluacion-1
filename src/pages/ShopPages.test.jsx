@@ -67,4 +67,21 @@ describe('MenuPage', () => {
     expect(screen.getByRole('heading', { name: 'Alfa' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Beta' })).toBeInTheDocument();
   });
+
+  it('separa las rutas por zona y ofrece enlaces a cada listado', () => {
+    useProducts.mockReturnValue({ products: [
+      { slug: 'arica', title: 'Santiago - Arica', destination: 'Arica', price: 35000, type: 'Premium', image: 'arica.jpg' },
+      { slug: 'valparaiso', title: 'Santiago - Valparaíso', destination: 'Valparaíso', price: 10000, type: 'Clásico', image: 'valpo.jpg' },
+      { slug: 'pucon', title: 'Santiago - Pucón', destination: 'Pucón', price: 28000, type: 'Salón Cama', image: 'pucon.jpg' }
+    ] });
+
+    render(renderMenuPage());
+
+    expect(screen.getByRole('link', { name: 'Viajes nortinos' })).toHaveAttribute('href', '#viajes-nortinos');
+    expect(screen.getByRole('link', { name: 'Zona centro' })).toHaveAttribute('href', '#zona-centro');
+    expect(screen.getByRole('link', { name: 'Zona austral' })).toHaveAttribute('href', '#zona-austral');
+    expect(document.querySelector('#viajes-nortinos')).toContainElement(screen.getByRole('heading', { name: 'Arica' }));
+    expect(document.querySelector('#zona-centro')).toContainElement(screen.getByRole('heading', { name: 'Valparaíso' }));
+    expect(document.querySelector('#zona-austral')).toContainElement(screen.getByRole('heading', { name: 'Pucón' }));
+  });
 });
