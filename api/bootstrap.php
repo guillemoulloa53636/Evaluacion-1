@@ -64,6 +64,18 @@ function require_admin(): void
     }
 }
 
+/** Registra un suceso visible en el reporte del admin. Nunca interrumpe la operación principal. */
+function log_activity(PDO $pdo, string $type, string $description, ?string $actor = null): void
+{
+    try {
+        $actor ??= (string) (current_user()['name'] ?? 'Cliente');
+        $pdo->prepare('INSERT INTO activity_log (type, description, actor) VALUES (?, ?, ?)')
+            ->execute([$type, mb_substr($description, 0, 500), mb_substr($actor, 0, 150)]);
+    } catch (Throwable $error) {
+        error_log('No se pudo registrar la actividad: ' . $error->getMessage());
+    }
+}
+
 function report_api_error(Throwable $error): never
 {
     error_log($error->getMessage());

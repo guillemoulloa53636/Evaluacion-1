@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import AdminLayout from './components/AdminLayout.jsx';
 import SiteLayout from './components/SiteLayout.jsx';
 import AccountPages from './pages/AccountPages.jsx';
+import AdminMessagesPage from './pages/AdminMessagesPage.jsx';
 import AdminPage from './pages/AdminPage.jsx';
 import AdminUsersPage from './pages/AdminUsersPage.jsx';
 import DescuentosPage from './pages/DescuentosPage.jsx';
@@ -27,6 +28,7 @@ export default function App() {
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminPage />} />
         <Route path="usuarios" element={<AdminUsersPage />} />
+        <Route path="mensajes" element={<AdminMessagesPage />} />
         <Route path="reportes" element={<ReportesPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

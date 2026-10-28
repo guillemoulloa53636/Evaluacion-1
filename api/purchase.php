@@ -18,7 +18,7 @@ if ($method === 'GET') {
         if (!$sale) {
             json_response(['error' => 'No se encontró la compra solicitada.'], 404);
         }
-        $ticketQuery = $pdo->prepare('SELECT ticket_code, trip_title, destination, schedule_date, departure_time, platform, seat_number, passenger_name, passenger_rut, original_price, discount_percent, price_paid FROM tickets WHERE sale_id = (SELECT id FROM sales WHERE sale_code = ?) ORDER BY id');
+        $ticketQuery = $pdo->prepare('SELECT ticket_code, trip_title, destination, schedule_date, departure_time, platform, seat_number, passenger_name, passenger_rut, original_price, discount_percent, price_paid, status FROM tickets WHERE sale_id = (SELECT id FROM sales WHERE sale_code = ?) ORDER BY id');
         $ticketQuery->execute([$saleCode]);
         $sale['total_amount'] = (int) $sale['total_amount'];
         $sale['tickets'] = $ticketQuery->fetchAll();
@@ -45,7 +45,7 @@ try {
     $saleCode = bin2hex(random_bytes(16));
     $ticketInsert = $pdo->prepare('INSERT INTO tickets (sale_id, ticket_code, product_id, trip_title, destination, schedule_date, departure_time, platform, seat_number, passenger_name, passenger_rut, original_price, discount_percent, price_paid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
     $productQuery = $pdo->prepare('SELECT id, slug, title, destination, price, status, discount_percent, schedules FROM products WHERE slug = ? FOR UPDATE');
-    $soldSeatsQuery = $pdo->prepare('SELECT seat_number FROM tickets WHERE product_id = ? AND schedule_date = ? AND departure_time = ?');
+    $soldSeatsQuery = $pdo->prepare("SELECT seat_number FROM tickets WHERE product_id = ? AND schedule_date = ? AND departure_time = ? AND status = 'activo'");
     $tickets = [];
     $reservedSeats = [];
     $total = 0;
@@ -166,6 +166,7 @@ try {
     }
 
     $pdo->commit();
+    log_activity($pdo, 'compra', 'Compra ' . substr($saleCode, 0, 8) . ': ' . count($tickets) . ' boleto(s) por $' . number_format($total, 0, ',', '.'), $tickets[0]['passenger_name'] ?? 'Cliente');
     $publicTickets = array_map(static function (array $ticket): array {
         unset($ticket['product_id']);
         return $ticket;

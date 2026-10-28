@@ -53,8 +53,16 @@ CREATE TABLE IF NOT EXISTS contact_messages (
   name VARCHAR(150) NOT NULL,
   email VARCHAR(190) NOT NULL,
   message TEXT NOT NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  status ENUM('no_leido', 'leido', 'aplicado', 'archivado', 'eliminado') NOT NULL DEFAULT 'no_leido',
+  admin_notes TEXT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+ALTER TABLE contact_messages
+  ADD COLUMN IF NOT EXISTS status ENUM('no_leido', 'leido', 'aplicado', 'archivado', 'eliminado') NOT NULL DEFAULT 'no_leido',
+  ADD COLUMN IF NOT EXISTS admin_notes TEXT NULL,
+  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 
 CREATE TABLE IF NOT EXISTS sales (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -81,7 +89,41 @@ CREATE TABLE IF NOT EXISTS tickets (
   price_paid INT UNSIGNED NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT tickets_sale_fk FOREIGN KEY (sale_id) REFERENCES sales(id) ON DELETE CASCADE,
-  UNIQUE KEY ticket_schedule_seat (product_id, schedule_date, departure_time, seat_number)
+  KEY ticket_schedule_seat (product_id, schedule_date, departure_time, seat_number)
+);
+
+-- --------------------------------------------------------
+-- Operación: cancelaciones, flota (buses) y registro de sucesos
+-- --------------------------------------------------------
+
+ALTER TABLE sales
+  ADD COLUMN IF NOT EXISTS status ENUM('pagada', 'parcial', 'anulada') NOT NULL DEFAULT 'pagada';
+
+ALTER TABLE tickets
+  ADD COLUMN IF NOT EXISTS status ENUM('activo', 'cancelado') NOT NULL DEFAULT 'activo',
+  ADD COLUMN IF NOT EXISTS cancelled_at TIMESTAMP NULL DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS cancel_reason VARCHAR(300) NULL;
+
+ALTER TABLE tickets DROP INDEX IF EXISTS ticket_schedule_seat;
+ALTER TABLE tickets ADD INDEX IF NOT EXISTS ticket_schedule_seat (product_id, schedule_date, departure_time, seat_number);
+
+CREATE TABLE IF NOT EXISTS fleet_events (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  vehicle VARCHAR(60) NOT NULL,
+  description VARCHAR(500) NOT NULL,
+  status ENUM('con_falla', 'en_servicio_tecnico', 'reparado', 'fuera_de_servicio') NOT NULL DEFAULT 'con_falla',
+  admin_notes TEXT NULL,
+  reported_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  resolved_at TIMESTAMP NULL DEFAULT NULL,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS activity_log (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  type VARCHAR(30) NOT NULL,
+  description VARCHAR(500) NOT NULL,
+  actor VARCHAR(150) NOT NULL DEFAULT 'Sistema',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- --------------------------------------------------------
