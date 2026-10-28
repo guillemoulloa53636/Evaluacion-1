@@ -99,6 +99,7 @@ export function TripDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const [scheduleId, setScheduleId] = useState('');
   const [added, setAdded] = useState(false);
+  const [seatClass, setSeatClass] = useState('semi');
   const [bookingOpen, setBookingOpen] = useState(false);
   const [passengers, setPassengers] = useState([{ name: '', rut: '' }]);
   const [customDate, setCustomDate] = useState(() => {
@@ -126,7 +127,10 @@ export function TripDetailPage() {
   };
   const schedule = dateSchedules.find((item) => item.id === scheduleId) || dateSchedules[0] || (!schedules.length ? customSchedule : null);
   const discountPercent = Number(product.discount_percent || 0);
-  const discountedPrice = Math.round(Number(product.price) * (100 - discountPercent) / 100);
+  const hasBothSeats = product.type === 'Salón Cama';
+  const seatFactor = hasBothSeats && seatClass === 'salon' ? 1.25 : 1;
+  const basePrice = Math.round(Number(product.price) * seatFactor);
+  const discountedPrice = Math.round(basePrice * (100 - discountPercent) / 100);
   const currentImage = gallery.includes(image) ? image : product.image;
   const related = products.filter((item) => item.slug !== product.slug).slice(0, 4);
 
@@ -148,8 +152,10 @@ export function TripDetailPage() {
     addItem({
       ...product,
       price: discountedPrice,
-      originalPrice: product.price,
+      originalPrice: basePrice,
       discountPercent,
+      seatClass: hasBothSeats ? seatClass : '',
+      title: hasBothSeats ? `${product.title} (${seatClass === 'salon' ? 'Salón Cama' : 'Semi Cama'})` : product.title,
       scheduleId: schedule.id,
       scheduleDate: schedule.date,
       departureTime: schedule.time,
@@ -164,7 +170,7 @@ export function TripDetailPage() {
     <div className="breadcrumb-line"><Link to="/menu">Rutas</Link><i className="bi bi-chevron-right" /><span>{product.destination}</span></div>
     <div className="detail-grid">
       <div><div className="detail-image"><img src={imageUrl(currentImage)} alt={`Paisaje de ${product.destination}`} /></div><div className="detail-thumbs">{gallery.map((photo) => <button key={photo} className={currentImage === photo ? 'is-active' : ''} onClick={() => setImage(photo)} aria-label="Ver otra imagen"><img src={imageUrl(photo)} alt="" /></button>)}</div></div>
-      <div className="detail-copy"><span className="eyebrow">VIAJE INTERURBANO · {product.type}</span><h1>{product.title}</h1><p>{product.description}</p><div className="availability"><span className={product.status === 'Activo' ? 'status-dot' : 'status-dot is-unavailable'} />{product.status === 'Activo' ? 'Disponible para reservar' : 'Agotado'}</div>{discountPercent > 0 ? <><del className="detail-original-price">{formatPrice(product.price)}</del><div className="detail-price">{formatPrice(discountedPrice)} <small>/ pasaje · {discountPercent}% de descuento</small></div></> : <div className="detail-price">{formatPrice(product.price)} <small>/ pasaje</small></div>}
+      <div className="detail-copy"><span className="eyebrow">VIAJE INTERURBANO · {product.type}</span><h1>{product.title}</h1><p>{product.description}</p><div className="availability"><span className={product.status === 'Activo' ? 'status-dot' : 'status-dot is-unavailable'} />{product.status === 'Activo' ? 'Disponible para reservar' : 'Agotado'}</div>{discountPercent > 0 ? <><del className="detail-original-price">{formatPrice(basePrice)}</del><div className="detail-price">{formatPrice(discountedPrice)} <small>/ pasaje · {discountPercent}% de descuento</small></div></> : <div className="detail-price">{formatPrice(basePrice)} <small>/ pasaje</small></div>}
         <label className="booking-toggle"><input type="checkbox" checked={bookingOpen} onChange={(event) => setBookingOpen(event.target.checked)} /> Reservar este viaje</label>
         {bookingOpen && <form className="booking-form" onSubmit={addBooking}>
           {schedules.length ? <>
@@ -175,6 +181,7 @@ export function TripDetailPage() {
             <label>Fecha de viaje<input type="date" value={customDate} min={todayString} onChange={(event) => { setCustomDate(event.target.value); setAdded(false); }} required /></label>
             <label>Hora de salida<input type="time" value={customTime} onChange={(event) => { setCustomTime(event.target.value); setAdded(false); }} required /></label>
           </>}
+          {hasBothSeats && <label>Tipo de asiento<select value={seatClass} onChange={(event) => { setSeatClass(event.target.value); setAdded(false); }}><option value="semi">Semi Cama (piso 2) · {formatPrice(Math.round(Number(product.price) * (100 - discountPercent) / 100))}</option><option value="salon">Salón Cama (piso 1) · {formatPrice(Math.round(Math.round(Number(product.price) * 1.25) * (100 - discountPercent) / 100))}</option></select></label>}
           <label>Cantidad de pasajes<select value={quantity} onChange={(event) => changeQuantity(Number(event.target.value))}>{[1, 2, 3, 4].map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
           {passengers.map((passenger, index) => <fieldset className="booking-passenger" key={index}>
             <legend>Pasajero {index + 1}</legend>

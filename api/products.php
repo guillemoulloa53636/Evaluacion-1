@@ -57,6 +57,10 @@ function validate_product(array $data): array
             $schedule['capacity'] < 1 || $schedule['capacity'] > 100) {
             json_response(['error' => 'Revisa la fecha, hora, andén y cupos de cada salida.'], 422);
         }
+        $limit = ['Semi Cama' => 44, 'Salón Cama' => 56][$product['type']] ?? 100;
+        if ($schedule['capacity'] > $limit) {
+            json_response(['error' => "Un bus {$product['type']} tiene máximo {$limit} asientos por salida."], 422);
+        }
     }
     unset($schedule);
     return $product;

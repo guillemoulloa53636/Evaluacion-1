@@ -165,11 +165,11 @@ export default function ReportesPage() {
               <td>{sale.sale_code.slice(0, 8)}</td>
               <td>{sale.tickets.map((ticket) => <div key={ticket.ticket_code}>
                 {ticket.passenger_name} · {ticket.trip_title} · asiento {ticket.seat_number} · {formatPrice(ticket.price_paid)}
-                {ticket.status === 'cancelado' ? ' (cancelado)' : <> <button type="button" onClick={() => cancel({ ticket_code: ticket.ticket_code }, `el boleto de ${ticket.passenger_name}`)}>Cancelar boleto</button></>}
+                {ticket.status === 'cancelado' ? ' (cancelado)' : <> <button type="button" className="btn btn-outline-danger btn-sm py-0 px-2 ms-1" style={{ fontSize: '0.75rem' }} onClick={() => cancel({ ticket_code: ticket.ticket_code }, `el asiento ${ticket.seat_number} de ${ticket.passenger_name}`)}>Cancelar asiento</button></>}
               </div>)}</td>
               <td>{formatPrice(sale.total_amount)}</td>
               <td><span className={`table-status ${sale.status !== 'pagada' ? 'is-off' : ''}`}>{SALE_STATUS[sale.status] || sale.status}</span></td>
-              <td>{sale.status !== 'anulada' && <button type="button" onClick={() => cancel({ sale_code: sale.sale_code }, 'toda la compra')}>Cancelar compra</button>}</td>
+              <td>{sale.status !== 'anulada' && sale.tickets.filter((t) => t.status !== 'cancelado').length > 1 && <button type="button" className="btn btn-outline-danger btn-sm py-0 px-2" style={{ fontSize: '0.75rem' }} onClick={() => cancel({ sale_code: sale.sale_code }, 'toda la compra')}>Cancelar todos</button>}</td>
             </tr>)}</tbody>
           </table></div> : <p className="muted">No hay compras en este período.</p>}
         </section>

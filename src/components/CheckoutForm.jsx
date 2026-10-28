@@ -32,6 +32,7 @@ export default function CheckoutForm({ items, onCancel, onComplete }) {
           items: items.map((item) => ({
             slug: item.slug,
             scheduleId: item.scheduleId,
+            seatClass: item.seatClass || '',
             customSchedule: item.customSchedule || false,
             scheduleDate: item.scheduleDate,
             departureTime: item.departureTime,

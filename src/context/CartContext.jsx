@@ -19,7 +19,7 @@ export function CartProvider({ children }) {
   }, [items]);
 
   function addItem(product, quantity = 1, passengers = product.passengers || []) {
-    const cartKey = product.scheduleId ? `${product.slug}:${product.scheduleId}` : product.slug;
+    const cartKey = product.scheduleId ? `${product.slug}:${product.scheduleId}${product.seatClass ? ':' + product.seatClass : ''}` : product.slug;
     setItems((current) => {
       const exists = current.some((item) => (item.cartKey || item.slug) === cartKey);
       return exists
@@ -36,6 +36,7 @@ export function CartProvider({ children }) {
           originalPrice: Number(product.originalPrice ?? product.price ?? product.precio),
           discountPercent: Number(product.discountPercent ?? product.discount_percent ?? 0),
           scheduleId: product.scheduleId || '',
+          seatClass: product.seatClass || '',
           scheduleDate: product.scheduleDate || '',
           departureTime: product.departureTime || '',
           platform: product.platform || '',

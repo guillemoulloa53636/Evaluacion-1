@@ -45,6 +45,7 @@ describe('CheckoutForm', () => {
         items: [{
           slug: 'valparaiso',
           scheduleId: 'departure-1',
+          seatClass: '',
           customSchedule: false,
           scheduleDate: '2099-04-20',
           departureTime: '09:30',
@@ -83,6 +84,7 @@ describe('CheckoutForm', () => {
         items: [{
           slug: 'valparaiso',
           scheduleId: 'custom:2099-04-20:09:00',
+          seatClass: '',
           customSchedule: true,
           scheduleDate: '2099-04-20',
           departureTime: '09:00',

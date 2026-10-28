@@ -44,7 +44,7 @@ try {
     $pdo->beginTransaction();
     $saleCode = bin2hex(random_bytes(16));
     $ticketInsert = $pdo->prepare('INSERT INTO tickets (sale_id, ticket_code, product_id, trip_title, destination, schedule_date, departure_time, platform, seat_number, passenger_name, passenger_rut, original_price, discount_percent, price_paid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-    $productQuery = $pdo->prepare('SELECT id, slug, title, destination, price, status, discount_percent, schedules FROM products WHERE slug = ? FOR UPDATE');
+    $productQuery = $pdo->prepare('SELECT id, slug, title, destination, price, type, status, discount_percent, schedules FROM products WHERE slug = ? FOR UPDATE');
     $soldSeatsQuery = $pdo->prepare("SELECT seat_number FROM tickets WHERE product_id = ? AND schedule_date = ? AND departure_time = ? AND status = 'activo'");
     $tickets = [];
     $reservedSeats = [];
@@ -93,6 +93,25 @@ try {
             throw new RuntimeException('Una de las salidas seleccionadas ya no está disponible.');
         }
 
+        // Límite físico del bus según el servicio.
+        // Semi Cama: 44 asientos (1-44). Salón Cama: bus de 2 pisos, 12 Salón Cama (1-12) + 44 Semi Cama (13-56).
+        $seatClass = strtolower(trim((string) ($item['seatClass'] ?? '')));
+        $priceFactor = 100;
+        $seatFrom = 1;
+        $seatTo = $schedule['capacity'] === null ? 65535 : (int) $schedule['capacity'];
+        if (($product['type'] ?? '') === 'Semi Cama') {
+            $seatTo = min($seatTo, 44);
+        } elseif (($product['type'] ?? '') === 'Salón Cama') {
+            if ($seatClass === 'salon') {
+                $seatFrom = 1;
+                $seatTo = 12;
+                $priceFactor = 125;
+            } else {
+                $seatFrom = 13;
+                $seatTo = 56;
+            }
+        }
+
         $occupied = [];
         $soldSeatsQuery->execute([$product['id'], $schedule['date'], $schedule['time']]);
         foreach ($soldSeatsQuery->fetchAll(PDO::FETCH_COLUMN) as $seat) {
@@ -103,25 +122,17 @@ try {
             $occupied[$seat] = true;
         }
         $availableSeats = [];
-        if ($schedule['capacity'] === null) {
-            for ($seat = 1; $seat <= 65535 && count($availableSeats) < count($passengers); $seat++) {
-                if (!isset($occupied[$seat])) {
-                    $availableSeats[] = $seat;
-                }
-            }
-        } else {
-            for ($seat = 1; $seat <= (int) $schedule['capacity']; $seat++) {
-                if (!isset($occupied[$seat])) {
-                    $availableSeats[] = $seat;
-                }
+        for ($seat = $seatFrom; $seat <= $seatTo && count($availableSeats) < count($passengers); $seat++) {
+            if (!isset($occupied[$seat])) {
+                $availableSeats[] = $seat;
             }
         }
         if (count($availableSeats) < count($passengers)) {
-            throw new RuntimeException('No quedan suficientes asientos disponibles para una de las salidas.');
+            throw new RuntimeException('No quedan suficientes asientos de ese tipo disponibles para una de las salidas.');
         }
         $reservedSeats[$seatKey] = array_merge($reservedSeats[$seatKey] ?? [], array_slice($availableSeats, 0, count($passengers)));
 
-        $originalPrice = (int) $product['price'];
+        $originalPrice = (int) round((int) $product['price'] * $priceFactor / 100);
         $discountPercent = (int) $product['discount_percent'];
         $pricePaid = (int) round($originalPrice * (100 - $discountPercent) / 100);
 
