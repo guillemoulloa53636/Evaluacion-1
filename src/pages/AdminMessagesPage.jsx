@@ -13,6 +13,7 @@ export const MESSAGE_STATUSES = {
 export default function AdminMessagesPage() {
   const [messages, setMessages] = useState([]);
   const [filter, setFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState('');
   const [access, setAccess] = useState('checking');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -30,7 +31,10 @@ export default function AdminMessagesPage() {
         }
         setAccess('granted');
         setLoading(true);
-        const query = filter ? `?status=${encodeURIComponent(filter)}` : '';
+        const params = new URLSearchParams();
+        if (filter) params.set('status', filter);
+        if (typeFilter) params.set('type', typeFilter);
+        const query = params.toString() ? `?${params}` : '';
         const data = await apiRequest(`contact.php${query}`);
         if (active) {
           setMessages(data);
@@ -45,7 +49,7 @@ export default function AdminMessagesPage() {
 
     load();
     return () => { active = false; };
-  }, [filter]);
+  }, [filter, typeFilter]);
 
   async function update(id, changes) {
     try {
@@ -85,6 +89,13 @@ export default function AdminMessagesPage() {
     <section className="admin-table-wrap">
       <div className="section-heading">
         <div><span className="eyebrow">{unread} SIN LEER</span><h2>Bandeja de entrada</h2></div>
+        <label>Tipo
+          <select value={typeFilter} onChange={(event) => setTypeFilter(event.target.value)} aria-label="Filtrar por tipo">
+            <option value="">Mensajes y reclamos</option>
+            <option value="mensaje">Solo mensajes</option>
+            <option value="reclamo">Solo reclamos</option>
+          </select>
+        </label>
         <label>Estado
           <select value={filter} onChange={(event) => setFilter(event.target.value)} aria-label="Filtrar por estado">
             <option value="">Todos (sin eliminados)</option>
@@ -94,9 +105,10 @@ export default function AdminMessagesPage() {
       </div>
       {error && <p className="form-error" role="alert">{error}</p>}
       {loading ? <p className="muted">Cargando mensajes…</p> : messages.length ? <div className="table-responsive"><table className="table admin-table">
-        <thead><tr><th>Fecha</th><th>Nombre</th><th>Correo</th><th>Mensaje</th><th>Estado</th><th>Notas</th><th>Acciones</th></tr></thead>
+        <thead><tr><th>Fecha</th><th>Tipo</th><th>Nombre</th><th>Correo</th><th>Mensaje</th><th>Estado</th><th>Notas</th><th>Acciones</th></tr></thead>
         <tbody>{messages.map((item) => <tr key={item.id} style={item.status === 'no_leido' ? { fontWeight: 600 } : undefined}>
-          <td>{new Date(item.created_at).toLocaleString('es-CL')}</td>
+          <td>{new Date(item.created_at.replace(' ', 'T')).toLocaleString('es-CL')}</td>
+          <td><span className={`table-status ${item.type === 'reclamo' ? 'is-off' : ''}`}>{item.type === 'reclamo' ? 'Reclamo' : 'Mensaje'}</span></td>
           <td>{item.name}</td>
           <td><a href={`mailto:${item.email}`}>{item.email}</a></td>
           <td style={{ whiteSpace: 'pre-wrap', maxWidth: 320 }}>{item.message}</td>

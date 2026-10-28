@@ -37,6 +37,7 @@ try {
             trim((string) ($data['telephone'] ?? '')), trim((string) ($data['region'] ?? '')),
             trim((string) ($data['commune'] ?? '')),
         ]);
+        log_activity($pdo, 'registro', "Nueva cuenta registrada: {$name} ({$email})", $name);
         json_response(['created' => true], 201);
     }
 

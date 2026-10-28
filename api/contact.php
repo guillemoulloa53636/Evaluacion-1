@@ -3,23 +3,26 @@ declare(strict_types=1);
 require_once __DIR__ . '/bootstrap.php';
 
 const CONTACT_STATUSES = ['no_leido', 'leido', 'aplicado', 'archivado', 'eliminado'];
-const CONTACT_COLUMNS = 'id, name, email, message, status, admin_notes, created_at, updated_at';
+const CONTACT_TYPES = ['mensaje', 'reclamo'];
+const CONTACT_COLUMNS = 'id, name, email, message, type, status, admin_notes, created_at, updated_at';
 
 try {
     $pdo = database();
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
-    // Público: el formulario de contacto envía mensajes.
+    // Público: el formulario de contacto envía mensajes o reclamos.
     if ($method === 'POST') {
         $data = request_json();
         $name = trim((string) ($data['name'] ?? ''));
         $email = strtolower(trim((string) ($data['email'] ?? '')));
         $message = trim((string) ($data['message'] ?? ''));
+        $type = ($data['isComplaint'] ?? false) === true ? 'reclamo' : 'mensaje';
         if ($name === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || $message === '') {
             json_response(['error' => 'Completa nombre, correo y mensaje válido.'], 422);
         }
-        $statement = $pdo->prepare("INSERT INTO contact_messages (name, email, message, status) VALUES (?, ?, ?, 'no_leido')");
-        $statement->execute([$name, $email, $message]);
+        $statement = $pdo->prepare("INSERT INTO contact_messages (name, email, message, type, status) VALUES (?, ?, ?, ?, 'no_leido')");
+        $statement->execute([$name, $email, $message, $type]);
+        log_activity($pdo, $type, ($type === 'reclamo' ? 'Nuevo reclamo' : 'Nuevo mensaje de contacto') . " de {$name}", $name);
         json_response(['sent' => true], 201);
     }
 
@@ -28,18 +31,26 @@ try {
 
     if ($method === 'GET') {
         $status = (string) ($_GET['status'] ?? '');
+        $type = (string) ($_GET['type'] ?? '');
         if ($status !== '' && !in_array($status, CONTACT_STATUSES, true)) {
             json_response(['error' => 'Estado no válido.'], 422);
         }
-        $sql = 'SELECT ' . CONTACT_COLUMNS . ' FROM contact_messages';
+        if ($type !== '' && !in_array($type, CONTACT_TYPES, true)) {
+            json_response(['error' => 'Tipo no válido.'], 422);
+        }
+        $conditions = [];
         $params = [];
         if ($status !== '') {
-            $sql .= ' WHERE status = ?';
+            $conditions[] = 'status = ?';
             $params[] = $status;
         } else {
-            $sql .= " WHERE status <> 'eliminado'";
+            $conditions[] = "status <> 'eliminado'";
         }
-        $statement = $pdo->prepare($sql . ' ORDER BY created_at DESC, id DESC');
+        if ($type !== '') {
+            $conditions[] = 'type = ?';
+            $params[] = $type;
+        }
+        $statement = $pdo->prepare('SELECT ' . CONTACT_COLUMNS . ' FROM contact_messages WHERE ' . implode(' AND ', $conditions) . ' ORDER BY created_at DESC, id DESC');
         $statement->execute($params);
         json_response($statement->fetchAll());
     }
@@ -75,6 +86,10 @@ try {
         $row = $statement->fetch();
         if (!$row) {
             json_response(['error' => 'Mensaje no encontrado.'], 404);
+        }
+        if (array_key_exists('status', $data)) {
+            $label = $row['type'] === 'reclamo' ? 'Reclamo' : 'Mensaje';
+            log_activity($pdo, $row['type'], "{$label} de {$row['name']}: estado cambiado a " . str_replace('_', ' ', $row['status']));
         }
         json_response(['message' => $row]);
     }

@@ -101,7 +101,7 @@ export function ServicePage() {
     try {
       await apiRequest('contact.php', {
         method: 'POST',
-        body: JSON.stringify({ name: formData.get('nombre'), email: formData.get('correo'), message: formData.get('mensaje') })
+        body: JSON.stringify({ name: formData.get('nombre'), email: formData.get('correo'), message: formData.get('mensaje'), isComplaint: formData.get('reclamo') === 'on' })
       });
       setSent(true);
       formElement.reset();
@@ -109,7 +109,7 @@ export function ServicePage() {
       setError(requestError.message);
     }
   }
-  return <section className="container contact-page page-section"><div><span className="eyebrow">ESTAMOS PARA AYUDAR</span><h1>Hablemos de tu viaje.</h1><p className="muted">Cuéntanos cómo podemos ayudarte. Nuestro equipo revisará tu consulta.</p><div className="contact-detail"><i className="bi bi-envelope" /><span>Atención en línea<br /><strong>Respuesta dentro de 1 día hábil</strong></span></div></div><form className="stack-form form-panel" onSubmit={submit}><label>Nombre completo<input name="nombre" autoComplete="name" required /></label><label>Correo electrónico<input type="email" name="correo" autoComplete="email" required /></label><label>Mensaje<textarea name="mensaje" rows="5" required /></label>{error && <p className="form-error" role="alert">{error}</p>}{sent && <div className="form-success" role="status">Mensaje guardado en la base de datos.</div>}<button className="button button-dark">Enviar mensaje <i className="bi bi-arrow-right" /></button></form></section>;
+  return <section className="container contact-page page-section"><div><span className="eyebrow">ESTAMOS PARA AYUDAR</span><h1>Hablemos de tu viaje.</h1><p className="muted">Cuéntanos cómo podemos ayudarte. Nuestro equipo revisará tu consulta.</p><div className="contact-detail"><i className="bi bi-envelope" /><span>Atención en línea<br /><strong>Respuesta dentro de 1 día hábil</strong></span></div></div><form className="stack-form form-panel" onSubmit={submit}><label>Nombre completo<input name="nombre" autoComplete="name" required /></label><label>Correo electrónico<input type="email" name="correo" autoComplete="email" required /></label><label>Mensaje<textarea name="mensaje" rows="5" required /></label><label style={{ display: 'flex', alignItems: 'center', gap: 10 }}><input type="checkbox" name="reclamo" style={{ width: 'auto', minHeight: 'auto' }} />Este mensaje es un reclamo</label>{error && <p className="form-error" role="alert">{error}</p>}{sent && <div className="form-success" role="status">Mensaje guardado en la base de datos.</div>}<button className="button button-dark">Enviar mensaje <i className="bi bi-arrow-right" /></button></form></section>;
 }
 
 const AccountPages = { LoginPage, RegisterPage, ServicePage };

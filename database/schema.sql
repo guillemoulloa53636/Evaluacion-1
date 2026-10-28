@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS contact_messages (
   name VARCHAR(150) NOT NULL,
   email VARCHAR(190) NOT NULL,
   message TEXT NOT NULL,
+  type ENUM('mensaje', 'reclamo') NOT NULL DEFAULT 'mensaje',
   status ENUM('no_leido', 'leido', 'aplicado', 'archivado', 'eliminado') NOT NULL DEFAULT 'no_leido',
   admin_notes TEXT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -60,6 +61,7 @@ CREATE TABLE IF NOT EXISTS contact_messages (
 );
 
 ALTER TABLE contact_messages
+  ADD COLUMN IF NOT EXISTS type ENUM('mensaje', 'reclamo') NOT NULL DEFAULT 'mensaje',
   ADD COLUMN IF NOT EXISTS status ENUM('no_leido', 'leido', 'aplicado', 'archivado', 'eliminado') NOT NULL DEFAULT 'no_leido',
   ADD COLUMN IF NOT EXISTS admin_notes TEXT NULL,
   ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;

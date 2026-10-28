@@ -26,7 +26,7 @@ describe('AdminUsersPage', () => {
 
   it('renderiza todas las cuentas recibidas desde la API', async () => {
     render(<MemoryRouter><AdminUsersPage /></MemoryRouter>);
-    await screen.findByRole('heading', { name: 'Usuarios compradores' });
+    await screen.findByRole('heading', { name: 'Usuarios registrados' });
 
     const tableBody = document.querySelector('.admin-table tbody');
     expect(within(tableBody).getAllByRole('row')).toHaveLength(users.length);

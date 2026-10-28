@@ -94,6 +94,8 @@ export default function ReportesPage() {
     { label: 'Viajes realizados', value: report.metrics.completedTrips, icon: 'bi-bus-front' },
     { label: 'Cancelaciones', value: report.metrics.cancellations, icon: 'bi-x-circle' },
     { label: 'Reclamos recibidos', value: report.metrics.complaints, icon: 'bi-chat-left-text' },
+    { label: 'Mensajes de contacto', value: report.metrics.messages ?? 0, icon: 'bi-envelope' },
+    { label: 'Cuentas nuevas', value: report.metrics.newUsers ?? 0, icon: 'bi-person-plus' },
     { label: 'Buses con problemas', value: report.metrics.openFleetEvents, icon: 'bi-tools' }
   ] : [];
 

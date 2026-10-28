@@ -41,18 +41,19 @@ export default function AdminUsersPage() {
 
   return <div className="admin-content">
     <header className="admin-topline">
-      <div><span className="eyebrow">GESTIÓN / USUARIOS</span><h1>Usuarios compradores</h1></div>
+      <div><span className="eyebrow">GESTIÓN / USUARIOS</span><h1>Usuarios registrados</h1></div>
     </header>
     <section className="admin-table-wrap">
-      <div className="section-heading"><div><span className="eyebrow">CUENTAS COMPRADORAS</span><h2>Compradores registrados</h2></div></div>
+      <div className="section-heading"><div><span className="eyebrow">HISTORIAL DE CUENTAS</span><h2>Todas las cuentas ({users.length})</h2></div></div>
       {error && <p className="form-error" role="alert">{error}</p>}
-      {loading ? <p className="muted">Cargando compradores…</p> : users.length ? <div className="table-responsive"><table className="table admin-table">
-        <thead><tr><th>Nombre</th><th>Correo</th><th>Teléfono</th><th>Región</th><th>Comuna</th><th>Fecha de registro</th></tr></thead>
+      {loading ? <p className="muted">Cargando usuarios…</p> : users.length ? <div className="table-responsive"><table className="table admin-table">
+        <thead><tr><th>Nombre</th><th>Correo</th><th>Teléfono</th><th>Región</th><th>Comuna</th><th>Tipo</th><th>Fecha de registro</th></tr></thead>
         <tbody>{users.map((user) => <tr key={user.id}>
           <td>{user.name}</td><td>{user.email}</td><td>{user.telephone || '—'}</td><td>{user.region || '—'}</td><td>{user.commune || '—'}</td>
-          <td>{new Date(user.created_at).toLocaleDateString('es-CL')}</td>
+          <td>{user.role === 'admin' ? 'Administrador' : 'Comprador'}</td>
+          <td>{new Date(user.created_at.replace(' ', 'T')).toLocaleString('es-CL')}</td>
         </tr>)}</tbody>
-      </table></div> : !error && <p className="muted">Todavía no hay usuarios compradores registrados.</p>}
+      </table></div> : !error && <p className="muted">Todavía no hay usuarios registrados.</p>}
     </section>
   </div>;
 }

@@ -135,7 +135,30 @@ describe('ServicePage', () => {
       body: JSON.stringify({
         name: 'Ana Pérez',
         email: 'ana@example.com',
-        message: 'Necesito información de una ruta.'
+        message: 'Necesito información de una ruta.',
+        isComplaint: false
+      })
+    }));
+  });
+
+  it('marca el mensaje como reclamo cuando se activa la casilla', async () => {
+    apiRequest.mockResolvedValue({ sent: true });
+    const user = userEvent.setup();
+    render(<MemoryRouter><ServicePage /></MemoryRouter>);
+
+    await user.type(screen.getByLabelText('Nombre completo'), 'Ana Pérez');
+    await user.type(screen.getByLabelText('Correo electrónico'), 'ana@example.com');
+    await user.type(screen.getByLabelText('Mensaje'), 'El bus llegó atrasado.');
+    await user.click(screen.getByLabelText('Este mensaje es un reclamo'));
+    await user.click(screen.getByRole('button', { name: /Enviar mensaje/ }));
+
+    await screen.findByRole('status');
+    expect(apiRequest).toHaveBeenCalledWith('contact.php', expect.objectContaining({
+      body: JSON.stringify({
+        name: 'Ana Pérez',
+        email: 'ana@example.com',
+        message: 'El bus llegó atrasado.',
+        isComplaint: true
       })
     }));
   });

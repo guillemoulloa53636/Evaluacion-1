@@ -36,8 +36,10 @@ try {
         'completedTrips' => $scalar("SELECT COUNT(*) FROM (SELECT DISTINCT product_id, schedule_date, departure_time FROM tickets WHERE status = 'activo' AND schedule_date >= ? AND TIMESTAMP(schedule_date, departure_time) <= NOW()) trips", [$startDate]),
         'cancellations' => $scalar("SELECT COUNT(*) FROM tickets WHERE status = 'cancelado' AND cancelled_at >= ?", [$from]),
         'cancelledAmount' => $scalar("SELECT COALESCE(SUM(price_paid), 0) FROM tickets WHERE status = 'cancelado' AND cancelled_at >= ?", [$from]),
-        'complaints' => $scalar("SELECT COUNT(*) FROM contact_messages WHERE created_at >= ? AND status <> 'eliminado'", [$from]),
+        'complaints' => $scalar("SELECT COUNT(*) FROM contact_messages WHERE type = 'reclamo' AND created_at >= ? AND status <> 'eliminado'", [$from]),
+        'messages' => $scalar("SELECT COUNT(*) FROM contact_messages WHERE type = 'mensaje' AND created_at >= ? AND status <> 'eliminado'", [$from]),
         'unreadMessages' => $scalar("SELECT COUNT(*) FROM contact_messages WHERE status = 'no_leido'"),
+        'newUsers' => $scalar('SELECT COUNT(*) FROM users WHERE created_at >= ?', [$from]),
         'openFleetEvents' => $scalar("SELECT COUNT(*) FROM fleet_events WHERE status <> 'reparado'"),
     ];
 
@@ -74,7 +76,7 @@ try {
     $fleet = $pdo->prepare("SELECT id, vehicle, description, status, admin_notes, reported_at, resolved_at FROM fleet_events WHERE reported_at >= ? OR status <> 'reparado' ORDER BY (status = 'reparado'), reported_at DESC");
     $fleet->execute([$from]);
 
-    $activity = $pdo->prepare('SELECT id, type, description, actor, created_at FROM activity_log WHERE created_at >= ? ORDER BY id DESC LIMIT 100');
+    $activity = $pdo->prepare('SELECT id, type, description, actor, created_at FROM activity_log WHERE created_at >= ? ORDER BY created_at DESC, id DESC LIMIT 200');
     $activity->execute([$from]);
 
     json_response([
