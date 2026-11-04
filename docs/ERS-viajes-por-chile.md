@@ -38,6 +38,7 @@ La autorización del administrador se comprueba en la interfaz y en los endpoint
 | RF-11 | Consultar reportes de operación. | `/admin/reportes`, visible desde el espacio de administración, permite elegir Hoy (Día), Esta Semana, Este Mes y Este Año y presenta monto, viajes, cancelaciones, reclamos y eventos de flota. |
 | RF-12 | Enviar una consulta. | El formulario de ayuda valida los campos y envía el mensaje a la API para guardarlo en MariaDB; muestra confirmación o un error explícito. |
 | RF-13 | Crear una cuenta e iniciar sesión. | El registro valida coincidencia de correos y contraseñas; el inicio de sesión consulta la API y dirige según el rol autorizado. |
+| RF-15 | Iniciar sesión con Google. | El login muestra el botón de Google Identity Services; la API (`auth.php?action=google`) valida el token con Google, comprueba el `client_id` y el correo verificado, crea la cuenta de cliente si no existe y abre la sesión. |
 | RF-14 | Consultar información institucional. | El visitante puede abrir las páginas de blog y de información del proyecto/equipo. |
 
 ### 3.1 Límite funcional importante
@@ -59,7 +60,7 @@ Los valores y eventos de `/admin/reportes` son datos locales ilustrativos del co
 ## 5. Interfaces y arquitectura
 
 - **Frontend:** React, React Router, Vite, Bootstrap y Bootstrap Icons.
-- **API:** PHP bajo Apache; la SPA realiza solicitudes JSON bajo `/api`. En desarrollo, Vite conserva el proxy `/api` hacia `http://localhost:8000`.
+- **API:** PHP bajo Apache; la SPA realiza solicitudes JSON bajo `/api`. En desarrollo, Vite conserva el proxy `/api` hacia `http://localhost` (Apache de XAMPP). Diagramas de arquitectura, endpoints y flujo de compra, con el detalle del viaje que devuelve cada endpoint: [diagrama de APIs](./diagrama-apis.md).
 - **Datos:** MariaDB/MySQL, esquema `database/schema.sql` y migración de descuentos, salidas y boletos en `database/migrations/`.
 - **Persistencia de interfaz:** el carrito se almacena en `localStorage`; catálogo, usuarios, mensajes, ventas y boletos usan endpoints de la API.
 - **Configuración local de base:** `127.0.0.1:3308`, base `viajes_chile`, usuario `root`, contraseña vacía como valor por defecto local o `DB_PASSWORD` si está definida.
@@ -103,6 +104,6 @@ El esquema contempla productos/rutas, usuarios, mensajes de contacto, ventas y b
 |---|---|
 | Framework frontend | React + Vite, configuración en `package.json` y `vite.config.js`. |
 | Componentes, estado y navegación | Páginas y componentes reutilizables, estado local/contextos y rutas React Router. |
-| Adaptabilidad | Bootstrap, CSS responsive y reglas media-query en `src/styles.css`. |
-| Pruebas | 38 casos automatizados con Vitest/React Testing Library; detalle y limitaciones en [informe de cobertura](./cobertura-de-pruebas.md). Jasmine y Karma se omiten según el alcance solicitado. |
+| Adaptabilidad | Bootstrap (sistema de grilla `row`/`col-*` en el catálogo), CSS responsive y reglas media-query en `src/styles.css`. |
+| Pruebas | 43 casos automatizados con Vitest/React Testing Library, con mocks y spies; detalle y limitaciones en [informe de cobertura](./cobertura-de-pruebas.md). Jasmine y Karma se omiten según el alcance solicitado. |
 | Persistencia e interactividad | API PHP/MariaDB, carrito, catálogo administrable, formulario de contacto y emisión de boletos. |

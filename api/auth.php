@@ -55,6 +55,36 @@ try {
         json_response(['user' => $user]);
     }
 
+    if ($action === 'google') {
+        // Valida el ID token de Google (Google Identity Services) contra el endpoint tokeninfo.
+        $clientId = (string) (getenv('GOOGLE_CLIENT_ID') ?: '25065180497-5qa2tf845vbhk57gjav0iht24jkre8ft.apps.googleusercontent.com');
+        $credential = (string) ($data['credential'] ?? '');
+        if ($clientId === '' || $credential === '') {
+            json_response(['error' => 'Inicio con Google no configurado (GOOGLE_CLIENT_ID).'], 422);
+        }
+        $raw = @file_get_contents('https://oauth2.googleapis.com/tokeninfo?id_token=' . urlencode($credential));
+        $claims = $raw ? json_decode($raw, true) : null;
+        if (!is_array($claims) || ($claims['aud'] ?? '') !== $clientId
+            || ($claims['email_verified'] ?? '') !== 'true' || empty($claims['email'])) {
+            json_response(['error' => 'No se pudo validar la cuenta de Google.'], 401);
+        }
+        $email = strtolower((string) $claims['email']);
+        $name = trim((string) ($claims['name'] ?? $email));
+        $statement = $pdo->prepare('SELECT id, name, email, role FROM users WHERE email = ? LIMIT 1');
+        $statement->execute([$email]);
+        $user = $statement->fetch();
+        if (!$user) {
+            $pdo->prepare('INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)')
+                ->execute([$name, $email, password_hash(bin2hex(random_bytes(16)), PASSWORD_DEFAULT)]);
+            log_activity($pdo, 'registro', "Nueva cuenta registrada con Google: {$name} ({$email})", $name);
+            $statement->execute([$email]);
+            $user = $statement->fetch();
+        }
+        session_regenerate_id(true);
+        $_SESSION['user'] = $user;
+        json_response(['user' => $user]);
+    }
+
     json_response(['error' => 'Acción no válida.'], 404);
 } catch (PDOException $error) {
     if ($error->getCode() === '23000') {

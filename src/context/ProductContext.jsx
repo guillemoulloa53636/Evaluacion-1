@@ -1,17 +1,8 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+﻿import { createContext, useContext, useEffect, useState } from 'react';
+import { apiRequest } from '../lib/api.js';
 
-// Configurable con VITE_API_URL; por defecto usa el mismo host desde el que se abre la app
-// (así funciona desde otros dispositivos de la red, no solo en localhost).
-const API_BASE = import.meta.env?.VITE_API_URL || `http://${window.location.hostname}:8080`;
-const API_URL = `${API_BASE}/api/products`;
 
 const ProductContext = createContext(null);
-
-async function request(url, options) {
-  const response = await fetch(url, options);
-  if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
-  return response.status === 204 ? null : response.json();
-}
 
 export function ProductProvider({ children }) {
   const [products, setProducts] = useState([]);
@@ -23,7 +14,7 @@ export function ProductProvider({ children }) {
     async function loadProducts() {
       try {
         setLoading(true);
-        const data = await request(API_URL);
+        const data = await apiRequest('products.php');
         if (active) {
           setProducts(data);
           setError('');
@@ -39,9 +30,8 @@ export function ProductProvider({ children }) {
   }, []);
 
   async function saveProduct(product, originalSlug = null) {
-    const saved = await request(originalSlug ? `${API_URL}/${encodeURIComponent(originalSlug)}` : API_URL, {
+    const { product: saved } = await apiRequest(originalSlug ? `products.php?slug=${encodeURIComponent(originalSlug)}` : 'products.php', {
       method: originalSlug ? 'PUT' : 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(product)
     });
     setProducts((current) => originalSlug
@@ -51,7 +41,7 @@ export function ProductProvider({ children }) {
   }
 
   async function deleteProduct(slug) {
-    await request(`${API_URL}/${encodeURIComponent(slug)}`, { method: 'DELETE' });
+    await apiRequest(`products.php?slug=${encodeURIComponent(slug)}`, { method: 'DELETE' });
     setProducts((current) => current.filter((product) => product.slug !== slug));
   }
 

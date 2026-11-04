@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { apiRequest } from '../lib/api.js';
 import { imageUrl } from '../data/catalog.js';
@@ -10,6 +10,32 @@ export function LoginPage() {
   const [error, setError] = useState('');
   const [isAdminLogin, setIsAdminLogin] = useState(false);
   const navigate = useNavigate();
+  const googleButton = useRef(null);
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+  useEffect(() => {
+    if (!googleClientId || isAdminLogin) return undefined;
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.onload = () => {
+      if (!window.google || !googleButton.current) return;
+      window.google.accounts.id.initialize({
+        client_id: googleClientId,
+        callback: async ({ credential }) => {
+          try {
+            const { user } = await apiRequest('auth.php?action=google', { method: 'POST', body: JSON.stringify({ credential }) });
+            navigate(user.role === 'admin' ? '/admin' : '/menu');
+          } catch (requestError) {
+            setError(requestError.message);
+          }
+        }
+      });
+      window.google.accounts.id.renderButton(googleButton.current, { theme: 'outline', size: 'large', width: 320 });
+    };
+    document.body.appendChild(script);
+    return () => script.remove();
+  }, [googleClientId, isAdminLogin, navigate]);
 
   function toggleLoginMode() {
     setIsAdminLogin((current) => !current);
@@ -42,6 +68,7 @@ export function LoginPage() {
       </button>
       <span className="eyebrow">{isAdminLogin ? 'ACCESO ADMINISTRADOR' : 'BIENVENIDO DE VUELTA'}</span><h2>{isAdminLogin ? 'Inicia sesión como administrador' : 'Inicia sesión'}</h2><p className="muted">{isAdminLogin ? 'Ingresa tus credenciales de administrador para acceder al menú.' : 'Accede para gestionar tus pasajes.'}</p>{params.get('registro') === 'exitoso' && !isAdminLogin && <div className="form-success" role="status">Cuenta creada. Ya puedes iniciar sesión.</div>}
       <form className="stack-form" onSubmit={submit}><label>Correo electrónico<input type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></label><label>Contraseña<input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required /></label>{error && <p className="form-error" role="alert">{error}</p>}<button className="button button-dark w-100">{isAdminLogin ? 'Ingresar al menú administrador' : 'Ingresar a mi cuenta'} <i className="bi bi-arrow-right" /></button></form>
+      {googleClientId && !isAdminLogin && <div ref={googleButton} className="google-signin" />}
       <p className="account-switch">¿No tienes una cuenta? <Link to="/registro">Regístrate</Link></p>
       <p className="demo-note">Tus datos se validan en la base MariaDB local.</p>
     </div>

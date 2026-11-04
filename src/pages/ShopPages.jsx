@@ -83,7 +83,7 @@ export function MenuPage() {
       {matchingProducts.length ? productsByZone.map((zone) => (
         <section className="travel-zone" id={zone.id} aria-labelledby={`${zone.id}-title`} key={zone.id}>
           <h3 id={`${zone.id}-title`}>{zone.name}</h3>
-          {zone.products.length > 0 && <div className="route-grid">{zone.products.map((product) => <ProductCard product={product} key={product.slug} />)}</div>}
+          {zone.products.length > 0 && <div className="row g-4">{zone.products.map((product) => <div className="col-12 col-sm-6 col-lg-4" key={product.slug}><ProductCard product={product} /></div>)}</div>}
         </section>
       )) : <div className="empty-results">No encontramos rutas{serviceType ? ` del servicio ${serviceType}` : ''}{query ? ` con “${query}”` : ''}.</div>}
       <div className="text-center mt-4"><button className="text-button" onClick={() => navigate('/blog')}>Ideas para el viaje <i className="bi bi-arrow-up-right" /></button></div>

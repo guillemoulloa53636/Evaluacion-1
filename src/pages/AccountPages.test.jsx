@@ -70,6 +70,32 @@ describe('LoginPage', () => {
   });
 });
 
+describe('LoginPage con Google', () => {
+  it('envía la credencial de Google a la API y navega al menú', async () => {
+    vi.stubEnv('VITE_GOOGLE_CLIENT_ID', 'client-id-prueba');
+    apiRequest.mockResolvedValue({ user: { role: 'customer' } });
+    let callback;
+    const renderButton = vi.fn();
+    window.google = { accounts: { id: { initialize: vi.fn((options) => { callback = options.callback; }), renderButton } } };
+    const originalAppend = document.body.appendChild.bind(document.body);
+    const appendSpy = vi.spyOn(document.body, 'appendChild').mockImplementation((node) => {
+      if (node.tagName === 'SCRIPT') { node.onload?.(); return node; }
+      return originalAppend(node);
+    });
+
+    renderRoutes(<LoginPage />, '/menu');
+    await callback({ credential: 'token-google' });
+
+    expect(renderButton).toHaveBeenCalled();
+    expect(apiRequest).toHaveBeenCalledWith('auth.php?action=google', expect.objectContaining({ method: 'POST', body: JSON.stringify({ credential: 'token-google' }) }));
+    expect(await screen.findByText('Página de destino')).toBeInTheDocument();
+
+    appendSpy.mockRestore();
+    delete window.google;
+    vi.unstubAllEnvs();
+  });
+});
+
 describe('RegisterPage', () => {
   it('detiene el registro si las contraseñas no coinciden', async () => {
     const user = userEvent.setup();

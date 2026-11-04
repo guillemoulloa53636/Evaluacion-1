@@ -6,20 +6,22 @@ Se ejecutaron las pruebas sobre el estado del proyecto después de incorporar el
 
 | Comando | Resultado |
 |---|---|
-| `npm test -- --run` | PASS — 15 archivos de prueba, 38 casos aprobados, 0 fallidos. |
+| `npm test -- --run` | PASS — 15 archivos de prueba, 43 casos aprobados, 0 fallidos. |
 | `npm test -- --run src/pages/DescuentosPage.test.jsx` | PASS — 1 archivo, 3 casos. |
 | `npm test -- --run src/pages/ReportesPage.test.jsx` | PASS — 1 archivo, 3 casos. |
-| `npm run coverage` | PASS — 15 archivos, 38 casos aprobados y reporte V8 generado. |
+| `npm run coverage` | PASS — 15 archivos, 43 casos aprobados y reporte V8 generado. |
 | `npm run build` | PASS — Vite generó el build de producción. |
 
 La ejecución de cobertura informa:
 
-| Métrica | Resultado | Cubiertos / total |
-|---|---:|---:|
-| Sentencias | 76,76% | 370 / 482 |
-| Ramas | 62,68% | 215 / 343 |
-| Funciones | 70,05% | 138 / 197 |
-| Líneas | 80,41% | 312 / 388 |
+| Métrica | Resultado |
+|---|---:|
+| Sentencias | 75,86% |
+| Ramas | 62,55% |
+| Funciones | 67,94% |
+| Líneas | 79,78% |
+
+Casos nuevos: inicio de sesión con Google (`AccountPages.test.jsx`, 1 caso). Mocks usados: `vi.mock` de `apiRequest`, `vi.fn` para `google.accounts.id` y `vi.spyOn` sobre `document.body.appendChild` para simular la carga del script de Google.
 
 Los porcentajes se refieren a los módulos que informa el recolector de cobertura V8 en esta configuración. No implican que todas las funciones del repositorio estén probadas ni que cada rama de negocio se haya ejecutado.
 
@@ -55,10 +57,10 @@ La tabla refleja porcentajes de líneas y funciones por archivo presentados por 
 
 ## Relación con la pauta y exclusiones
 
-- Se dispone de más de 10 casos automatizados: se ejecutan **38** con el comando único `npm test -- --run`.
+- Se dispone de más de 10 casos automatizados: se ejecutan **43** con el comando único `npm test -- --run`.
 - Las pruebas de las dos páginas solicitadas (`DescuentosPage` y `ReportesPage`) fueron además ejecutadas cada una en un comando separado.
 - Se usa **Vitest + React Testing Library + user-event + jsdom**. Jasmine/Karma se omiten deliberadamente según el alcance solicitado; no se declaran instalados ni utilizados.
-- La cobertura de líneas es 80,41%, pero no se fijó un mínimo obligatorio en la configuración ni se afirma cobertura total.
+- La cobertura de líneas es 79,78%, pero no se fijó un mínimo obligatorio en la configuración ni se afirma cobertura total.
 
 ## Límites de la evidencia y brechas pendientes
 
