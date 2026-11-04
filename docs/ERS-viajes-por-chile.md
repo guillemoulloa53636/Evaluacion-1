@@ -61,6 +61,8 @@ Los valores y eventos de `/admin/reportes` son datos locales ilustrativos del co
 
 - **Frontend:** React, React Router, Vite, Bootstrap y Bootstrap Icons.
 - **API:** PHP bajo Apache; la SPA realiza solicitudes JSON bajo `/api`. En desarrollo, Vite conserva el proxy `/api` hacia `http://localhost` (Apache de XAMPP). Diagramas de arquitectura, endpoints y flujo de compra, con el detalle del viaje que devuelve cada endpoint: [diagrama de APIs](./diagrama-apis.md).
+
+![Arquitectura de APIs](./diagrama-arquitectura.png)
 - **Datos:** MariaDB/MySQL, esquema `database/schema.sql` y migración de descuentos, salidas y boletos en `database/migrations/`.
 - **Persistencia de interfaz:** el carrito se almacena en `localStorage`; catálogo, usuarios, mensajes, ventas y boletos usan endpoints de la API.
 - **Configuración local de base:** `127.0.0.1:3308`, base `viajes_chile`, usuario `root`, contraseña vacía como valor por defecto local o `DB_PASSWORD` si está definida.

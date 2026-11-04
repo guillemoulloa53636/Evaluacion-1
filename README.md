@@ -48,9 +48,22 @@ Ejecuta `npm test` para correr las pruebas con Vitest o `npm run coverage` para 
 
 ### Documentos de evaluación
 
+- [Diagrama de APIs y lógica de negocio](docs/diagrama-apis.md)
 - [Especificación de Requisitos de Software (ERS)](docs/ERS-viajes-por-chile.md)
 - [Informe de cobertura de pruebas](docs/cobertura-de-pruebas.md)
 - [Guía de estudio y exposición individual](docs/guia-exposicion-individual.md)
+
+## Inicio de sesión con Google
+
+1. En Google Cloud crea un *ID de cliente OAuth* de tipo Aplicación web, con los orígenes `http://localhost` y `http://localhost:5173`, y agrega tu correo como usuario de prueba.
+2. Copia `.env.example` a `.env` y define `VITE_GOOGLE_CLIENT_ID`. Opcionalmente define `GOOGLE_CLIENT_ID` en el entorno de Apache.
+3. Reinicia `npm run dev`. El botón de Google aparece en el formulario de inicio de sesión.
+
+El secreto del cliente no se usa ni se guarda en el proyecto.
+
+## Backend Java (opcional)
+
+`backend/` contiene un Spring Boot con el catálogo de productos (puerto 8080). El frontend no lo usa; la aplicación funciona con la API PHP de `api/`.
 
 ## Publicar dentro de htdocs
 

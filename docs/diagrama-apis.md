@@ -2,6 +2,10 @@
 
 ## Arquitectura
 
+![Arquitectura](./diagrama-arquitectura.png)
+
+Versiones exportadas: [`diagrama-apis.svg`](./diagrama-apis.svg) y [`diagrama-flujo-compra.pdf`](./diagrama-flujo-compra.pdf).
+
 ```mermaid
 flowchart LR
   UI[React + Vite] -->|/api proxy| API[API PHP en Apache]

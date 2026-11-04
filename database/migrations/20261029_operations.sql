@@ -1,3 +1,4 @@
+USE viajes_chile;
 -- Operación del panel admin: cancelaciones de boletos, estado de buses y registro de sucesos.
 -- Ejecutar sobre la base viajes_chile (phpMyAdmin → Importar o pestaña SQL).
 
