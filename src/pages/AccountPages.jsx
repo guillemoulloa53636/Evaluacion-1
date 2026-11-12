@@ -3,6 +3,8 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { apiRequest } from '../lib/api.js';
 import { imageUrl } from '../data/catalog.js';
 
+const DEFAULT_GOOGLE_CLIENT_ID = '25065180497-5qa2tf845vbhk57gjav0iht24jkre8ft.apps.googleusercontent.com';
+
 export function LoginPage() {
   const [params] = useSearchParams();
   const [email, setEmail] = useState('');
@@ -11,7 +13,7 @@ export function LoginPage() {
   const [isAdminLogin, setIsAdminLogin] = useState(false);
   const navigate = useNavigate();
   const googleButton = useRef(null);
-  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || DEFAULT_GOOGLE_CLIENT_ID;
 
   useEffect(() => {
     if (!googleClientId || isAdminLogin) return undefined;

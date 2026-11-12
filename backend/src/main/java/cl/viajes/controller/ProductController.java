@@ -2,6 +2,12 @@ package cl.viajes.controller;
 
 import cl.viajes.model.Product;
 import cl.viajes.repository.ProductRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +19,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/products")
+@Tag(name = "Productos", description = "Operaciones sobre las rutas disponibles")
 public class ProductController {
 
     private final ProductRepository repository;
@@ -27,6 +34,14 @@ public class ProductController {
     }
 
     @GetMapping("/{slug}")
+    @Operation(summary = "Obtener una ruta", description = "Busca una ruta por su identificador slug.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Ruta encontrada",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Product.class))),
+            @ApiResponse(responseCode = "404", description = "No existe una ruta con ese slug",
+                    content = @Content)
+    })
     public Product get(@PathVariable String slug) {
         return repository.findBySlug(slug).orElseThrow(this::notFound);
     }

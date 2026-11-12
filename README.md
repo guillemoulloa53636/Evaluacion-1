@@ -55,15 +55,15 @@ Ejecuta `npm test` para correr las pruebas con Vitest o `npm run coverage` para 
 
 ## Inicio de sesión con Google
 
-1. En Google Cloud crea un *ID de cliente OAuth* de tipo Aplicación web, con los orígenes `http://localhost` y `http://localhost:5173`, y agrega tu correo como usuario de prueba.
-2. Copia `.env.example` a `.env` y define `VITE_GOOGLE_CLIENT_ID`. Opcionalmente define `GOOGLE_CLIENT_ID` en el entorno de Apache.
-3. Reinicia `npm run dev`. El botón de Google aparece en el formulario de inicio de sesión.
+1. El formulario de inicio de sesión muestra el botón de Google usando el ID público predeterminado del proyecto; no necesitas crear `.env` para probarlo.
+2. Para usar tu propio *ID de cliente OAuth* de tipo Aplicación web, autoriza los orígenes `http://localhost` y `http://localhost:5173`, agrega tu correo como usuario de prueba y configura el mismo ID en `VITE_GOOGLE_CLIENT_ID` (frontend) y `GOOGLE_CLIENT_ID` (Apache/PHP).
+3. Reinicia `npm run dev` y Apache después de cambiar la configuración.
 
 El secreto del cliente no se usa ni se guarda en el proyecto.
 
 ## Backend Java (opcional)
 
-`backend/` contiene un Spring Boot con el catálogo de productos (puerto 8080). El frontend no lo usa; la aplicación funciona con la API PHP de `api/`.
+`backend/` contiene una API Spring Boot con el catálogo de productos (puerto 8080). El frontend no la usa; la aplicación funciona con la API PHP de `api/`. La interfaz de Swagger está disponible en `http://localhost:8080/swagger-ui/index.html` y la especificación OpenAPI en `http://localhost:8080/v3/api-docs`.
 
 ## Publicar dentro de htdocs
 

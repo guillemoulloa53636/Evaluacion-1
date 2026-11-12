@@ -10,6 +10,8 @@ vi.mock('../lib/api.js', () => ({ apiRequest: vi.fn() }));
 afterEach(() => {
   cleanup();
   vi.resetAllMocks();
+  vi.unstubAllEnvs();
+  delete window.google;
 });
 
 function renderRoutes(page, nextPath = '/menu') {
@@ -71,6 +73,25 @@ describe('LoginPage', () => {
 });
 
 describe('LoginPage con Google', () => {
+  it('muestra el botón de Google cuando no hay un ID configurado localmente', () => {
+    vi.stubEnv('VITE_GOOGLE_CLIENT_ID', '');
+    const initialize = vi.fn();
+    const renderButton = vi.fn();
+    window.google = { accounts: { id: { initialize, renderButton } } };
+    const appendSpy = vi.spyOn(document.body, 'appendChild').mockImplementation((node) => {
+      if (node.tagName === 'SCRIPT') { node.onload?.(); return node; }
+      return node;
+    });
+
+    renderRoutes(<LoginPage />);
+    appendSpy.mockRestore();
+
+    expect(initialize).toHaveBeenCalledWith(expect.objectContaining({
+      client_id: '25065180497-5qa2tf845vbhk57gjav0iht24jkre8ft.apps.googleusercontent.com'
+    }));
+    expect(renderButton).toHaveBeenCalled();
+  });
+
   it('envía la credencial de Google a la API y navega al menú', async () => {
     vi.stubEnv('VITE_GOOGLE_CLIENT_ID', 'client-id-prueba');
     apiRequest.mockResolvedValue({ user: { role: 'customer' } });
