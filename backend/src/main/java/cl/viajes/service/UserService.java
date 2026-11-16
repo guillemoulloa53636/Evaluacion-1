@@ -59,7 +59,7 @@ public class UserService {
         if (!email.equals(user.getEmail()) && userRepository.existsByEmailAndIdNot(email, id)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya existe una cuenta con ese correo");
         }
-        if ("admin".equals(user.getRole()) && "customer".equals(request.role())
+        if ("admin".equals(user.getRole()) && !"admin".equals(request.role())
                 && userRepository.countByRole("admin") <= 1) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "No se puede quitar el último administrador");
         }

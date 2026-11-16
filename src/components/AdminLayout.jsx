@@ -1,12 +1,20 @@
+import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { apiRequest } from '../lib/api.js';
+import { apiRequest, clearAuth } from '../lib/api.js';
 import { imageUrl } from '../data/catalog.js';
 
 export default function AdminLayout() {
+  const [logoutError, setLogoutError] = useState('');
   const navigate = useNavigate();
   async function logout() {
-    await apiRequest('auth/logout', { method: 'POST' }).catch(() => {});
-    navigate('/');
+    setLogoutError('');
+    try {
+      await apiRequest('auth/logout', { method: 'POST' });
+      clearAuth();
+      navigate('/');
+    } catch (requestError) {
+      setLogoutError(requestError.message);
+    }
   }
 
   return <div className="admin-shell">
@@ -18,6 +26,7 @@ export default function AdminLayout() {
       <NavLink to="/admin/mensajes"><i className="bi bi-envelope" /> Mensajes</NavLink>
       <NavLink to="/admin/reportes"><i className="bi bi-bar-chart" /> Reportes</NavLink>
       <NavLink to="/menu"><i className="bi bi-signpost-2" /> Ver sitio</NavLink>
+      {logoutError && <p className="form-error" role="alert">{logoutError}</p>}
       <button type="button" className="admin-logout" onClick={logout}><i className="bi bi-box-arrow-left" /> Cerrar sesión</button>
     </aside>
     <main className="admin-main"><Outlet /></main>

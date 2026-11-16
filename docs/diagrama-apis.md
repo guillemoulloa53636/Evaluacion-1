@@ -10,21 +10,23 @@ flowchart LR
   API -->|JPA| DB[(MariaDB viajes_chile)]
 ```
 
-En desarrollo, Vite reenvía `/api` a `http://localhost:8080`. El frontend no llama a la API PHP.
+En desarrollo, Vite reenvía `/api` a `http://localhost:8080`.
 
 ## Endpoints
 
 | Endpoint | Métodos | Acceso | Función |
 |---|---|---|---|
 | `/api/v1/auth/register` | POST | Público | Crea una cuenta cliente y guarda su contraseña con BCrypt. |
-| `/api/v1/auth/login` | POST | Público | Verifica correo y contraseña; responde con JWT y datos públicos del usuario. |
-| `/api/v1/auth/google` | POST | Público | Verifica la credencial con Google, registra al usuario cliente si hace falta y responde con JWT. |
+| `/api/v1/auth/login` | POST | Público | Verifica correo y contraseña; responde con access JWT y datos públicos del usuario, y establece cookie HttpOnly para renovar. |
+| `/api/v1/auth/google` | POST | Público | Verifica la credencial con Google, registra al usuario cliente si hace falta y establece la misma sesión JWT. |
+| `/api/v1/auth/refresh` | POST | Cookie HttpOnly | Rota el refresh token de un solo uso y emite un nuevo access JWT. |
 | `/api/v1/auth/me` | GET | Bearer JWT | Devuelve la cuenta asociada al token. |
-| `/api/v1/auth/logout` | POST | Bearer JWT | Confirma el cierre; el cliente elimina el token de sesión. |
-| `/api/v1/products` | GET, POST | GET público; POST admin | Lista o crea rutas. |
-| `/api/v1/products/{slug}` | GET, PUT, DELETE | GET público; cambios admin | Consulta, actualiza o elimina una ruta. |
-| `/api/v1/purchases` | POST | Público | Valida disponibilidad y pasajeros; reserva asientos y crea venta y boletos en una transacción. |
-| `/api/v1/purchases/{saleCode}` | GET | Código de compra | Devuelve el detalle de una compra y sus boletos. |
+| `/api/v1/auth/logout` | POST | Bearer JWT | Revoca el refresh token y elimina la cookie. |
+| `/api/v1/products` y `/api/v1/productos` | GET, POST | GET público; POST admin | Lista o crea rutas. |
+| `/api/v1/products/{slug}` y `/api/v1/productos/{slug}` | GET, PUT, DELETE | GET público; cambios admin | Consulta, actualiza o elimina una ruta. |
+| `/api/v1/ordenes` | GET | Vendedor y admin | Lista órdenes con código, total, estado, fecha y cantidad de boletos; no expone datos personales de pasajeros. |
+| `/api/v1/purchases` | POST | Público excepto vendedor | Valida disponibilidad y pasajeros; reserva asientos y crea venta y boletos en una transacción. |
+| `/api/v1/purchases/{saleCode}` | GET | Público con código; no vendedor | Devuelve el detalle de una compra y sus boletos. |
 | `/api/v1/sales/cancellations` | POST | Admin | Cancela un boleto o todos los boletos de una compra y recalcula su estado. |
 | `/api/v1/contact-messages` | POST, GET | POST público; GET admin | Recibe mensajes/reclamos; lista y filtra la bandeja de administración. |
 | `/api/v1/contact-messages/{id}` | PUT, DELETE | Admin | Actualiza estado/notas; elimina lógicamente o, con `?permanent=true`, definitivamente. |
@@ -34,7 +36,7 @@ En desarrollo, Vite reenvía `/api` a `http://localhost:8080`. El frontend no ll
 | `/api/v1/users` | GET, POST | Admin | Lista o crea usuarios. |
 | `/api/v1/users/{id}` | GET, PUT, DELETE | Admin | Consulta, actualiza o elimina un usuario. |
 
-Las rutas de administración requieren `Authorization: Bearer <token>` con rol `admin`. La API comprueba que la cuenta siga existiendo y consulta su rol actual antes de autorizar la solicitud.
+Las rutas de administración requieren `Authorization: Bearer <token>` con rol `admin`. El vendedor (`seller`) solo puede consultar productos con GET y el listado de órdenes con GET; el resto de solicitudes de ese rol se deniega. La API comprueba que la cuenta siga existiendo y consulta su rol actual antes de autorizar la solicitud.
 
 ## Flujo de compra
 
@@ -57,7 +59,8 @@ sequenceDiagram
 
 ## Autenticación
 
-1. `POST /api/v1/auth/login` recibe `email` y `password`; el verificador BCrypt también admite los hashes creados por la API PHP existente.
-2. La API firma un JWT con `JWT_SECRET` y devuelve el usuario sin datos de contraseña.
-3. React conserva el token en `sessionStorage` y lo envía como Bearer en las solicitudes protegidas.
-4. El login Google valida el ID token con Google y usa el mismo formato de respuesta JWT.
+1. `POST /api/v1/auth/login` recibe `email` y `password`; BCrypt valida la contraseña almacenada.
+2. La API firma un access JWT con `JWT_SECRET` (15 minutos por defecto) y lo devuelve junto al usuario sin datos de contraseña. El refresh token aleatorio se envía en cookie `HttpOnly; Secure; SameSite=Strict`, nunca en el JSON.
+3. React conserva el access JWT solo en memoria. Al recibir `401`, hace `POST /api/v1/auth/refresh`; el backend verifica el hash persistido, revoca el refresh anterior y emite uno nuevo. El cliente reintenta una sola vez la petición original.
+4. El refresh token se almacena como SHA-256 en MariaDB, expira en 7 días y se revoca al cerrar sesión. La clave JWT es obligatoria por entorno y no tiene fallback en el repositorio.
+5. El login Google valida el ID token con Google y crea la misma sesión JWT.

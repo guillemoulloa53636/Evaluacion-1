@@ -11,6 +11,6 @@ public record UserUpdateRequest(
         @Size(max = 40) String telephone,
         @Size(max = 100) String region,
         @Size(max = 100) String commune,
-        @NotBlank @Pattern(regexp = "customer|admin", message = "El rol debe ser customer o admin") String role
+        @NotBlank @Pattern(regexp = "customer|seller|admin", message = "El rol debe ser customer, seller o admin") String role
 ) {
 }

@@ -1,6 +1,6 @@
 # Viajes por Chile
 
-SPA en React + Vite, API REST Spring Boot y MariaDB. El catálogo, las cuentas, los mensajes, las ventas y los boletos se guardan en la base `viajes_chile`; el carrito permanece en el navegador. El frontend ya no consume los endpoints PHP.
+SPA en React + Vite, API REST Spring Boot y MariaDB. El catálogo, las cuentas, los mensajes, las ventas y los boletos se guardan en la base `viajes_chile`; el carrito permanece en el navegador.
 
 ## Abrir en desarrollo
 
@@ -15,6 +15,7 @@ SPA en React + Vite, API REST Spring Boot y MariaDB. El catálogo, las cuentas, 
 	$env:DB_USER = "root"
 	$env:DB_PASSWORD = ""
 	$env:JWT_SECRET = "<clave aleatoria de al menos 32 bytes>"
+	$env:CORS_ORIGINS = "http://localhost:5173"
 	```
 
 5. Inicia Spring Boot desde `backend`:
@@ -66,9 +67,11 @@ El secreto del cliente no se usa ni se guarda en el proyecto.
 
 `backend/` contiene la API REST usada por el frontend (puerto 8080). La interfaz de Swagger está disponible en `http://localhost:8080/swagger-ui/index.html` y la especificación OpenAPI en `http://localhost:8080/v3/api-docs`.
 
-La autenticación entrega un JWT en `POST /api/v1/auth/login` y `POST /api/v1/auth/google`. Las rutas protegidas reciben `Authorization: Bearer <token>`. El API centraliza productos, usuarios, contactos, compras, cancelaciones, eventos de flota y reportes. La creación de usuarios, la gestión administrativa y las modificaciones del catálogo requieren rol `admin`; el catálogo, el envío de contacto y las compras simuladas son públicos.
+La autenticación entrega un JWT en `POST /api/v1/auth/login` y `POST /api/v1/auth/google`. Las rutas protegidas reciben `Authorization: Bearer <token>`. El API centraliza productos, usuarios, contactos, compras, cancelaciones, eventos de flota y reportes. Las modificaciones administrativas requieren rol `admin`; el rol `seller` solo puede consultar productos y el listado `GET /api/v1/ordenes`. El catálogo, el envío de contacto y las compras simuladas son públicos para usuarios no vendedores.
 
-Antes de iniciar Spring Boot, configura `JWT_SECRET` con una clave aleatoria de al menos 32 bytes. No la guardes en el repositorio. `JWT_EXPIRATION_MS` es opcional y tiene un valor predeterminado de una hora (3 600 000 ms). La API verifica el usuario y su rol actual en la base de datos en cada solicitud autenticada.
+El frontend conserva el access JWT solo en memoria; el refresh token se entrega en una cookie `HttpOnly`, `Secure` y `SameSite=Strict`, y el perfil no secreto para navegación se guarda en `localStorage`. El cliente renueva el access token al recibir `401`, y el refresh token rota y solo se almacena como hash en MariaDB. El catálogo está disponible en `GET /api/v1/products` y también en `GET /api/v1/productos`; el listado de órdenes devuelve resúmenes sin datos personales. Aplica `database/migrations/20261116_seller_role.sql` y `database/migrations/20261116_jwt_refresh_tokens.sql` a las bases existentes; `database/schema.sql` incluye ambos cambios para bases nuevas.
+
+Antes de iniciar Spring Boot, configura `JWT_SECRET` con una clave aleatoria de al menos 32 bytes; no existe una clave de fallback y la aplicación no inicia sin ella. No la guardes en el repositorio. `JWT_EXPIRATION_MS` es opcional y dura 15 minutos por defecto; `JWT_REFRESH_EXPIRATION_MS` dura 7 días. `CORS_ORIGINS` debe limitarse a los orígenes reales del frontend. La API verifica el usuario y su rol actual en la base de datos en cada solicitud autenticada.
 
 ## Publicar dentro de htdocs
 

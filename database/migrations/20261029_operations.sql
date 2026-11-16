@@ -11,7 +11,7 @@ ALTER TABLE tickets
   ADD COLUMN IF NOT EXISTS cancel_reason VARCHAR(300) NULL;
 
 -- El índice único impedía volver a vender un asiento cancelado; se reemplaza por uno normal.
--- La disponibilidad se valida en purchase.php (con bloqueo de la ruta) solo contra boletos activos.
+-- La disponibilidad se valida en PurchaseService (con bloqueo de la ruta) solo contra boletos activos.
 ALTER TABLE tickets DROP INDEX IF EXISTS ticket_schedule_seat;
 ALTER TABLE tickets ADD INDEX IF NOT EXISTS ticket_schedule_seat (product_id, schedule_date, departure_time, seat_number);
 

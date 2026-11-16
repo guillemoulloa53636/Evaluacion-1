@@ -12,6 +12,6 @@ public record UserCreateRequest(
         @Size(max = 40) String telephone,
         @Size(max = 100) String region,
         @Size(max = 100) String commune,
-        @Pattern(regexp = "customer|admin", message = "El rol debe ser customer o admin") String role
+        @Pattern(regexp = "customer|seller|admin", message = "El rol debe ser customer, seller o admin") String role
 ) {
 }

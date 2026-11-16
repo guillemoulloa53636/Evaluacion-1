@@ -1,9 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { apiRequest } from '../lib/api.js';
+import { apiRequest, clearAuth } from '../lib/api.js';
 import { imageUrl } from '../data/catalog.js';
 
 const DEFAULT_GOOGLE_CLIENT_ID = '25065180497-5qa2tf845vbhk57gjav0iht24jkre8ft.apps.googleusercontent.com';
+
+function getRoleHome(role) {
+  if (['admin', 'administrador'].includes(role)) return '/admin';
+  if (['seller', 'vendedor'].includes(role)) return '/vendedor';
+  return '/menu';
+}
 
 export function LoginPage() {
   const [params] = useSearchParams();
@@ -27,7 +33,7 @@ export function LoginPage() {
         callback: async ({ credential }) => {
           try {
             const { user } = await apiRequest('auth/google', { method: 'POST', body: JSON.stringify({ credential }) });
-            navigate(user.role === 'admin' ? '/admin' : '/menu');
+            navigate(getRoleHome(user.role));
           } catch (requestError) {
             setError(requestError.message);
           }
@@ -52,11 +58,19 @@ export function LoginPage() {
         method: 'POST',
         body: JSON.stringify({ email, password })
       });
-      if (isAdminLogin && user.role !== 'admin') {
+      if (isAdminLogin && !['admin', 'administrador'].includes(user.role)) {
+        try {
+          await apiRequest('auth/logout', { method: 'POST' });
+        } catch (logoutError) {
+          clearAuth();
+          setError(`Esta cuenta no tiene acceso al menú de administración. No se pudo revocar la sesión: ${logoutError.message}`);
+          return;
+        }
+        clearAuth();
         setError('Esta cuenta no tiene acceso al menú de administración.');
         return;
       }
-      navigate(user.role === 'admin' ? '/admin' : '/menu');
+      navigate(getRoleHome(user.role));
     } catch (requestError) {
       setError(requestError.message);
     }

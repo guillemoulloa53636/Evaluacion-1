@@ -1,6 +1,7 @@
 package cl.viajes.service;
 
 import cl.viajes.dto.AuthResponse;
+import cl.viajes.dto.AuthSession;
 import cl.viajes.dto.GoogleLoginRequest;
 import cl.viajes.dto.LoginRequest;
 import cl.viajes.dto.RegisterRequest;
@@ -12,6 +13,7 @@ import cl.viajes.security.JwtService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Locale;
@@ -24,6 +26,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
     private final GoogleIdentityVerifier googleIdentityVerifier;
     private final ActivityLogService activityLog;
 
@@ -31,17 +34,19 @@ public class AuthService {
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
+            RefreshTokenService refreshTokenService,
             GoogleIdentityVerifier googleIdentityVerifier,
             ActivityLogService activityLog
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.refreshTokenService = refreshTokenService;
         this.googleIdentityVerifier = googleIdentityVerifier;
         this.activityLog = activityLog;
     }
 
-    public AuthResponse login(LoginRequest request) {
+    public AuthSession login(LoginRequest request) {
         String email = request.email().trim().toLowerCase(Locale.ROOT);
         User user = userRepository.findByEmail(email)
                 .filter(candidate -> passwordEncoder.matches(request.password(), candidate.getPasswordHash()))
@@ -72,11 +77,21 @@ public class AuthService {
         return Map.of("created", true);
     }
 
-    public AuthResponse loginWithGoogle(GoogleLoginRequest request) {
+    public AuthSession loginWithGoogle(GoogleLoginRequest request) {
         GoogleIdentityVerifier.GoogleIdentity identity = googleIdentityVerifier.verify(request.credential());
         String email = identity.email().trim().toLowerCase(Locale.ROOT);
         User user = userRepository.findByEmail(email).orElseGet(() -> createGoogleUser(email, identity.name()));
         return tokenResponse(user);
+    }
+
+    @Transactional
+    public AuthSession refresh(String rawRefreshToken) {
+        RefreshTokenService.IssuedRefreshToken refreshToken = refreshTokenService.rotate(rawRefreshToken);
+        return tokenResponse(refreshToken.user(), refreshToken);
+    }
+
+    public void logout(String rawRefreshToken) {
+        refreshTokenService.revoke(rawRefreshToken);
     }
 
     public UserResponse currentUser(Long id) {
@@ -96,12 +111,17 @@ public class AuthService {
         return user;
     }
 
-    private AuthResponse tokenResponse(User user) {
-        return new AuthResponse(
+    private AuthSession tokenResponse(User user) {
+        return tokenResponse(user, refreshTokenService.issue(user));
+    }
+
+    private AuthSession tokenResponse(User user, RefreshTokenService.IssuedRefreshToken refreshToken) {
+        AuthResponse response = new AuthResponse(
                 jwtService.generateToken(user),
                 "Bearer",
                 jwtService.getExpirationSeconds(),
                 UserResponse.from(user)
         );
+        return new AuthSession(response, refreshToken.value(), refreshToken.expiresInSeconds());
     }
 }

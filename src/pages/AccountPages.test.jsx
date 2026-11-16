@@ -5,7 +5,7 @@ import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { LoginPage, RegisterPage, ServicePage } from './AccountPages.jsx';
 import { apiRequest } from '../lib/api.js';
 
-vi.mock('../lib/api.js', () => ({ apiRequest: vi.fn() }));
+vi.mock('../lib/api.js', () => ({ apiRequest: vi.fn(), clearAuth: vi.fn() }));
 
 afterEach(() => {
   cleanup();

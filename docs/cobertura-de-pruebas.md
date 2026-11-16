@@ -36,7 +36,7 @@ Los porcentajes se refieren a los módulos que informa el recolector de cobertur
 - **Administración y catálogo:** representación de rutas, edición de descuento/salidas y nuevo filtro de tipos de servicio.
 - **Checkout y boletos:** datos de pasajeros enviados a la API, emisión/visualización, error de búsqueda y escape del HTML de descarga.
 
-La configuración de Vitest/RTL usa `jsdom`. Los tests de interfaz no requieren XAMPP ni usan una base de datos real: las dependencias API se simulan en esos casos para aislar el comportamiento del frontend.
+La configuración de Vitest/RTL usa `jsdom`. Los tests de interfaz no requieren MariaDB ni usan una base de datos real: las dependencias API se simulan en esos casos para aislar el comportamiento del frontend.
 
 ## Cobertura observada en módulos clave
 
@@ -65,7 +65,7 @@ La tabla refleja porcentajes de líneas y funciones por archivo presentados por 
 ## Límites de la evidencia y brechas pendientes
 
 1. No se ejecutó una suite Playwright de navegador; jsdom no sustituye una prueba visual en Chrome/Firefox.
-2. No se ejecutaron pruebas de integración sobre endpoints PHP con la MariaDB local durante esta medición. La suite frontend simula respuestas API.
+2. No se ejecutaron pruebas de integración sobre endpoints Spring Boot con MariaDB durante esta medición. La suite frontend simula respuestas API.
 3. La cobertura más baja está en `AdminPage.jsx` y `SiteLayout.jsx`; deben priorizarse el CRUD completo, autorización, estados vacíos/errores del carrito, eliminación, compra y descarga de boletos.
 4. Los tests del panel Reportes validan los datos ilustrativos del componente; no prueban métricas reales ni almacenamiento para ventas, cancelaciones, reclamos o eventos de flota.
 5. No hay pago real; el checkout registra una compra simulada y emite boletos.

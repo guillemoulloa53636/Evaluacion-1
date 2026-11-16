@@ -106,6 +106,12 @@ img { max-width: 100%; }
 .text-button:hover { color: var(--accent-dark); }
 .form-error { margin: 10px 0; color: #a52c21; font-size: .88rem; }
 .form-success { padding: 11px 14px; background: #e1f1e9; color: #215d46; font-size: .9rem; }
+.role-dashboard { padding-top: 48px; }
+.role-dashboard-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.role-data-card { min-width: 0; padding: 24px; border: 1px solid var(--line); background: white; }
+.role-data-card h2 { margin: 0 0 18px; font: 500 1.7rem Georgia, "Times New Roman", serif; }
+.role-data-list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.role-data-list li { display: flex; justify-content: space-between; gap: 12px; padding: 12px; border-bottom: 1px solid var(--line); }
 .detail-page { padding-top: 35px; }
 .breadcrumb-line { display: flex; align-items: center; gap: 10px; margin-bottom: 25px; color: var(--ink-soft); font-size: .84rem; }
 .breadcrumb-line a { color: var(--accent-dark); }
@@ -303,6 +309,7 @@ img { max-width: 100%; }
 }
 
 @media (max-width: 680px) {
+  .role-dashboard-grid { grid-template-columns: 1fr; }
   .header-inner { min-height: 66px; flex-wrap: wrap; gap: 4px; }
   .menu-toggle { display: block; margin-left: auto; }
   .site-nav { display: none; width: 100%; padding: 10px 0 18px; align-items: stretch; flex-direction: column; gap: 0; }

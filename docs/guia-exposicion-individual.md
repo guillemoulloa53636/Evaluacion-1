@@ -2,7 +2,7 @@
 
 ## Objetivo de la presentación
 
-Explicar con palabras propias qué problema resuelve Viajes por Chile, cómo se conectan la interfaz React y la API PHP/MariaDB, cómo funciona una reserva y qué evidencia ofrecen las pruebas. La guía es material de preparación: practica el flujo y adapta el guion a lo que realmente entiendes y puedes mostrar.
+Explicar con palabras propias qué problema resuelve Viajes por Chile, cómo se conectan la interfaz React y la API REST de Spring Boot con MariaDB, cómo funciona una reserva y qué evidencia ofrecen las pruebas. La guía es material de preparación: practica el flujo y adapta el guion a lo que realmente entiendes y puedes mostrar.
 
 ## Presentación sugerida de 15 minutos
 
@@ -18,19 +18,20 @@ Muestra [App.jsx](../src/App.jsx), [main.jsx](../src/main.jsx) y [vite.config.js
 
 - **React** organiza la interfaz en páginas y componentes.
 - **React Router** resuelve rutas públicas y rutas del espacio administrativo.
-- **Vite** ofrece servidor de desarrollo y build de producción; su proxy reenvía `/api` a Apache.
-- **PHP** publica endpoints JSON y **PDO** consulta la base MariaDB.
+- **Vite** ofrece servidor de desarrollo y build de producción; su proxy reenvía `/api` a Spring Boot.
+- **Spring Boot** publica endpoints JSON con `@RestController`; Spring Data JPA consulta y persiste datos en MariaDB.
 - **Vitest y React Testing Library** comprueban lógica y comportamiento de interfaz en jsdom.
-- El carrito vive en `localStorage`; ventas y boletos se guardan mediante la API.
+- El carrito y los datos mínimos del perfil viven en `localStorage`; el access JWT solo permanece en memoria y el refresh token se mantiene en una cookie `HttpOnly`.
 
-La conexión local usa `127.0.0.1:3308`, base `viajes_chile` y usuario `root`. La contraseña se obtiene de `DB_PASSWORD` si existe; de lo contrario se usa vacía para el entorno XAMPP local.
+La conexión a MariaDB se configura mediante `DB_URL`, `DB_USER` y `DB_PASSWORD`. Configura también `JWT_SECRET` (mínimo 32 bytes) y `CORS_ORIGINS`. Spring Boot arranca desde `backend` con `mvn spring-boot:run`; no requiere Apache.
 
 ### 3:00–5:00 — Usuarios y requisitos
 
-Explica los dos perfiles principales:
+Explica los perfiles de acceso:
 
-- **Cliente/visitante:** rutas, búsqueda por destino, filtro por tipo de servicio, descuentos, registro, ayuda y carrito.
-- **Administrador:** catálogo, porcentajes de descuento, horarios/andenes/cupos, cuentas compradoras y reportes.
+- **Cliente:** rutas, búsqueda por destino, filtro por tipo de servicio, descuentos, registro, ayuda y carrito.
+- **Vendedor:** lectura de productos y órdenes en `/api/v1/productos` y `/api/v1/ordenes`.
+- **Administrador:** catálogo, porcentajes de descuento, horarios/andenes/cupos, cuentas y reportes.
 
 Muestra [ERS-viajes-por-chile.md](./ERS-viajes-por-chile.md) para señalar requisitos funcionales, restricciones y límites. Reportes son solo para administrador. El proyecto respeta esa separación de navegación y realiza comprobaciones del rol.
 
@@ -43,7 +44,7 @@ Muestra [ERS-viajes-por-chile.md](./ERS-viajes-por-chile.md) para señalar requi
 5. Abre `/boletos/:saleCode` y muestra destino, pasajero, fecha/hora, andén, asiento, código y precio.
 6. Señala las acciones para imprimir/guardar como PDF y descargar el HTML.
 
-**Preparación:** inicia Apache y MySQL en XAMPP; carga esquema, migración y, si sus horarios aún están vigentes, el seed de demostración. Si las fechas seed ya pasaron, configura salidas futuras desde el panel antes de hacer la exposición. No publiques ni incluyas contraseñas reales en capturas o diapositivas.
+**Preparación:** inicia MariaDB; carga el esquema, las migraciones pendientes y, si sus horarios aún están vigentes, el seed de demostración. Configura las variables de entorno e inicia Spring Boot. Si las fechas seed ya pasaron, configura salidas futuras desde el panel antes de hacer la exposición. No publiques ni incluyas contraseñas reales en capturas o diapositivas.
 
 ### 8:30–10:30 — Administración
 
@@ -66,7 +67,7 @@ Puedes ejecutar `npm run coverage` para regenerar los porcentajes y abrir el inf
 
 ### 13:30–15:00 — Cierre
 
-Resume el valor principal (descubrir y preparar una reserva con descuento), la evidencia (pruebas y documentación) y los próximos pasos reales: agregar integración de navegador/PHP y convertir los reportes ilustrativos en métricas persistidas. Invita a preguntas.
+Resume el valor principal (descubrir y preparar una reserva con descuento), la evidencia (pruebas y documentación) y los próximos pasos reales: agregar pruebas de integración HTTP con MariaDB y convertir los reportes ilustrativos en métricas persistidas. Invita a preguntas.
 
 ## Mapa rápido del código
 
@@ -84,8 +85,12 @@ Resume el valor principal (descubrir y preparar una reserva con descuento), la e
 | Métricas ilustrativas restringidas a admin | [ReportesPage.jsx](../src/pages/ReportesPage.jsx) |
 | Acceso común a la API | [api.js](../src/lib/api.js) |
 | Rutas y precios base | [catalog.js](../src/data/catalog.js) |
-| Conexión MariaDB y sesión | [bootstrap.php](../api/bootstrap.php) |
-| Persistencia de compra y emisión | [purchase.php](../api/purchase.php) |
+| Seguridad, JWT y autorización por rol | [SecurityConfig.java](../backend/src/main/java/cl/viajes/config/SecurityConfig.java) |
+| Login, registro y usuario actual | [AuthController.java](../backend/src/main/java/cl/viajes/controller/AuthController.java) y [AuthService.java](../backend/src/main/java/cl/viajes/service/AuthService.java) |
+| Productos y reglas de catálogo | [ProductController.java](../backend/src/main/java/cl/viajes/controller/ProductController.java) |
+| Persistencia de compra y emisión | [PurchaseController.java](../backend/src/main/java/cl/viajes/controller/PurchaseController.java) y [PurchaseService.java](../backend/src/main/java/cl/viajes/service/PurchaseService.java) |
+| Listado de órdenes para vendedor | [OrderController.java](../backend/src/main/java/cl/viajes/controller/OrderController.java) |
+| Rol vendedor en bases existentes | [20261116_seller_role.sql](../database/migrations/20261116_seller_role.sql) |
 
 ## Conceptos que debes poder explicar
 
@@ -95,11 +100,11 @@ Un componente representa una parte de la pantalla. Las **props** entregan datos/
 
 ### Flujo de datos de una compra
 
-`TripDetailPage` reúne ruta, salida y pasajeros → `CartContext` conserva el carrito → `CheckoutForm` llama `apiRequest` → `purchase.php` valida y persiste la compra/boletos → la app navega al código de compra → `TicketsPage` recupera y presenta los boletos.
+`TripDetailPage` reúne ruta, salida y pasajeros → `CartContext` conserva el carrito → `CheckoutForm` llama `apiRequest` → `PurchaseController` delega en `PurchaseService` para validar y persistir la compra/boletos → la app navega al código de compra → `TicketsPage` recupera y presenta los boletos.
 
 ### Qué valida una prueba unitaria/de componente
 
-Una prueba prepara entradas o respuestas simuladas, renderiza una función o componente, realiza una acción y verifica el resultado observable. `user-event` simula interacciones de usuario. Los mocks de API hacen que esas pruebas sean repetibles e independientes de XAMPP, pero por sí solos no demuestran que PHP o MariaDB respondan correctamente.
+Una prueba prepara entradas o respuestas simuladas, renderiza una función o componente, realiza una acción y verifica el resultado observable. `user-event` simula interacciones de usuario. Los mocks de API hacen que esas pruebas sean repetibles e independientes de MariaDB, pero por sí solos no demuestran que Spring Boot o la base de datos respondan correctamente.
 
 ## Preguntas posibles y respuestas honestas
 
@@ -113,7 +118,7 @@ No. Los valores son ilustrativos, y la interfaz lo informa. Una mejora pendiente
 
 **¿Qué se guarda en el navegador y qué en la base?**
 
-El carrito se guarda en `localStorage`. La API PHP/MariaDB gestiona las cuentas, el catálogo, los mensajes y las compras/boletos emitidos.
+El carrito y el perfil mínimo de interfaz se guardan en `localStorage`. El access JWT solo vive en memoria; el refresh token es una cookie `HttpOnly`, se rota al renovar y solo se almacena como hash en MariaDB. La API Spring Boot/MariaDB gestiona las cuentas, el catálogo, los mensajes y las compras/boletos emitidos.
 
 **¿Por qué el cliente no puede ver reportes?**
 
@@ -125,7 +130,7 @@ No. Es una medición de líneas ejecutadas, no una medida de calidad, requisitos
 
 **¿Los tests se conectan a MySQL?**
 
-Los tests frontend documentados simulan la API para aislar la interfaz. En esa ejecución no se corrió una suite de integración PHP/MariaDB ni Playwright; por eso la cobertura de persistencia real queda como límite.
+Los tests frontend documentados simulan la API para aislar la interfaz. En esa ejecución no se corrió una suite de integración Spring Boot/MariaDB ni Playwright; por eso la cobertura de persistencia real queda como límite.
 
 **¿Por qué se usa Vitest en vez de Jasmine/Karma?**
 
@@ -134,10 +139,14 @@ El proyecto se construye con Vite y su entorno de prueba configurado es Vitest +
 ## Comandos para practicar
 
 ```powershell
-# Terminal 1: iniciar Apache y MySQL desde XAMPP antes de empezar
+# Terminal 1: iniciar la API desde backend (configura antes DB_URL, DB_USER y DB_PASSWORD)
+Set-Location backend
+mvn spring-boot:run
+
+# Terminal 2: desde la raíz del proyecto
 npm run dev
 
-# Terminal 2, en la raíz del proyecto
+# Terminal 3: desde la raíz del proyecto
 npm test -- --run
 npm test -- --run src/pages/DescuentosPage.test.jsx
 npm test -- --run src/pages/ReportesPage.test.jsx
@@ -145,4 +154,4 @@ npm run coverage
 npm run build
 ```
 
-Prepara la demo antes de presentar: verifica sesión de admin, disponibilidad de la ruta y fecha futura, que el carrito esté limpio y que Apache/MariaDB estén disponibles. No dependas de una compra improvisada si la API o la base no están listas; puedes explicar el flujo desde el código y la evidencia de pruebas sin afirmar que una compra real se procesó.
+Prepara la demo antes de presentar: verifica sesión de admin, disponibilidad de la ruta y fecha futura, que el carrito esté limpio y que Spring Boot/MariaDB estén disponibles. No dependas de una compra improvisada si la API o la base no están listas; puedes explicar el flujo desde el código y la evidencia de pruebas sin afirmar que una compra real se procesó.

@@ -19,7 +19,7 @@ El alcance incluye la interfaz web SPA, la API REST Spring Boot y la persistenci
 | Cliente | Iniciar sesión, elegir una salida, ingresar datos de pasajeros, conservar pasajes en el carrito y consultar los boletos emitidos. |
 | Administrador | Mantener rutas, descuentos y salidas; revisar cuentas compradoras y acceder al panel de reportes. |
 
-La autorización del administrador se comprueba en la interfaz y en los endpoints protegidos de Spring Boot. La autenticación utiliza JWT y los hashes BCrypt almacenados en MariaDB.
+La autorización de administrador y vendedor se comprueba en la interfaz y en los endpoints protegidos de Spring Boot. La autenticación utiliza JWT de acceso de corta duración y refresh tokens rotatorios en cookie HttpOnly; los hashes BCrypt y los hashes de refresh tokens se almacenan en MariaDB. El vendedor puede consultar productos y el listado de órdenes; no puede crear compras, modificar datos ni acceder a otras rutas REST.
 
 ## 3. Requisitos funcionales
 
@@ -40,6 +40,7 @@ La autorización del administrador se comprueba en la interfaz y en los endpoint
 | RF-13 | Crear una cuenta e iniciar sesión. | El registro valida coincidencia de correos y contraseñas; el inicio de sesión consulta la API y dirige según el rol autorizado. |
 | RF-15 | Iniciar sesión con Google. | El login muestra el botón de Google Identity Services; la API valida la credencial con Google, comprueba la audiencia y el correo verificado, crea la cuenta de cliente si no existe y devuelve un JWT. |
 | RF-14 | Consultar información institucional. | El visitante puede abrir las páginas de blog y de información del proyecto/equipo. |
+| RF-16 | Consultar órdenes como vendedor. | Un usuario con rol `seller` puede listar órdenes y leer productos; las demás solicitudes REST se deniegan. |
 
 ### 3.1 Límite funcional importante
 

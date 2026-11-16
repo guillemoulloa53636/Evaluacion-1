@@ -50,7 +50,7 @@ export default function AdminUsersPage() {
         <thead><tr><th>Nombre</th><th>Correo</th><th>Teléfono</th><th>Región</th><th>Comuna</th><th>Tipo</th><th>Fecha de registro</th></tr></thead>
         <tbody>{users.map((user) => <tr key={user.id}>
           <td>{user.name}</td><td>{user.email}</td><td>{user.telephone || '—'}</td><td>{user.region || '—'}</td><td>{user.commune || '—'}</td>
-          <td>{user.role === 'admin' ? 'Administrador' : 'Comprador'}</td>
+          <td>{user.role === 'admin' ? 'Administrador' : user.role === 'seller' ? 'Vendedor' : 'Cliente'}</td>
           <td>{new Date(user.createdAt.replace(' ', 'T')).toLocaleString('es-CL')}</td>
         </tr>)}</tbody>
       </table></div> : !error && <p className="muted">Todavía no hay usuarios registrados.</p>}

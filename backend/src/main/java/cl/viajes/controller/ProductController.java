@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/products")
+@RequestMapping({"/api/v1/products", "/api/v1/productos"})
 @Tag(name = "Productos", description = "Operaciones sobre las rutas disponibles")
 public class ProductController {
 

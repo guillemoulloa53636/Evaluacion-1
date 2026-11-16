@@ -132,6 +132,11 @@ public class PurchaseService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public List<OrderSummaryResponse> listOrders() {
+        return saleRepository.findAllOrderSummaries();
+    }
+
     private TripSchedule resolveSchedule(Product product, PurchaseItem item) {
         LocalDate today = LocalDate.now();
         List<Map<?, ?>> schedules = scheduleMaps(product);
