@@ -7,9 +7,9 @@
 
 ## 1. Propósito y alcance
 
-Viajes por Chile es una aplicación web para explorar rutas de bus dentro de Chile, consultar precios y salidas, reservar pasajes y emitir boletos en una compra simulada. Cuenta con un espacio de administración para mantener las rutas y sus descuentos, revisar cuentas compradoras y consultar métricas de demostración.
+Viajes por Chile es una aplicación web para explorar rutas de bus dentro de Chile, consultar precios y salidas, reservar pasajes y emitir boletos en una compra simulada. Cuenta con un espacio de administración para mantener las rutas y sus descuentos, revisar cuentas compradoras y consultar métricas calculadas desde MariaDB.
 
-El alcance incluye la interfaz web SPA, la API PHP y la persistencia local en MariaDB. El proyecto se ejecuta en un entorno local con Apache y MySQL/MariaDB de XAMPP. La compra no procesa dinero real ni se conecta a una pasarela de pago.
+El alcance incluye la interfaz web SPA, la API REST Spring Boot y la persistencia local en MariaDB. XAMPP puede usarse para ejecutar MariaDB en desarrollo; la aplicación no requiere Apache ni PHP. La compra no procesa dinero real ni se conecta a una pasarela de pago.
 
 ## 2. Tipos de usuario
 
@@ -19,7 +19,7 @@ El alcance incluye la interfaz web SPA, la API PHP y la persistencia local en Ma
 | Cliente | Iniciar sesión, elegir una salida, ingresar datos de pasajeros, conservar pasajes en el carrito y consultar los boletos emitidos. |
 | Administrador | Mantener rutas, descuentos y salidas; revisar cuentas compradoras y acceder al panel de reportes. |
 
-La autorización del administrador se comprueba en la interfaz y en los endpoints PHP protegidos. Las cuentas y sesiones son administradas por la API.
+La autorización del administrador se comprueba en la interfaz y en los endpoints protegidos de Spring Boot. La autenticación utiliza JWT y los hashes BCrypt almacenados en MariaDB.
 
 ## 3. Requisitos funcionales
 
@@ -38,12 +38,12 @@ La autorización del administrador se comprueba en la interfaz y en los endpoint
 | RF-11 | Consultar reportes de operación. | `/admin/reportes`, visible desde el espacio de administración, permite elegir Hoy (Día), Esta Semana, Este Mes y Este Año y presenta monto, viajes, cancelaciones, reclamos y eventos de flota. |
 | RF-12 | Enviar una consulta. | El formulario de ayuda valida los campos y envía el mensaje a la API para guardarlo en MariaDB; muestra confirmación o un error explícito. |
 | RF-13 | Crear una cuenta e iniciar sesión. | El registro valida coincidencia de correos y contraseñas; el inicio de sesión consulta la API y dirige según el rol autorizado. |
-| RF-15 | Iniciar sesión con Google. | El login muestra el botón de Google Identity Services; la API (`auth.php?action=google`) valida el token con Google, comprueba el `client_id` y el correo verificado, crea la cuenta de cliente si no existe y abre la sesión. |
+| RF-15 | Iniciar sesión con Google. | El login muestra el botón de Google Identity Services; la API valida la credencial con Google, comprueba la audiencia y el correo verificado, crea la cuenta de cliente si no existe y devuelve un JWT. |
 | RF-14 | Consultar información institucional. | El visitante puede abrir las páginas de blog y de información del proyecto/equipo. |
 
 ### 3.1 Límite funcional importante
 
-Los valores y eventos de `/admin/reportes` son datos locales ilustrativos del componente, no resultados calculados a partir de las ventas, cancelaciones, reclamos o eventos de flota persistidos. La interfaz lo advierte explícitamente. No se debe presentar el reporte como analítica real. Los boletos sí se generan a partir de los datos de la compra que responde la API.
+El panel `/admin/reportes` calcula sus métricas a partir de las ventas, cancelaciones, reclamos, usuarios y eventos de flota almacenados en MariaDB. Las filas agregadas por los seeds son datos de demostración, no actividad real de clientes.
 
 ## 4. Requisitos no funcionales
 
@@ -51,16 +51,16 @@ Los valores y eventos de `/admin/reportes` son datos locales ilustrativos del co
 |---|---|---|
 | RNF-01 | Interfaz adaptable. | La aplicación combina Bootstrap con reglas CSS y breakpoints propios para ajustar navegación, formularios y grillas a pantallas menores. |
 | RNF-02 | Separación de responsabilidades. | La SPA organiza presentación, páginas, contextos compartidos, catálogo y acceso a API en módulos distintos. |
-| RNF-03 | Persistencia local de la información de negocio. | PHP usa PDO y MariaDB; el DSN local usa host `127.0.0.1`, puerto `3308` y base `viajes_chile`. `DB_PASSWORD` toma precedencia si está definida y, si no, queda vacía para XAMPP. |
-| RNF-04 | Seguridad básica de cuentas. | Las contraseñas se almacenan con `password_hash` y se verifican con `password_verify`; las consultas SQL usan sentencias preparadas. No se debe publicar la contraseña local de una cuenta ni usar la configuración `root` sin contraseña en producción. |
+| RNF-03 | Persistencia local de la información de negocio. | Spring Data JPA y MariaDB usan la base `viajes_chile`; la conexión se configura con `DB_URL`, `DB_USER` y `DB_PASSWORD`. |
+| RNF-04 | Seguridad básica de cuentas. | Las contraseñas se almacenan y verifican con BCrypt. Las operaciones protegidas requieren un JWT firmado y validado por la API; no se debe publicar `JWT_SECRET` ni usar la configuración `root` sin contraseña en producción. |
 | RNF-05 | Manejo de errores. | La interfaz presenta errores de API en vez de mostrar confirmaciones ficticias cuando falla una solicitud. |
 | RNF-06 | Verificabilidad. | Vitest, React Testing Library, `user-event` y jsdom permiten ejecutar pruebas unitarias y de componentes desde los scripts npm del proyecto. |
-| RNF-07 | Instalación reproducible del frontend. | Las dependencias JavaScript se restauran a partir de `package-lock.json` con `npm ci`. La API y MariaDB requieren XAMPP. |
+| RNF-07 | Instalación reproducible del frontend. | Las dependencias JavaScript se restauran a partir de `package-lock.json` con `npm ci`; el backend requiere Java 17 y Maven. |
 
 ## 5. Interfaces y arquitectura
 
 - **Frontend:** React, React Router, Vite, Bootstrap y Bootstrap Icons.
-- **API:** PHP bajo Apache; la SPA realiza solicitudes JSON bajo `/api`. En desarrollo, Vite conserva el proxy `/api` hacia `http://localhost` (Apache de XAMPP). Diagramas de arquitectura, endpoints y flujo de compra, con el detalle del viaje que devuelve cada endpoint: [diagrama de APIs](./diagrama-apis.md).
+- **API:** Spring Boot bajo `/api/v1`; la SPA realiza solicitudes JSON con JWT Bearer. En desarrollo, Vite reenvía `/api` a `http://localhost:8080`. Diagramas de arquitectura, endpoints y flujo de compra: [diagrama de APIs](./diagrama-apis.md).
 
 ![Arquitectura de APIs](./diagrama-arquitectura.png)
 - **Datos:** MariaDB/MySQL, esquema `database/schema.sql` y migración de descuentos, salidas y boletos en `database/migrations/`.
@@ -79,7 +79,7 @@ Los valores y eventos de `/admin/reportes` son datos locales ilustrativos del co
 | `/boletos/:saleCode` | Resultado de la compra y boletos. |
 | `/admin` | Administración del catálogo. |
 | `/admin/usuarios` | Listado de cuentas compradoras, solo administración. |
-| `/admin/reportes` | Métricas ilustrativas, solo administración. |
+| `/admin/reportes` | Métricas operacionales, solo administración. |
 
 ## 6. Datos y reglas del dominio
 
@@ -92,11 +92,11 @@ El esquema contempla productos/rutas, usuarios, mensajes de contacto, ventas y b
 
 ## 7. Restricciones, supuestos y exclusiones
 
-1. Se asume un entorno local con Apache, PHP, extensión PDO MySQL y MariaDB/MySQL iniciado desde XAMPP.
+1. Se asume un entorno local con Java 17, Maven y MariaDB/MySQL; XAMPP puede proporcionar la base de datos.
 2. El host, puerto, nombre de base y usuario indicados son la configuración predeterminada del proyecto; la contraseña puede configurarse como variable de entorno `DB_PASSWORD`.
 3. La operación está diseñada para un ejercicio/demostración, no para cobros ni despliegue público.
 4. La compra es simulada; no hay pasarela, liquidación ni comprobante de pago financiero.
-5. Las cifras del panel de reportes son ilustrativas. No hay flujo persistente para registrar reclamos, cancelaciones ni eventos de flota.
+5. Los datos de demostración de los seeds no representan actividad real; los reportes consultan los registros persistidos.
 6. El material de demostración `database/seeds/demo_trips.sql` contiene fechas fijas; si ya vencieron, se deben crear salidas futuras desde administración antes de exponer el flujo.
 7. La cobertura de pruebas no es exhaustiva ni significa que cada función del proyecto tenga un caso. El informe asociado describe métricas, alcance y brechas.
 
@@ -108,4 +108,4 @@ El esquema contempla productos/rutas, usuarios, mensajes de contacto, ventas y b
 | Componentes, estado y navegación | Páginas y componentes reutilizables, estado local/contextos y rutas React Router. |
 | Adaptabilidad | Bootstrap (sistema de grilla `row`/`col-*` en el catálogo), CSS responsive y reglas media-query en `src/styles.css`. |
 | Pruebas | 43 casos automatizados con Vitest/React Testing Library, con mocks y spies; detalle y limitaciones en [informe de cobertura](./cobertura-de-pruebas.md). Jasmine y Karma se omiten según el alcance solicitado. |
-| Persistencia e interactividad | API PHP/MariaDB, carrito, catálogo administrable, formulario de contacto y emisión de boletos. |
+| Persistencia e interactividad | API Spring Boot/MariaDB con JWT, carrito, catálogo administrable, formulario de contacto y emisión de boletos. |

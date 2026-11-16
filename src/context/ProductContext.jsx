@@ -14,7 +14,7 @@ export function ProductProvider({ children }) {
     async function loadProducts() {
       try {
         setLoading(true);
-        const data = await apiRequest('products.php');
+        const data = await apiRequest('products');
         if (active) {
           setProducts(data);
           setError('');
@@ -30,7 +30,7 @@ export function ProductProvider({ children }) {
   }, []);
 
   async function saveProduct(product, originalSlug = null) {
-    const { product: saved } = await apiRequest(originalSlug ? `products.php?slug=${encodeURIComponent(originalSlug)}` : 'products.php', {
+    const saved = await apiRequest(originalSlug ? `products/${encodeURIComponent(originalSlug)}` : 'products', {
       method: originalSlug ? 'PUT' : 'POST',
       body: JSON.stringify(product)
     });
@@ -41,7 +41,7 @@ export function ProductProvider({ children }) {
   }
 
   async function deleteProduct(slug) {
-    await apiRequest(`products.php?slug=${encodeURIComponent(slug)}`, { method: 'DELETE' });
+    await apiRequest(`products/${encodeURIComponent(slug)}`, { method: 'DELETE' });
     setProducts((current) => current.filter((product) => product.slug !== slug));
   }
 

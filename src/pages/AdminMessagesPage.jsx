@@ -23,7 +23,7 @@ export default function AdminMessagesPage() {
 
     async function load() {
       try {
-        const { user } = await apiRequest('auth.php?action=me');
+        const { user } = await apiRequest('auth/me');
         if (!active) return;
         if (user?.role !== 'admin') {
           setAccess('denied');
@@ -35,7 +35,7 @@ export default function AdminMessagesPage() {
         if (filter) params.set('status', filter);
         if (typeFilter) params.set('type', typeFilter);
         const query = params.toString() ? `?${params}` : '';
-        const data = await apiRequest(`contact.php${query}`);
+        const data = await apiRequest(`contact-messages${query}`);
         if (active) {
           setMessages(data);
           setError('');
@@ -53,7 +53,7 @@ export default function AdminMessagesPage() {
 
   async function update(id, changes) {
     try {
-      const { message } = await apiRequest(`contact.php?id=${id}`, { method: 'PUT', body: JSON.stringify(changes) });
+      const { message } = await apiRequest(`contact-messages/${id}`, { method: 'PUT', body: JSON.stringify(changes) });
       setMessages((current) => current
         .map((item) => (item.id === id ? message : item))
         .filter((item) => (filter ? item.status === filter : item.status !== 'eliminado')));
@@ -66,7 +66,7 @@ export default function AdminMessagesPage() {
   async function remove(id, permanent = false) {
     if (permanent && !window.confirm('¿Eliminar definitivamente este mensaje? No se puede deshacer.')) return;
     try {
-      await apiRequest(`contact.php?id=${id}${permanent ? '&permanent=1' : ''}`, { method: 'DELETE' });
+      await apiRequest(`contact-messages/${id}${permanent ? '?permanent=true' : ''}`, { method: 'DELETE' });
       setMessages((current) => current.filter((item) => item.id !== id));
       setError('');
     } catch (requestError) {

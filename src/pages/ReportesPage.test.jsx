@@ -21,7 +21,7 @@ const report = {
 
 describe('ReportesPage', () => {
   beforeEach(() => {
-    apiRequest.mockImplementation(async (path) => (path.startsWith('auth.php') ? { user: { role: 'admin' } } : report));
+    apiRequest.mockImplementation(async (path) => (path.startsWith('auth/me') ? { user: { role: 'admin' } } : report));
   });
 
   afterEach(() => {
@@ -49,7 +49,7 @@ describe('ReportesPage', () => {
     await screen.findByRole('heading', { name: 'Detalle de compras' });
     await user.selectOptions(screen.getByLabelText('Período del reporte'), 'week');
 
-    expect(apiRequest).toHaveBeenCalledWith('reports.php?period=week');
+    expect(apiRequest).toHaveBeenCalledWith('reports?period=week');
   });
 
   it('cambia el estado de un bus a reparado', async () => {
@@ -59,7 +59,7 @@ describe('ReportesPage', () => {
     await screen.findByLabelText('Estado de Bus 12');
     await user.selectOptions(screen.getByLabelText('Estado de Bus 12'), 'reparado');
 
-    expect(apiRequest).toHaveBeenCalledWith('fleet.php?id=1', expect.objectContaining({
+    expect(apiRequest).toHaveBeenCalledWith('fleet-events/1', expect.objectContaining({
       method: 'PUT',
       body: JSON.stringify({ status: 'reparado' })
     }));

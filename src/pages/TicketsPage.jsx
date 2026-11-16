@@ -30,7 +30,7 @@ export default function TicketsPage() {
 
   useEffect(() => {
     let active = true;
-    apiRequest(`purchase.php?code=${encodeURIComponent(saleCode)}`)
+    apiRequest(`purchases/${encodeURIComponent(saleCode)}`)
       .then((result) => { if (active) setSale(result); })
       .catch((requestError) => { if (active) setError(requestError.message); })
       .finally(() => { if (active) setLoading(false); });

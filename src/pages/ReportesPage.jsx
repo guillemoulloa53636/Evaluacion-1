@@ -31,7 +31,7 @@ export default function ReportesPage() {
 
   useEffect(() => {
     let active = true;
-    apiRequest('auth.php?action=me')
+    apiRequest('auth/me')
       .then(({ user }) => { if (active) setAccess(user?.role === 'admin' ? 'granted' : 'denied'); })
       .catch((requestError) => {
         if (active) {
@@ -45,7 +45,7 @@ export default function ReportesPage() {
   const loadReport = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await apiRequest(`reports.php?period=${period}`);
+      const data = await apiRequest(`reports?period=${period}`);
       setReport(data);
       setError('');
     } catch (requestError) {
@@ -69,19 +69,19 @@ export default function ReportesPage() {
     }
   }
 
-  const changeFleet = (id, changes) => run(() => apiRequest(`fleet.php?id=${id}`, { method: 'PUT', body: JSON.stringify(changes) }));
-  const deleteFleet = (id) => window.confirm('¿Eliminar este evento de flota?') && run(() => apiRequest(`fleet.php?id=${id}`, { method: 'DELETE' }));
+  const changeFleet = (id, changes) => run(() => apiRequest(`fleet-events/${id}`, { method: 'PUT', body: JSON.stringify(changes) }));
+  const deleteFleet = (id) => window.confirm('¿Eliminar este evento de flota?') && run(() => apiRequest(`fleet-events/${id}`, { method: 'DELETE' }));
   const addFleet = (event) => {
     event.preventDefault();
     return run(async () => {
-      await apiRequest('fleet.php', { method: 'POST', body: JSON.stringify(newEvent) });
+      await apiRequest('fleet-events', { method: 'POST', body: JSON.stringify(newEvent) });
       setNewEvent({ vehicle: '', description: '', status: 'con_falla' });
     });
   };
   const cancel = (payload, label) => {
     if (!window.confirm(`¿Cancelar ${label}? Los asientos quedarán disponibles.`)) return;
     const reason = window.prompt('Motivo de la cancelación (opcional):') ?? '';
-    return run(() => apiRequest('sales.php', { method: 'PUT', body: JSON.stringify({ ...payload, reason }) }));
+    return run(() => apiRequest('sales/cancellations', { method: 'POST', body: JSON.stringify({ ...payload, reason }) }));
   };
 
   if (access === 'checking') return <div className="admin-content"><p className="muted" role="status">Verificando sesión de administrador…</p></div>;

@@ -2,8 +2,13 @@ package cl.viajes.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,38 +22,50 @@ public class Product {
     private String id;
 
     @NotBlank
+    @Size(max = 100)
     @Column(nullable = false, unique = true, length = 100)
     private String slug;
 
     @NotBlank
+    @Size(max = 180)
     private String title;
 
     @NotBlank
+    @Size(max = 120)
     private String destination;
 
-    @Min(0)
+    @Positive
     private int price;
 
     @NotBlank
+    @Size(max = 60)
     private String type;
 
+    @NotBlank
+    @Pattern(regexp = "Activo|Agotado", message = "El estado debe ser Activo o Agotado")
     @Column(nullable = false)
     private String status = "Activo";
 
     @NotBlank
+    @Size(max = 255)
     private String image;
 
+    @NotNull
     @Column(columnDefinition = "TEXT")
     private String description = "";
 
+    @NotNull
     @Convert(converter = JsonListConverter.class)
     @Column(columnDefinition = "LONGTEXT")
     private List<Object> gallery = new ArrayList<>();
 
     @JsonProperty("discount_percent")
+    @Min(0)
+    @Max(90)
     @Column(name = "discount_percent")
     private int discountPercent = 0;
 
+    @NotNull
     @Convert(converter = JsonListConverter.class)
     @Column(columnDefinition = "LONGTEXT")
     private List<Object> schedules = new ArrayList<>();

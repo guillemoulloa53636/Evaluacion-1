@@ -13,14 +13,14 @@ export default function AdminUsersPage() {
 
     async function loadUsers() {
       try {
-        const { user } = await apiRequest('auth.php?action=me');
+        const { user } = await apiRequest('auth/me');
         if (!active) return;
         if (user?.role !== 'admin') {
           setAccess('denied');
           return;
         }
         setAccess('granted');
-        const buyerUsers = await apiRequest('users.php');
+        const buyerUsers = await apiRequest('users');
         if (active) setUsers(buyerUsers);
       } catch (requestError) {
         if (active) setError(requestError.message);
@@ -51,7 +51,7 @@ export default function AdminUsersPage() {
         <tbody>{users.map((user) => <tr key={user.id}>
           <td>{user.name}</td><td>{user.email}</td><td>{user.telephone || '—'}</td><td>{user.region || '—'}</td><td>{user.commune || '—'}</td>
           <td>{user.role === 'admin' ? 'Administrador' : 'Comprador'}</td>
-          <td>{new Date(user.created_at.replace(' ', 'T')).toLocaleString('es-CL')}</td>
+          <td>{new Date(user.createdAt.replace(' ', 'T')).toLocaleString('es-CL')}</td>
         </tr>)}</tbody>
       </table></div> : !error && <p className="muted">Todavía no hay usuarios registrados.</p>}
     </section>

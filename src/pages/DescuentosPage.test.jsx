@@ -41,8 +41,9 @@ describe('DescuentosPage', () => {
     expect(screen.getAllByLabelText('Precio original').map((price) => price.textContent)).toEqual(['$10.000', '$35.000']);
     expect(screen.getAllByLabelText('Precio con descuento').map((price) => price.textContent)).toEqual(['$8.500', '$29.750']);
     expect(screen.getByRole('link', { name: 'Ver viaje a Valparaíso' })).toHaveAttribute('href', '/viajes/valparaiso');
-    expect(fetch).toHaveBeenCalledWith('/api/products.php', expect.objectContaining({
-      credentials: 'include'
+    expect(fetch).toHaveBeenCalledWith('/api/v1/products', expect.objectContaining({
+      method: 'GET',
+      headers: { Accept: 'application/json' }
     }));
   });
 });

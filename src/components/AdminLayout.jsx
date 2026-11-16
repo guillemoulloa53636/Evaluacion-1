@@ -5,7 +5,7 @@ import { imageUrl } from '../data/catalog.js';
 export default function AdminLayout() {
   const navigate = useNavigate();
   async function logout() {
-    await apiRequest('auth.php?action=logout', { method: 'POST' }).catch(() => {});
+    await apiRequest('auth/logout', { method: 'POST' }).catch(() => {});
     navigate('/');
   }
 

@@ -39,7 +39,7 @@ describe('CheckoutForm', () => {
     expect(screen.getByLabelText('RUT')).toHaveValue('12345678-9');
     await user.click(screen.getByRole('button', { name: 'Confirmar compra y emitir boletos' }));
 
-    expect(apiRequest).toHaveBeenCalledWith('purchase.php', expect.objectContaining({
+    expect(apiRequest).toHaveBeenCalledWith('purchases', expect.objectContaining({
       method: 'POST',
       body: JSON.stringify({
         items: [{
@@ -79,7 +79,7 @@ describe('CheckoutForm', () => {
 
     await user.click(screen.getByRole('button', { name: 'Confirmar compra y emitir boletos' }));
 
-    expect(apiRequest).toHaveBeenCalledWith('purchase.php', expect.objectContaining({
+    expect(apiRequest).toHaveBeenCalledWith('purchases', expect.objectContaining({
       body: JSON.stringify({
         items: [{
           slug: 'valparaiso',

@@ -23,7 +23,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     let active = true;
-    apiRequest('auth.php?action=me')
+    apiRequest('auth/me')
       .then(({ user }) => {
         if (!active) return;
         if (user?.role !== 'admin') {
@@ -31,7 +31,7 @@ export default function AdminPage() {
           return;
         }
         setAccess('granted');
-        return apiRequest('users.php').then(setUsers);
+        return apiRequest('users').then(setUsers);
       })
       .catch(() => { if (active) setAccess('denied'); });
     return () => { active = false; };

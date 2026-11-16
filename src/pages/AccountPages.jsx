@@ -26,7 +26,7 @@ export function LoginPage() {
         client_id: googleClientId,
         callback: async ({ credential }) => {
           try {
-            const { user } = await apiRequest('auth.php?action=google', { method: 'POST', body: JSON.stringify({ credential }) });
+            const { user } = await apiRequest('auth/google', { method: 'POST', body: JSON.stringify({ credential }) });
             navigate(user.role === 'admin' ? '/admin' : '/menu');
           } catch (requestError) {
             setError(requestError.message);
@@ -48,7 +48,7 @@ export function LoginPage() {
     event.preventDefault();
     setError('');
     try {
-      const { user } = await apiRequest('auth.php?action=login', {
+      const { user } = await apiRequest('auth/login', {
         method: 'POST',
         body: JSON.stringify({ email, password })
       });
@@ -93,7 +93,7 @@ export function RegisterPage() {
     if (form.password !== form.confirmarPassword) return setError('Las contraseñas no coinciden.');
     setError('');
     try {
-      await apiRequest('auth.php?action=register', {
+      await apiRequest('auth/register', {
         method: 'POST',
         body: JSON.stringify({
           name: form.nombre.trim(), email: correo, password: form.password,
@@ -128,7 +128,7 @@ export function ServicePage() {
     const formData = new FormData(formElement);
     setError('');
     try {
-      await apiRequest('contact.php', {
+      await apiRequest('contact-messages', {
         method: 'POST',
         body: JSON.stringify({ name: formData.get('nombre'), email: formData.get('correo'), message: formData.get('mensaje'), isComplaint: formData.get('reclamo') === 'on' })
       });

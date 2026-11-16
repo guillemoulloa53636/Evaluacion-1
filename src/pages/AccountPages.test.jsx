@@ -42,7 +42,7 @@ describe('LoginPage', () => {
     await user.click(screen.getByRole('button', { name: /Ingresar a mi cuenta/ }));
 
     expect(await screen.findByText('Página de destino')).toBeInTheDocument();
-    expect(apiRequest).toHaveBeenCalledWith('auth.php?action=login', expect.objectContaining({ method: 'POST' }));
+    expect(apiRequest).toHaveBeenCalledWith('auth/login', expect.objectContaining({ method: 'POST' }));
   });
 
   it('no permite que una cuenta cliente use el acceso de administrador', async () => {
@@ -108,7 +108,7 @@ describe('LoginPage con Google', () => {
     await callback({ credential: 'token-google' });
 
     expect(renderButton).toHaveBeenCalled();
-    expect(apiRequest).toHaveBeenCalledWith('auth.php?action=google', expect.objectContaining({ method: 'POST', body: JSON.stringify({ credential: 'token-google' }) }));
+    expect(apiRequest).toHaveBeenCalledWith('auth/google', expect.objectContaining({ method: 'POST', body: JSON.stringify({ credential: 'token-google' }) }));
     expect(await screen.findByText('Página de destino')).toBeInTheDocument();
 
     appendSpy.mockRestore();
@@ -151,7 +151,7 @@ describe('RegisterPage', () => {
     await user.click(screen.getByRole('button', { name: /Crear cuenta/ }));
 
     expect(await screen.findByLabelText('ubicación actual')).toHaveTextContent('/?registro=exitoso');
-    expect(apiRequest).toHaveBeenCalledWith('auth.php?action=register', expect.objectContaining({
+    expect(apiRequest).toHaveBeenCalledWith('auth/register', expect.objectContaining({
       method: 'POST',
       body: JSON.stringify({
         name: 'Ana Pérez',
@@ -177,7 +177,7 @@ describe('ServicePage', () => {
     await user.click(screen.getByRole('button', { name: /Enviar mensaje/ }));
 
     expect(await screen.findByRole('status')).toHaveTextContent('Mensaje guardado');
-    expect(apiRequest).toHaveBeenCalledWith('contact.php', expect.objectContaining({
+    expect(apiRequest).toHaveBeenCalledWith('contact-messages', expect.objectContaining({
       method: 'POST',
       body: JSON.stringify({
         name: 'Ana Pérez',
@@ -200,7 +200,7 @@ describe('ServicePage', () => {
     await user.click(screen.getByRole('button', { name: /Enviar mensaje/ }));
 
     await screen.findByRole('status');
-    expect(apiRequest).toHaveBeenCalledWith('contact.php', expect.objectContaining({
+    expect(apiRequest).toHaveBeenCalledWith('contact-messages', expect.objectContaining({
       body: JSON.stringify({
         name: 'Ana Pérez',
         email: 'ana@example.com',

@@ -26,7 +26,7 @@ export default function CheckoutForm({ items, onCancel, onComplete }) {
     setSubmitting(true);
     setError('');
     try {
-      const purchase = await apiRequest('purchase.php', {
+      const purchase = await apiRequest('purchases', {
         method: 'POST',
         body: JSON.stringify({
           items: items.map((item) => ({

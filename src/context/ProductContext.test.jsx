@@ -26,8 +26,8 @@ describe('ProductContext', () => {
   it('permite crear y editar una ruta reflejando la respuesta de la API', async () => {
     apiRequest
       .mockResolvedValueOnce([])
-      .mockResolvedValueOnce({ product: { slug: 'talca', title: 'Santiago - Talca' } })
-      .mockResolvedValueOnce({ product: { slug: 'talca', title: 'Santiago - Talca actualizado' } });
+      .mockResolvedValueOnce({ slug: 'talca', title: 'Santiago - Talca' })
+      .mockResolvedValueOnce({ slug: 'talca', title: 'Santiago - Talca actualizado' });
     const { result } = renderHook(() => useProducts(), { wrapper });
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -35,8 +35,8 @@ describe('ProductContext', () => {
     expect(result.current.products).toEqual([{ slug: 'talca', title: 'Santiago - Talca' }]);
     await act(() => result.current.saveProduct({ title: 'Santiago - Talca actualizado' }, 'talca'));
 
-    expect(apiRequest).toHaveBeenNthCalledWith(2, 'products.php', expect.objectContaining({ method: 'POST' }));
-    expect(apiRequest).toHaveBeenNthCalledWith(3, 'products.php?slug=talca', expect.objectContaining({ method: 'PUT' }));
+    expect(apiRequest).toHaveBeenNthCalledWith(2, 'products', expect.objectContaining({ method: 'POST' }));
+    expect(apiRequest).toHaveBeenNthCalledWith(3, 'products/talca', expect.objectContaining({ method: 'PUT' }));
     expect(result.current.products[0].title).toBe('Santiago - Talca actualizado');
   });
 
@@ -49,7 +49,7 @@ describe('ProductContext', () => {
 
     await act(() => result.current.deleteProduct('talca'));
     expect(result.current.products).toEqual([{ slug: 'arica' }]);
-    expect(apiRequest).toHaveBeenLastCalledWith('products.php?slug=talca', { method: 'DELETE' });
+    expect(apiRequest).toHaveBeenLastCalledWith('products/talca', { method: 'DELETE' });
 
     cleanup();
     apiRequest.mockRejectedValueOnce(new Error('API no disponible'));

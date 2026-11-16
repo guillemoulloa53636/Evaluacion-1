@@ -30,7 +30,7 @@ describe('AdminPage', () => {
       deleteProduct: vi.fn(),
       error: ''
     });
-    apiRequest.mockImplementation((path) => path === 'auth.php?action=me'
+    apiRequest.mockImplementation((path) => path === 'auth/me'
       ? Promise.resolve({ user: { role: 'admin' } })
       : Promise.resolve([]));
   });
