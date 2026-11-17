@@ -25,6 +25,7 @@ export default function AdminLayout() {
       <NavLink to="/admin/usuarios"><i className="bi bi-people" /> Usuarios</NavLink>
       <NavLink to="/admin/mensajes"><i className="bi bi-envelope" /> Mensajes</NavLink>
       <NavLink to="/admin/reportes"><i className="bi bi-bar-chart" /> Reportes</NavLink>
+      <NavLink to="/admin/perfil"><i className="bi bi-person-gear" /> Mis datos</NavLink>
       <NavLink to="/menu"><i className="bi bi-signpost-2" /> Ver sitio</NavLink>
       {logoutError && <p className="form-error" role="alert">{logoutError}</p>}
       <button type="button" className="admin-logout" onClick={logout}><i className="bi bi-box-arrow-left" /> Cerrar sesión</button>

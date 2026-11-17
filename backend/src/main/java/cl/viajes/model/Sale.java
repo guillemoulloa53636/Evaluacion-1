@@ -24,6 +24,9 @@ public class Sale {
     @Column(nullable = false, length = 20)
     private String status = "pagada";
 
+    @Column(name = "user_id")
+    private Long userId;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -39,6 +42,8 @@ public class Sale {
     public void setTotalAmount(long totalAmount) { this.totalAmount = totalAmount; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public List<Ticket> getTickets() { return tickets; }
     public void addTicket(Ticket ticket) {

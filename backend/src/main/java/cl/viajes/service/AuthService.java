@@ -100,6 +100,28 @@ public class AuthService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "La cuenta ya no existe"));
     }
 
+    public Map<String, Boolean> changePassword(Long userId, cl.viajes.dto.ChangePasswordRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "La cuenta ya no existe"));
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPasswordHash())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La contraseña actual no es correcta");
+        }
+        user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+        activityLog.record("password", "Cambio de contraseña: " + user.getEmail(), user.getName());
+        return Map.of("ok", true);
+    }
+
+    public UserResponse updateProfile(Long id, cl.viajes.dto.ProfileUpdateRequest request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "La cuenta ya no existe"));
+        user.setName(request.name().trim());
+        user.setTelephone(request.telephone() == null ? "" : request.telephone().trim());
+        user.setRegion(request.region().trim());
+        user.setCommune(request.commune().trim());
+        return UserResponse.from(userRepository.save(user));
+    }
+
     private User createGoogleUser(String email, String name) {
         User user = new User();
         user.setName(name);

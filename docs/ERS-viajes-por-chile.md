@@ -41,6 +41,9 @@ La autorización de administrador y vendedor se comprueba en la interfaz y en lo
 | RF-15 | Iniciar sesión con Google. | El login muestra el botón de Google Identity Services; la API valida la credencial con Google, comprueba la audiencia y el correo verificado, crea la cuenta de cliente si no existe y devuelve un JWT. |
 | RF-14 | Consultar información institucional. | El visitante puede abrir las páginas de blog y de información del proyecto/equipo. |
 | RF-16 | Consultar órdenes como vendedor. | Un usuario con rol `seller` puede listar órdenes y leer productos; las demás solicitudes REST se deniegan. |
+| RF-17 | Recuperar y cambiar contraseña. | Sin sesión: `/olvide-contrasena` pide solo el correo y `POST /auth/forgot-password` envía un enlace `/restablecer?token=` (token hasheado, expira en 30 min); `POST /auth/reset-password` guarda la nueva clave. Con sesión: en "Mis datos" `POST /auth/change-password` exige la contraseña actual. |
+| RF-18 | Editar datos de la cuenta. | `/perfil` (cliente/vendedor) y `/admin/perfil` (administrador), accesibles solo con sesión iniciada desde el panel del usuario (opción "Mis datos"; sesión por usuario/contraseña o Google) permite editar nombre, teléfono, región y comuna mediante `PUT /auth/me`; el correo es de solo lectura. |
+| RF-19 | Sesión resiliente. | Un token expirado o inválido en rutas públicas (login, registro) no bloquea la solicitud; las rutas protegidas responden 401 y la SPA renueva el JWT con el refresh token. |
 
 ### 3.1 Límite funcional importante
 
@@ -64,6 +67,7 @@ El panel `/admin/reportes` calcula sus métricas a partir de las ventas, cancela
 - **API:** Spring Boot bajo `/api/v1`; la SPA realiza solicitudes JSON con JWT Bearer. En desarrollo, Vite reenvía `/api` a `http://localhost:8080`. Diagramas de arquitectura, endpoints y flujo de compra: [diagrama de APIs](./diagrama-apis.md).
 
 ![Arquitectura de APIs](./diagrama-arquitectura.png)
+- **MER y arquitectura:** [diagrama-mer-arquitectura.md](./diagrama-mer-arquitectura.md).
 - **Datos:** MariaDB/MySQL, esquema `database/schema.sql` y migración de descuentos, salidas y boletos en `database/migrations/`.
 - **Persistencia de interfaz:** el carrito se almacena en `localStorage`; catálogo, usuarios, mensajes, ventas y boletos usan endpoints de la API.
 - **Configuración local de base:** `127.0.0.1:3308`, base `viajes_chile`, usuario `root`, contraseña vacía como valor por defecto local o `DB_PASSWORD` si está definida.
@@ -76,6 +80,7 @@ El panel `/admin/reportes` calcula sus métricas a partir de las ventas, cancela
 | `/viajes/:slug` | Detalle, descuentos, salidas y reserva. |
 | `/descuentos` | Ofertas actuales del catálogo. |
 | `/` y `/registro` | Inicio de sesión y registro. |
+| `/cambiar-contrasena`, `/perfil` | Cambio de contraseña y edición de datos de la cuenta. |
 | `/servicio`, `/blog`, `/nosotros` | Ayuda, contenido e información institucional. |
 | `/boletos/:saleCode` | Resultado de la compra y boletos. |
 | `/admin` | Administración del catálogo. |

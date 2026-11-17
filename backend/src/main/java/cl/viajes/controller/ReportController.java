@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Reportes", description = "Indicadores y reportes de ventas (administrador)")
 @RestController
 @RequestMapping("/api/v1/reports")
 public class ReportController {

@@ -31,6 +31,7 @@ export default function SiteLayout() {
           <nav className={`site-nav ${menuOpen ? 'is-open' : ''}`} aria-label="Navegación principal">
             {links.map(([to, label]) => <NavLink key={to} to={to} onClick={() => setMenuOpen(false)}>{label}</NavLink>)}
             <NavLink className="nav-account" to="/">Mi cuenta</NavLink>
+            <NavLink to="/perfil" onClick={() => setMenuOpen(false)}>Mis datos</NavLink>
             <button className="cart-button" onClick={() => setCartOpen(true)} aria-label={`Abrir carrito, ${count} pasajes`}>
               <i className="bi bi-bag" /> <span>Carrito</span><b>{count}</b>
             </button>

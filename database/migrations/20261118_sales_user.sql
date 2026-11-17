@@ -1,0 +1,3 @@
+ALTER TABLE sales
+  ADD COLUMN IF NOT EXISTS user_id BIGINT UNSIGNED NULL,
+  ADD INDEX IF NOT EXISTS idx_sales_user (user_id);

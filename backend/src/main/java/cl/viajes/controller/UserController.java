@@ -13,6 +13,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Usuarios", description = "CRUD de usuarios (administrador)")
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {

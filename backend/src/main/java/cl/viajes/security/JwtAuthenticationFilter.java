@@ -8,7 +8,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -49,13 +48,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             claims = jwtService.parseToken(authorization.substring(7).trim());
             userId = Long.valueOf(claims.getSubject());
         } catch (JwtException | IllegalArgumentException exception) {
-            writeUnauthorized(response);
+            // Token vencido o inválido: se trata como anónimo; las rutas protegidas responden 401.
+            SecurityContextHolder.clearContext();
+            filterChain.doFilter(request, response);
             return;
         }
 
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
-            writeUnauthorized(response);
+            SecurityContextHolder.clearContext();
+            filterChain.doFilter(request, response);
             return;
         }
 
@@ -70,12 +72,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         filterChain.doFilter(request, response);
-    }
-
-    private void writeUnauthorized(HttpServletResponse response) throws IOException {
-        SecurityContextHolder.clearContext();
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.getWriter().write("{\"error\":\"Token inválido o expirado\"}");
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Ventas", description = "Anulación de boletos y ventas (administrador)")
 @RestController
 @RequestMapping("/api/v1/sales")
 public class SaleController {

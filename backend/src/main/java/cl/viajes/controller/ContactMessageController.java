@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Mensajes de contacto", description = "Mensajes y reclamos de clientes")
 @RestController
 @RequestMapping("/api/v1/contact-messages")
 public class ContactMessageController {

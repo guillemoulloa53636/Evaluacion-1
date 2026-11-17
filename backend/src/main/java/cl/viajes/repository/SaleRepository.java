@@ -26,6 +26,17 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
             """)
     List<OrderSummaryResponse> findAllOrderSummaries();
 
+    @Query("""
+            select new cl.viajes.dto.OrderSummaryResponse(
+                s.saleCode, s.totalAmount, s.status, s.createdAt, count(t.id)
+            )
+            from Sale s left join s.tickets t
+            where s.userId = :userId
+            group by s.id, s.saleCode, s.totalAmount, s.status, s.createdAt
+            order by s.createdAt desc, s.id desc
+            """)
+    List<OrderSummaryResponse> findOrderSummariesByUser(@Param("userId") Long userId);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select s from Sale s where s.saleCode = :saleCode")
     Optional<Sale> findBySaleCodeForUpdate(@Param("saleCode") String saleCode);

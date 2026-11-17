@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.Customizer;
@@ -38,19 +37,21 @@ public class SecurityConfig {
                                         "No tienes permisos para realizar esta operación")))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/error").permitAll()
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/auth/google",
-                                "/api/v1/auth/refresh",
+                                "/api/v1/auth/refresh", "/api/v1/auth/forgot-password", "/api/v1/auth/reset-password",
                                 "/api/v1/contact-messages", "/api/v1/purchases").access(permitUnlessSeller())
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
                                 .access(permitUnlessSeller())
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/products", "/api/v1/products/**",
                                 "/api/v1/productos", "/api/v1/productos/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/ordenes")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/ordenes", "/api/v1/ordenes/**")
                                 .hasAnyRole("SELLER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/purchases/mine").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/purchases/**").access(permitUnlessSeller())
-                        .requestMatchers("/api/v1/auth/me").access(authenticatedNonSeller())
+                        .requestMatchers("/api/v1/auth/me", "/api/v1/auth/change-password").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/logout").authenticated()
                         .requestMatchers(
                                 "/api/v1/users", "/api/v1/users/**",
@@ -70,15 +71,6 @@ public class SecurityConfig {
     private AuthorizationManager<RequestAuthorizationContext> permitUnlessSeller() {
         return (authentication, context) ->
                 new AuthorizationDecision(!isSeller(authentication.get()));
-    }
-
-    private AuthorizationManager<RequestAuthorizationContext> authenticatedNonSeller() {
-        return (authentication, context) -> {
-            Authentication current = authentication.get();
-            boolean authenticated = current.isAuthenticated()
-                    && !(current instanceof AnonymousAuthenticationToken);
-            return new AuthorizationDecision(authenticated && !isSeller(current));
-        };
     }
 
     private boolean isSeller(Authentication authentication) {

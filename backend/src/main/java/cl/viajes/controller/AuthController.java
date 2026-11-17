@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.Duration;
 import java.util.Map;
 
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Autenticación", description = "Login, registro, Google, refresh, recuperación y cambio de contraseña, perfil")
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {
@@ -31,13 +32,16 @@ public class AuthController {
     private static final String REFRESH_COOKIE_PATH = "/api/v1/auth";
 
     private final AuthService authService;
+    private final cl.viajes.service.PasswordResetService passwordResetService;
     private final boolean refreshCookieSecure;
 
     public AuthController(
             AuthService authService,
+            cl.viajes.service.PasswordResetService passwordResetService,
             @Value("${app.auth.refresh-cookie-secure:true}") boolean refreshCookieSecure
     ) {
         this.authService = authService;
+        this.passwordResetService = passwordResetService;
         this.refreshCookieSecure = refreshCookieSecure;
     }
 
@@ -68,6 +72,34 @@ public class AuthController {
     public Map<String, Object> currentUser(Authentication authentication) {
         Long id = Long.valueOf(authentication.getName());
         return Map.of("user", authService.currentUser(id));
+    }
+
+    @PostMapping("/change-password")
+    public Map<String, Boolean> changePassword(
+            Authentication authentication,
+            @Valid @RequestBody cl.viajes.dto.ChangePasswordRequest request
+    ) {
+        return authService.changePassword(Long.valueOf(authentication.getName()), request);
+    }
+
+    @PostMapping("/forgot-password")
+    public Map<String, Boolean> forgotPassword(@Valid @RequestBody cl.viajes.dto.ForgotPasswordRequest request) {
+        passwordResetService.requestReset(request.email());
+        return Map.of("ok", true);
+    }
+
+    @PostMapping("/reset-password")
+    public Map<String, Boolean> resetPassword(@Valid @RequestBody cl.viajes.dto.ResetPasswordRequest request) {
+        passwordResetService.reset(request.token(), request.newPassword());
+        return Map.of("ok", true);
+    }
+
+    @org.springframework.web.bind.annotation.PutMapping("/me")
+    public Map<String, Object> updateProfile(
+            Authentication authentication,
+            @Valid @RequestBody cl.viajes.dto.ProfileUpdateRequest request
+    ) {
+        return Map.of("user", authService.updateProfile(Long.valueOf(authentication.getName()), request));
     }
 
     @PostMapping("/logout")

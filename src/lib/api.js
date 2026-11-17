@@ -5,14 +5,16 @@ let accessToken = null;
 let refreshPromise = null;
 globalThis.localStorage?.removeItem(LEGACY_TOKEN_KEY);
 
+const PUBLIC_AUTH = ['auth/login', 'auth/register', 'auth/google', 'auth/refresh', 'auth/forgot-password', 'auth/reset-password'];
+
 function isAuthenticationRequest(path) {
   const endpoint = path.split('?')[0].replace(/^\/+/, '');
-  return ['auth/login', 'auth/register', 'auth/google', 'auth/refresh'].includes(endpoint);
+  return PUBLIC_AUTH.includes(endpoint);
 }
 
 function shouldRefresh(path) {
   const endpoint = path.split('?')[0].replace(/^\/+/, '');
-  return !['auth/login', 'auth/register', 'auth/google', 'auth/refresh'].includes(endpoint);
+  return !PUBLIC_AUTH.includes(endpoint);
 }
 
 function saveAuth(result) {

@@ -19,6 +19,9 @@ export default function App() {
       <Route element={<SiteLayout />}>
         <Route path="/" element={<AccountPages.LoginPage />} />
         <Route path="/registro" element={<AccountPages.RegisterPage />} />
+        <Route path="/olvide-contrasena" element={<AccountPages.ForgotPasswordPage />} />
+        <Route path="/restablecer" element={<AccountPages.ResetPasswordPage />} />
+        <Route path="/perfil" element={<RoleRoute allowedRoles={['customer', 'seller', 'admin']}><AccountPages.ProfilePage /></RoleRoute>} />
         <Route path="/menu" element={<ShopPages.MenuPage />} />
         <Route path="/viajes/:slug" element={<ShopPages.TripDetailPage />} />
         <Route path="/blog" element={<InfoPages.BlogPage />} />
@@ -33,6 +36,7 @@ export default function App() {
           <Route path="usuarios" element={<AdminUsersPage />} />
           <Route path="mensajes" element={<AdminMessagesPage />} />
           <Route path="reportes" element={<ReportesPage />} />
+          <Route path="perfil" element={<AccountPages.ProfilePage />} />
         </Route>
       </Route>
       <Route element={<RoleRoute allowedRoles={['seller']} />}>

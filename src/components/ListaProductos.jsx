@@ -9,6 +9,7 @@ export default function ListaProductos() {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState(null);
 
   useEffect(() => {
     let active = true;
@@ -34,6 +35,16 @@ export default function ListaProductos() {
         <li key={product.id || product.slug || index}>
           <strong>{itemLabel(product)}</strong>
           {product.price != null && <span>{product.price}</span>}
+          <button type="button" className="button" onClick={() => setSelected(selected === product ? null : product)}>
+            {selected === product ? 'Ocultar detalle' : 'Ver detalle'}
+          </button>
+          {selected === product && <dl className="role-detail">
+            {product.destination && <><dt>Destino</dt><dd>{product.destination}</dd></>}
+            {product.type && <><dt>Tipo</dt><dd>{product.type}</dd></>}
+            {product.status && <><dt>Estado</dt><dd>{product.status}</dd></>}
+            {product.discountPercent != null && <><dt>Descuento</dt><dd>{product.discountPercent}%</dd></>}
+            {product.description && <><dt>Descripción</dt><dd>{product.description}</dd></>}
+          </dl>}
         </li>
       ))}
     </ul>

@@ -39,4 +39,13 @@ public class ApiExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("error", "Los datos entran en conflicto con un registro existente"));
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleUnexpected(Exception exception) {
+        org.slf4j.LoggerFactory.getLogger(ApiExceptionHandler.class).error("Error no controlado", exception);
+        Throwable root = exception;
+        while (root.getCause() != null) root = root.getCause();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "Error interno: " + root.getClass().getSimpleName() + " - " + root.getMessage()));
+    }
 }

@@ -54,6 +54,16 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
   INDEX idx_refresh_tokens_expires_at (expires_at)
 );
 
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT UNSIGNED NOT NULL,
+  token_hash CHAR(64) NOT NULL UNIQUE,
+  expires_at DATETIME NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_password_reset_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_password_reset_expires_at (expires_at)
+);
+
 -- --------------------------------------------------------
 -- Estructura de tabla para `contact_messages`
 -- --------------------------------------------------------
@@ -109,7 +119,8 @@ CREATE TABLE IF NOT EXISTS tickets (
 -- --------------------------------------------------------
 
 ALTER TABLE sales
-  ADD COLUMN IF NOT EXISTS status ENUM('pagada', 'parcial', 'anulada') NOT NULL DEFAULT 'pagada';
+  ADD COLUMN IF NOT EXISTS status ENUM('pagada', 'parcial', 'anulada') NOT NULL DEFAULT 'pagada',
+  ADD COLUMN IF NOT EXISTS user_id BIGINT UNSIGNED NULL;
 
 ALTER TABLE tickets
   ADD COLUMN IF NOT EXISTS status ENUM('activo', 'cancelado') NOT NULL DEFAULT 'activo',
@@ -174,7 +185,7 @@ INSERT INTO users (name, email, password_hash, telephone, region, commune, role)
 (
   'maria',
   'cote@gmail.com',
-  '$2y$10$9GfM9t/Wp97h0x6U8Y/v2.LgRzKk2R7Q8sT10v/Z.wG3B/xH7o.xG',
+  '$2b$10$qWHIozwGhm2xzB5YWSmezuCiGpduVTxw/5DI9u/kAjLl3UlQOmPs.',
   '+56987654321',
   'Región Metropolitana',
   'La Florida',

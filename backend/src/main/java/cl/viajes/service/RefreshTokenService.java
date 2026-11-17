@@ -47,7 +47,7 @@ public class RefreshTokenService {
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setUser(user);
         refreshToken.setTokenHash(hash(rawToken));
-        refreshToken.setExpiresAt(LocalDateTime.now(ZoneOffset.UTC).plusMillis(expirationMillis));
+        refreshToken.setExpiresAt(LocalDateTime.now(ZoneOffset.UTC).plus(expirationMillis, java.time.temporal.ChronoUnit.MILLIS));
         repository.save(refreshToken);
 
         return new IssuedRefreshToken(user, rawToken, expirationMillis / 1000);

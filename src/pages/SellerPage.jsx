@@ -12,7 +12,17 @@ export default function SellerPage() {
   const [ordersError, setOrdersError] = useState('');
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [logoutError, setLogoutError] = useState('');
+  const [detail, setDetail] = useState(null);
   const navigate = useNavigate();
+
+  async function toggleOrder(saleCode) {
+    if (detail?.sale_code === saleCode) return setDetail(null);
+    try {
+      setDetail(await apiRequest(`ordenes/${encodeURIComponent(saleCode)}`));
+    } catch (requestError) {
+      setOrdersError(requestError.message);
+    }
+  }
 
   useEffect(() => {
     let active = true;
@@ -44,7 +54,7 @@ export default function SellerPage() {
     <main className="role-dashboard container">
       <header className="admin-topline">
         <div><span className="eyebrow">VIAJES POR CHILE / VENDEDOR</span><h1>Panel de vendedor</h1></div>
-        <button type="button" className="button button-dark" onClick={logout}>Cerrar sesión</button>
+        <div><button type="button" className="button" onClick={() => navigate('/perfil')}>Mis datos</button> <button type="button" className="button button-dark" onClick={logout}>Cerrar sesión</button></div>
       </header>
       {logoutError && <p className="form-error" role="alert">{logoutError}</p>}
       <div className="role-dashboard-grid">
@@ -60,11 +70,19 @@ export default function SellerPage() {
                 <li key={order.id || order.sale_code || order.codigo || index}>
                   <strong>{itemLabel(order)}</strong>
                   {order.total_amount != null && <span>{order.total_amount}</span>}
+                  <button type="button" className="button" onClick={() => toggleOrder(order.sale_code)}>
+                    {detail?.sale_code === order.sale_code ? 'Ocultar detalle' : 'Ver detalle'}
+                  </button>
+                  {detail?.sale_code === order.sale_code && <ul className="role-detail">
+                    {(detail.tickets || []).map((ticket) => <li key={ticket.ticket_code || ticket.id}>
+                      {ticket.trip_title || ticket.destination} · {ticket.passenger_name} · asiento {ticket.seat_number}
+                    </li>)}
+                  </ul>}
                 </li>
               ))}</ul> : <p className="muted">No hay órdenes para mostrar.</p>}
         </section>
       </div>
-      <p className="demo-note">Este panel consulta GET /productos y GET /ordenes. El backend actual aún no expone esas rutas ni el rol vendedor.</p>
+      <p className="demo-note">Este panel consulta los productos y las órdenes registradas en el sistema.</p>
     </main>
   );
 }

@@ -47,6 +47,16 @@ public class PurchaseService {
 
     @Transactional
     public PurchaseResponse createPurchase(PurchaseRequest request) {
+        return createPurchase(request, null);
+    }
+
+    @Transactional(readOnly = true)
+    public List<OrderSummaryResponse> listMine(Long userId) {
+        return saleRepository.findOrderSummariesByUser(userId);
+    }
+
+    @Transactional
+    public PurchaseResponse createPurchase(PurchaseRequest request, Long userId) {
         List<Ticket> tickets = new ArrayList<>();
         Map<String, Set<Integer>> reservedBySchedule = new HashMap<>();
         long total = 0;
@@ -109,6 +119,7 @@ public class PurchaseService {
         Sale sale = new Sale();
         sale.setSaleCode(newCode());
         sale.setTotalAmount(total);
+        sale.setUserId(userId);
         tickets.forEach(sale::addTicket);
         saleRepository.save(sale);
         String actor = tickets.get(0).getPassengerName();

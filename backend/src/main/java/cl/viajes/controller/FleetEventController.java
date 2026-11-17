@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Flota", description = "Eventos de flota y buses (administrador)")
 @RestController
 @RequestMapping("/api/v1/fleet-events")
 public class FleetEventController {
