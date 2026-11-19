@@ -14,7 +14,7 @@ Explica que el alcance es una demostración académica, no una plataforma de cob
 
 ### 1:00–3:00 — Tecnologías y arquitectura
 
-Muestra [App.jsx](../src/App.jsx), [main.jsx](../src/main.jsx) y [vite.config.js](../vite.config.js).
+Muestra [App.jsx](../frontend/src/App.jsx), [main.jsx](../frontend/src/main.jsx) y [vite.config.js](../frontend/vite.config.js).
 
 - **React** organiza la interfaz en páginas y componentes.
 - **React Router** resuelve rutas públicas y rutas del espacio administrativo.
@@ -73,24 +73,24 @@ Resume el valor principal (descubrir y preparar una reserva con descuento), la e
 
 | Responsabilidad | Archivo para estudiar |
 |---|---|
-| Declaración de rutas | [App.jsx](../src/App.jsx) |
-| Shell público, navegación y carrito | [SiteLayout.jsx](../src/components/SiteLayout.jsx) |
-| Catálogo, búsqueda, detalle y reserva | [ShopPages.jsx](../src/pages/ShopPages.jsx) |
-| Aplicación de descuentos en la vista | [DescuentosPage.jsx](../src/pages/DescuentosPage.jsx) |
-| Estado compartido de productos | [ProductContext.jsx](../src/context/ProductContext.jsx) |
-| Carrito y almacenamiento local | [CartContext.jsx](../src/context/CartContext.jsx) |
-| Formulario de checkout y llamada de compra | [CheckoutForm.jsx](../src/components/CheckoutForm.jsx) |
-| Vista y HTML de boletos | [TicketsPage.jsx](../src/pages/TicketsPage.jsx) |
-| Operaciones del administrador | [AdminPage.jsx](../src/pages/AdminPage.jsx) |
-| Métricas ilustrativas restringidas a admin | [ReportesPage.jsx](../src/pages/ReportesPage.jsx) |
-| Acceso común a la API | [api.js](../src/lib/api.js) |
-| Rutas y precios base | [catalog.js](../src/data/catalog.js) |
+| Declaración de rutas | [App.jsx](../frontend/src/App.jsx) |
+| Shell público, navegación y carrito | [SiteLayout.jsx](../frontend/src/components/SiteLayout.jsx) |
+| Catálogo, búsqueda, detalle y reserva | [ShopPages.jsx](../frontend/src/pages/ShopPages.jsx) |
+| Aplicación de descuentos en la vista | [DescuentosPage.jsx](../frontend/src/pages/DescuentosPage.jsx) |
+| Estado compartido de productos | [ProductContext.jsx](../frontend/src/context/ProductContext.jsx) |
+| Carrito y almacenamiento local | [CartContext.jsx](../frontend/src/context/CartContext.jsx) |
+| Formulario de checkout y llamada de compra | [CheckoutForm.jsx](../frontend/src/components/CheckoutForm.jsx) |
+| Vista y HTML de boletos | [TicketsPage.jsx](../frontend/src/pages/TicketsPage.jsx) |
+| Operaciones del administrador | [AdminPage.jsx](../frontend/src/pages/AdminPage.jsx) |
+| Métricas ilustrativas restringidas a admin | [ReportesPage.jsx](../frontend/src/pages/ReportesPage.jsx) |
+| Acceso común a la API | [api.js](../frontend/src/lib/api.js) |
+| Rutas y precios base | [catalog.js](../frontend/src/data/catalog.js) |
 | Seguridad, JWT y autorización por rol | [SecurityConfig.java](../backend/src/main/java/cl/viajes/config/SecurityConfig.java) |
 | Login, registro y usuario actual | [AuthController.java](../backend/src/main/java/cl/viajes/controller/AuthController.java) y [AuthService.java](../backend/src/main/java/cl/viajes/service/AuthService.java) |
 | Productos y reglas de catálogo | [ProductController.java](../backend/src/main/java/cl/viajes/controller/ProductController.java) |
 | Persistencia de compra y emisión | [PurchaseController.java](../backend/src/main/java/cl/viajes/controller/PurchaseController.java) y [PurchaseService.java](../backend/src/main/java/cl/viajes/service/PurchaseService.java) |
 | Listado de órdenes para vendedor | [OrderController.java](../backend/src/main/java/cl/viajes/controller/OrderController.java) |
-| Rol vendedor en bases existentes | [20261116_seller_role.sql](../database/migrations/20261116_seller_role.sql) |
+| Rol vendedor en bases existentes | [20261116_seller_role.sql](../backend/database/migrations/20261116_seller_role.sql) |
 
 ## Conceptos que debes poder explicar
 

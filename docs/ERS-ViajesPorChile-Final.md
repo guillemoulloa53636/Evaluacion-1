@@ -89,10 +89,10 @@ Tablas de apoyo: `refresh_tokens`, `password_reset_tokens`, `contact_messages`, 
 
 | Indicador | Evidencia |
 |---|---|
-| Backend y base de datos | `backend/`, `database/schema.sql`, migraciones |
+| Backend y base de datos | `backend/`, `backend/database/schema.sql`, migraciones |
 | API REST y Swagger | Controladores con `/api/v1` y `/swagger-ui.html` |
-| Integración frontend y backend | `src/lib/api.js`, proxy de Vite |
+| Integración frontend y backend | `frontend/src/lib/api.js`, proxy de Vite |
 | JWT y roles | `SecurityConfig`, `JwtService`, `RefreshTokenService` |
-| Sesiones en el frontend | `src/lib/api.js` (renovación automática) y `getStoredUser` |
+| Sesiones en el frontend | `frontend/src/lib/api.js` (renovación automática) y `getStoredUser` |
 | Restricciones en el frontend | `RoleRoute`, `AdminLayout`, `SellerPage`, `SiteLayout` |
 | Documentación | `docs/` (ERS, APIs e integración, CSV de endpoints, manual de usuario) |

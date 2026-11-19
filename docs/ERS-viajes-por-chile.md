@@ -59,7 +59,7 @@ El panel `/admin/reportes` calcula sus métricas a partir de las ventas, cancela
 | RNF-04 | Seguridad básica de cuentas. | Las contraseñas se almacenan y verifican con BCrypt. Las operaciones protegidas requieren un JWT firmado y validado por la API; no se debe publicar `JWT_SECRET` ni usar la configuración `root` sin contraseña en producción. |
 | RNF-05 | Manejo de errores. | La interfaz presenta errores de API en vez de mostrar confirmaciones ficticias cuando falla una solicitud. |
 | RNF-06 | Verificabilidad. | Vitest, React Testing Library, `user-event` y jsdom permiten ejecutar pruebas unitarias y de componentes desde los scripts npm del proyecto. |
-| RNF-07 | Instalación reproducible del frontend. | Las dependencias JavaScript se restauran a partir de `package-lock.json` con `npm ci`; el backend requiere Java 17 y Maven. |
+| RNF-07 | Instalación reproducible del frontend. | Las dependencias JavaScript se restauran a partir de `frontend/package-lock.json` con `npm ci --prefix frontend`; el backend requiere Java 17 y Maven. |
 
 ## 5. Interfaces y arquitectura
 
@@ -68,7 +68,7 @@ El panel `/admin/reportes` calcula sus métricas a partir de las ventas, cancela
 
 ![Arquitectura de APIs](./diagrama-arquitectura.png)
 - **MER y arquitectura:** [diagrama-mer-arquitectura.md](./diagrama-mer-arquitectura.md).
-- **Datos:** MariaDB/MySQL, esquema `database/schema.sql` y migración de descuentos, salidas y boletos en `database/migrations/`.
+- **Datos:** MariaDB/MySQL, esquema `backend/database/schema.sql` y migración de descuentos, salidas y boletos en `backend/database/migrations/`.
 - **Persistencia de interfaz:** el carrito se almacena en `localStorage`; catálogo, usuarios, mensajes, ventas y boletos usan endpoints de la API.
 - **Configuración local de base:** `127.0.0.1:3308`, base `viajes_chile`, usuario `root`, contraseña vacía como valor por defecto local o `DB_PASSWORD` si está definida.
 
@@ -103,15 +103,15 @@ El esquema contempla productos/rutas, usuarios, mensajes de contacto, ventas y b
 3. La operación está diseñada para un ejercicio/demostración, no para cobros ni despliegue público.
 4. La compra es simulada; no hay pasarela, liquidación ni comprobante de pago financiero.
 5. Los datos de demostración de los seeds no representan actividad real; los reportes consultan los registros persistidos.
-6. El material de demostración `database/seeds/demo_trips.sql` contiene fechas fijas; si ya vencieron, se deben crear salidas futuras desde administración antes de exponer el flujo.
+6. El material de demostración `backend/database/seeds/demo_trips.sql` contiene fechas fijas; si ya vencieron, se deben crear salidas futuras desde administración antes de exponer el flujo.
 7. La cobertura de pruebas no es exhaustiva ni significa que cada función del proyecto tenga un caso. El informe asociado describe métricas, alcance y brechas.
 
 ## 8. Trazabilidad con la evaluación
 
 | Área de la pauta | Evidencia en el proyecto |
 |---|---|
-| Framework frontend | React + Vite, configuración en `package.json` y `vite.config.js`. |
+| Framework frontend | React + Vite, configuración en `frontend/package.json` y `frontend/vite.config.js`. |
 | Componentes, estado y navegación | Páginas y componentes reutilizables, estado local/contextos y rutas React Router. |
-| Adaptabilidad | Bootstrap (sistema de grilla `row`/`col-*` en el catálogo), CSS responsive y reglas media-query en `src/styles.css`. |
+| Adaptabilidad | Bootstrap (sistema de grilla `row`/`col-*` en el catálogo), CSS responsive y reglas media-query en `frontend/src/styles.css`. |
 | Pruebas | 43 casos automatizados con Vitest/React Testing Library, con mocks y spies; detalle y limitaciones en [informe de cobertura](./cobertura-de-pruebas.md). Jasmine y Karma se omiten según el alcance solicitado. |
 | Persistencia e interactividad | API Spring Boot/MariaDB con JWT, carrito, catálogo administrable, formulario de contacto y emisión de boletos. |

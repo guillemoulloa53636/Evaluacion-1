@@ -23,9 +23,9 @@
 
 ## Instalación y configuración
 
-1. **Base de datos:** crear la base `viajes_chile` y ejecutar `database/schema.sql` y las migraciones de `database/migrations`, en orden de fecha. *(Captura: consola de MariaDB con las tablas creadas.)*
+1. **Base de datos:** crear la base `viajes_chile` y ejecutar `backend/database/schema.sql` y las migraciones de `backend/database/migrations`, en orden de fecha. *(Captura: consola de MariaDB con las tablas creadas.)*
 2. **Backend:** en la carpeta `backend`, ejecutar `mvn spring-boot:run`. Queda en `http://localhost:8080`. *(Captura: consola con el mensaje de inicio.)*
-3. **Frontend:** en la raíz, ejecutar `npm install` y luego `npm run dev`. Queda en `http://localhost:5173`. *(Captura: consola de Vite.)*
+3. **Frontend:** en la raíz, ejecutar `npm ci --prefix frontend` y luego `npm run dev`. Queda en `http://localhost:5173`. *(Captura: consola de Vite.)*
 4. **Configuración inicial:** variables de entorno opcionales: `DB_URL`, `DB_USER`, `DB_PASSWORD`, `JWT_SECRET`, `GOOGLE_CLIENT_ID`, `SPRING_MAIL_HOST` (correo real para recuperar contraseña) y `REFRESH_COOKIE_SECURE=true` en producción. *(Captura: Swagger abierto en `/swagger-ui.html`.)*
 
 ## Comenzando
@@ -73,6 +73,8 @@ El vendedor no ve otras opciones: el resto del sistema está bloqueado para su r
 | Flota | Registrar y gestionar eventos de buses. |
 | Reportes | Ventas, boletos, cancelaciones y anulación de boletos. |
 | Mis datos | Entrada "Mis datos" en el menú lateral. |
+
+En **Reportes**, elige el período y los datos que quieres exportar; luego pulsa **Exportar Excel**. La opción "Todo el reporte" crea un libro con hojas de resumen, ventas, compras, boletos, cancelaciones, flota y sucesos. También puedes exportar solo una categoría; las ventas y compras, boletos y cancelaciones respetan el período seleccionado.
 
 ### Navegación por el software
 

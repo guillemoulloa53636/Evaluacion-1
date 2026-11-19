@@ -97,7 +97,7 @@ Códigos de respuesta usados: 200, 201, 400 (dato inválido), 401 (sin sesión o
 
 ### Flujo de datos
 
-1. El componente React llama a `apiRequest('ruta', opciones)` (`src/lib/api.js`).
+1. El componente React llama a `apiRequest('ruta', opciones)` (`frontend/src/lib/api.js`).
 2. `apiRequest` agrega `Authorization: Bearer <token>` y envía `fetch` a `/api/v1/...` con `credentials: include`.
 3. Vite reenvía la llamada al backend (puerto 8080).
 4. El filtro JWT valida el token, el controlador responde JSON y el frontend actualiza la interfaz.
@@ -112,7 +112,7 @@ Códigos de respuesta usados: 200, 201, 400 (dato inválido), 401 (sin sesión o
 
 ### Restricciones de acceso en el frontend
 
-`RoleRoute` (`src/components/RoleRoute.jsx`) protege las rutas por rol:
+`RoleRoute` (`frontend/src/components/RoleRoute.jsx`) protege las rutas por rol:
 
 | Ruta | Roles permitidos |
 |---|---|

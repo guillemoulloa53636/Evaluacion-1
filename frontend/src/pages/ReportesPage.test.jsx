@@ -1,11 +1,13 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import ReportesPage from './ReportesPage.jsx';
 import { apiRequest } from '../lib/api.js';
+import { exportReportToExcel } from './reportExcel.js';
 
 vi.mock('../lib/api.js', () => ({ apiRequest: vi.fn() }));
+vi.mock('./reportExcel.js', () => ({ exportReportToExcel: vi.fn() }));
 
 const report = {
   period: 'day',
@@ -21,7 +23,10 @@ const report = {
 
 describe('ReportesPage', () => {
   beforeEach(() => {
-    apiRequest.mockImplementation(async (path) => (path.startsWith('auth/me') ? { user: { role: 'admin' } } : report));
+    apiRequest.mockImplementation(async (path) => {
+      if (path.startsWith('auth/me')) return { user: { role: 'admin' } };
+      return { ...report, period: new URLSearchParams(path.split('?')[1]).get('period') || 'day' };
+    });
   });
 
   afterEach(() => {
@@ -50,6 +55,19 @@ describe('ReportesPage', () => {
     await user.selectOptions(screen.getByLabelText('Período del reporte'), 'week');
 
     expect(apiRequest).toHaveBeenCalledWith('reports?period=week');
+  });
+
+  it('exporta el reporte con el período y filtro seleccionados', async () => {
+    const user = userEvent.setup();
+    render(<MemoryRouter><ReportesPage /></MemoryRouter>);
+
+    await screen.findByRole('heading', { name: 'Detalle de compras' });
+    await user.selectOptions(screen.getByLabelText('Período del reporte'), 'month');
+    await waitFor(() => expect(screen.getByRole('button', { name: /Exportar Excel/i })).toBeEnabled());
+    await user.selectOptions(screen.getByLabelText('Datos a exportar'), 'cancellations');
+    await user.click(screen.getByRole('button', { name: /Exportar Excel/i }));
+
+    expect(exportReportToExcel).toHaveBeenCalledWith({ ...report, period: 'month' }, 'cancellations');
   });
 
   it('cambia el estado de un bus a reparado', async () => {

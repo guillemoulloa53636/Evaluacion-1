@@ -17,11 +17,22 @@ const periods = [
   ['year', 'Este Año']
 ];
 
+const exportFilters = [
+  ['all', 'Todo el reporte'],
+  ['sales', 'Ventas y compras'],
+  ['purchases', 'Compras'],
+  ['tickets', 'Boletos'],
+  ['cancellations', 'Cancelaciones'],
+  ['fleet', 'Flota'],
+  ['activity', 'Registro de sucesos']
+];
+
 const SALE_STATUS = { pagada: 'Pagada', parcial: 'Cancelada parcial', anulada: 'Anulada' };
 const formatDate = (value) => (value ? new Date(value.replace(' ', 'T')).toLocaleString('es-CL') : '—');
 
 export default function ReportesPage() {
   const [period, setPeriod] = useState('day');
+  const [exportFilter, setExportFilter] = useState('all');
   const [access, setAccess] = useState('checking');
   const [accessError, setAccessError] = useState('');
   const [report, setReport] = useState(null);
@@ -83,6 +94,15 @@ export default function ReportesPage() {
     const reason = window.prompt('Motivo de la cancelación (opcional):') ?? '';
     return run(() => apiRequest('sales/cancellations', { method: 'POST', body: JSON.stringify({ ...payload, reason }) }));
   };
+  const handleExport = async () => {
+    try {
+      const { exportReportToExcel } = await import('./reportExcel.js');
+      exportReportToExcel(report, exportFilter);
+      setError('');
+    } catch (exportError) {
+      setError(`No se pudo exportar el reporte: ${exportError.message}`);
+    }
+  };
 
   if (access === 'checking') return <div className="admin-content"><p className="muted" role="status">Verificando sesión de administrador…</p></div>;
   if (access === 'denied') return <Navigate to="/" replace />;
@@ -106,12 +126,24 @@ export default function ReportesPage() {
           <span className="eyebrow">GESTIÓN / REPORTES</span>
           <h1>Reportes de operación</h1>
         </div>
-        <label className="report-period">
-          Período del reporte
-          <select value={period} onChange={(event) => setPeriod(event.target.value)}>
-            {periods.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-          </select>
-        </label>
+        <div className="report-controls">
+          <label className="report-period">
+            Período del reporte
+            <select value={period} onChange={(event) => setPeriod(event.target.value)}>
+              {periods.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+            </select>
+          </label>
+          <label className="report-period">
+            Datos a exportar
+            <select value={exportFilter} onChange={(event) => setExportFilter(event.target.value)}>
+              {exportFilters.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+            </select>
+          </label>
+          <button type="button" className="button button-dark report-export" onClick={handleExport}
+            disabled={loading || !report || report.period !== period}>
+            <i className="bi bi-file-earmark-spreadsheet" aria-hidden="true" /> Exportar Excel
+          </button>
+        </div>
       </header>
 
       {error && <p className="form-error" role="alert">{error}</p>}

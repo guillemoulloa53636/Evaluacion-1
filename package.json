@@ -1,33 +1,11 @@
 {
   "name": "viajes-por-chile",
   "private": true,
-  "version": "1.0.0",
-  "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "test": "vitest",
-    "coverage": "vitest run --coverage"
-  },
-  "dependencies": {
-    "bootstrap": "^5.3.8",
-    "bootstrap-icons": "^1.11.3",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-router-dom": "^6.30.1"
-  },
-  "devDependencies": {
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.3",
-    "@testing-library/user-event": "^14.6.1",
-    "@vitest/coverage-v8": "^5.0.3",
-    "@vitejs/plugin-react": "^5.0.4",
-    "jsdom": "^30.1.2",
-    "vite": "^7.1.7",
-    "vitest": "^5.0.3"
-  },
-  "allowScripts": {
-    "esbuild@0.28.2": true
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "preview": "npm --prefix frontend run preview",
+    "test": "npm --prefix frontend run test --",
+    "coverage": "npm --prefix frontend run coverage"
   }
 }

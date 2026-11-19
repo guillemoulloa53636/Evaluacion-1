@@ -42,16 +42,16 @@ La configuración de Vitest/RTL usa `jsdom`. Los tests de interfaz no requieren 
 
 | Módulo | Líneas | Funciones | Nota |
 |---|---:|---:|---|
-| `src/data/catalog.js` | 100% | 100% | Reglas de tarifa y formateo cubiertas. |
-| `src/lib/api.js` | 100% | 100% | Solicitudes correctas y condiciones de error cubiertas. |
-| `src/context/ProductContext.jsx` | 100% | 100% | Carga, CRUD, error y uso del hook cubiertos. |
-| `src/pages/DescuentosPage.jsx` | 100% | 100% | Presentación/ofertas y cálculo cubiertos. |
-| `src/pages/ReportesPage.jsx` | 87,5% | 90% | Vista/período principal cubiertos; aún hay ramas de estado por probar. |
-| `src/pages/AccountPages.jsx` | 97,82% | 100% | Acceso, registro y contacto; queda al menos una línea sin ejecutar. |
-| `src/pages/AdminPage.jsx` | 62,16% | 44,44% | Persisten formularios y caminos de CRUD por cubrir. |
-| `src/components/SiteLayout.jsx` | 56,52% | 37,5% | El drawer y parte de la navegación/checkout necesitan más casos. |
-| `src/context/CartContext.jsx` | 80,95% | 57,14% | Faltan algunas combinaciones de almacenamiento y mutaciones. |
-| `src/pages/TicketsPage.jsx` | 70,37% | 84,61% | Vista/HTML/error cubiertos; aún falta ejercitar toda la acción de descarga/impresión. |
+| `frontend/src/data/catalog.js` | 100% | 100% | Reglas de tarifa y formateo cubiertas. |
+| `frontend/src/lib/api.js` | 100% | 100% | Solicitudes correctas y condiciones de error cubiertas. |
+| `frontend/src/context/ProductContext.jsx` | 100% | 100% | Carga, CRUD, error y uso del hook cubiertos. |
+| `frontend/src/pages/DescuentosPage.jsx` | 100% | 100% | Presentación/ofertas y cálculo cubiertos. |
+| `frontend/src/pages/ReportesPage.jsx` | 87,5% | 90% | Vista/período principal cubiertos; aún hay ramas de estado por probar. |
+| `frontend/src/pages/AccountPages.jsx` | 97,82% | 100% | Acceso, registro y contacto; queda al menos una línea sin ejecutar. |
+| `frontend/src/pages/AdminPage.jsx` | 62,16% | 44,44% | Persisten formularios y caminos de CRUD por cubrir. |
+| `frontend/src/components/SiteLayout.jsx` | 56,52% | 37,5% | El drawer y parte de la navegación/checkout necesitan más casos. |
+| `frontend/src/context/CartContext.jsx` | 80,95% | 57,14% | Faltan algunas combinaciones de almacenamiento y mutaciones. |
+| `frontend/src/pages/TicketsPage.jsx` | 70,37% | 84,61% | Vista/HTML/error cubiertos; aún falta ejercitar toda la acción de descarga/impresión. |
 
 La tabla refleja porcentajes de líneas y funciones por archivo presentados por Vitest/V8. Para todas las métricas y ramas, vuelve a ejecutar `npm run coverage`.
 
@@ -75,7 +75,7 @@ Por lo tanto, el resultado acredita pruebas unitarias/de componentes y build, no
 ## Repetir la validación
 
 ```powershell
-npm ci
+npm ci --prefix frontend
 npm test -- --run
 npm test -- --run src/pages/DescuentosPage.test.jsx
 npm test -- --run src/pages/ReportesPage.test.jsx
@@ -83,4 +83,4 @@ npm run coverage
 npm run build
 ```
 
-Vitest genera la salida navegable dentro de `coverage/`; ese directorio se excluye de Git para no versionar artefactos generados.
+Vitest genera la salida navegable dentro de `frontend/coverage/`; ese directorio se excluye de Git para no versionar artefactos generados.
